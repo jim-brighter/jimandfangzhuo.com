@@ -8,6 +8,6 @@ const ddb = new aws.DynamoDB.DocumentClient({
 exports.handler = async event => {
     return {
         statusCode: 200,
-        body: 'hello from the events handler'
+        body: `Hello from events lambda to your ${event.httpMethod} request\nYou asked for ${event.queryStringParameters.type}`
     }
 };

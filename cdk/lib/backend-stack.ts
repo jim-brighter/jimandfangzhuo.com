@@ -92,10 +92,13 @@ export class PlannerBackend extends Stack {
       }
     });
 
+    const eventsLambdaIntegration = new apigw.LambdaIntegration(eventsLambda);
+
     const api = restApi.root.addResource('api');
 
     const eventsApi = api.addResource('events');
-    eventsApi.addMethod('GET', new apigw.LambdaIntegration(eventsLambda));
+    eventsApi.addMethod('GET', eventsLambdaIntegration);
+    eventsApi.addMethod('POST', eventsLambdaIntegration);
 
     //Route53 Mapping
 
