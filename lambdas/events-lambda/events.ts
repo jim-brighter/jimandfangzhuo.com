@@ -1,4 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { Event, validateEvent } from './event';
 
 export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     switch(event.httpMethod) {
@@ -12,7 +13,14 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
 
             }
             else {
-                event.body && console.log(JSON.parse(event.body));
+                const body: Event = event.body && JSON.parse(event.body);
+                if (!validateEvent(body)) {
+                    return {
+                        statusCode: 400,
+                        body: 'Invalid event'
+                    }
+                }
+                console.log(body);
             }
             break;
         default:

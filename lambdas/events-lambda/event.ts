@@ -6,3 +6,11 @@ export interface Event {
     eventStatus: 'TO_DO' | 'COMPLETE' | 'DELETED';
     createdTime: Date;
 }
+
+export const validateEvent = (event: Event): boolean => {
+
+    return event.title != undefined && event.title != null
+    && event.description != undefined && event.description != null
+    && event.eventType != undefined && event.eventType != null
+    && event.eventStatus != undefined && event.eventStatus != null;
+}
