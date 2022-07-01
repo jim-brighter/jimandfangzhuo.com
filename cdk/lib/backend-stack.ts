@@ -73,8 +73,10 @@ export class PlannerBackend extends Stack {
     const eventsLambda = new lambda.Function(this, 'EventsHandler', {
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: 'events.handler',
-      code: lambda.Code.fromAsset(path.join('..', 'events-lambda')),
-      environment: {},
+      code: lambda.Code.fromAsset(path.join('..', 'lambdas', 'events-lambda', 'events.zip')),
+      environment: {
+        EVENTS_TABLE: eventsTable.tableName
+      },
       logRetention: logs.RetentionDays.ONE_MONTH
     });
 
