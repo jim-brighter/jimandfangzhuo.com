@@ -103,7 +103,4 @@ dist
 # TernJS port file
 .tern-port
 
-lambdas/**/*.js
-lambdas/**/*.zip
-
 .DS_Store
