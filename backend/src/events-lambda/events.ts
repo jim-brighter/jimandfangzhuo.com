@@ -5,7 +5,20 @@ import * as eventService from './event-service';
 export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     switch(event.httpMethod) {
         case 'GET':
-            break;
+            try {
+                const allEvents: Event[] =  await eventService.getAllEvents();
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify(allEvents)
+                }
+            } catch(e) {
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({
+                        errorMessage: `Error retrieving all events`
+                    })
+                }
+            }
         case 'POST':
             if (event.path.endsWith('/delete')) {
 
@@ -18,6 +31,10 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                 if (eventContent.validate()) {
                     try {
                         eventContent = await eventService.createEvent(eventContent);
+                        return {
+                            statusCode: 201,
+                            body: JSON.stringify(eventContent)
+                        }
                     } catch (e) {
                         return {
                             statusCode: 500,
@@ -25,10 +42,6 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                                 errorMessage: `Error creating event with title ${eventContent.title}`
                             })
                         }
-                    }
-                    return {
-                        statusCode: 201,
-                        body: JSON.stringify(eventContent)
                     }
                 }
                 else {

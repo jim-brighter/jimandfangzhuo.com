@@ -27,6 +27,20 @@ const createEvent = async (event: Event): Promise<Event> => {
     return event;
 }
 
+const getAllEvents = async (): Promise<Array<Event>> => {
+    try {
+        const allEvents = await ddb.scan({
+            TableName: eventsTable
+        }).promise();
+
+        return allEvents.Items ? allEvents.Items.map(i => i as Event) : [];
+    } catch(e) {
+        console.error(`Failed to retrieve all events`, e);
+        throw e;
+    }
+}
+
 export {
-    createEvent
+    createEvent,
+    getAllEvents
 }
