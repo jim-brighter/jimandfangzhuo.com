@@ -6,12 +6,13 @@ interface IEvent {
     eventStatus: 'TO_DO' | 'COMPLETE' | 'DELETED';
     createdTime: number | null;
 
-    validate(): boolean;
+    validateNewEvent(): boolean;
+    validateUpdateEvent(): boolean;
 }
 
 export type Event = IEvent;
 
-const validTypes = [
+export const validTypes = [
     'TO_DO',
     'TO_EAT',
     'TO_COOK',
@@ -20,7 +21,7 @@ const validTypes = [
     'TO_BUY'
 ];
 
-const validStatuses = [
+export const validStatuses = [
     'TO_DO',
     'COMPLETE',
     'DELETED'
@@ -43,9 +44,15 @@ export class PlannerEvent implements Event {
         this.createdTime = json.createdTime || null;
     }
 
-    validate(): boolean {
+    validateNewEvent(): boolean {
         return this.title != undefined && this.title != null
         && this.description != undefined && this.description != null
         && this.eventType != undefined && this.eventType != null && validTypes.includes(this.eventType);
+    }
+
+    validateUpdateEvent(): boolean {
+        return this.title != undefined && this.title != null
+        && this.description != undefined && this.description != null
+        && this.eventStatus != undefined && this.eventStatus != null && validStatuses.includes(this.eventStatus);
     }
 }

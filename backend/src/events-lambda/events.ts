@@ -39,7 +39,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             }
         case 'POST':
             let eventContent: Event = new PlannerEvent(event.body && JSON.parse(event.body));
-            if (eventContent.validate()) {
+            if (eventContent.validateNewEvent()) {
                 try {
                     eventContent = await eventService.createEvent(eventContent);
                     return {
@@ -60,6 +60,38 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                     statusCode: 400,
                     body: JSON.stringify({
                         errorMessage: 'Invalid event'
+                    })
+                }
+            }
+        case 'PUT':
+            const eventsContents: Event[] = event.body && JSON.parse(event.body).map((i: any) => {
+                return new PlannerEvent(i);
+            });
+
+            for (let updateEvent of eventsContents) {
+                if (!updateEvent.validateUpdateEvent()) {
+                    return {
+                        statusCode: 400,
+                        body: JSON.stringify({
+                            errorMessage: `Invalid event with id ${updateEvent.eventId}`
+                        })
+                    }
+                }
+            }
+
+            try {
+                await eventService.updateEvents(eventsContents);
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        message: 'Success'
+                    })
+                }
+            } catch(e) {
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({
+                        errorMessage: `Error updating events`
                     })
                 }
             }
