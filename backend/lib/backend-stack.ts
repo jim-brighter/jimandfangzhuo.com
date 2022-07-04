@@ -10,6 +10,8 @@ import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as path from 'path';
 
+const EVENT_TYPE_INDEX = 'EventsTypeIndex';
+
 export class BackendStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
@@ -27,7 +29,7 @@ export class BackendStack extends Stack {
     });
 
     eventsTable.addGlobalSecondaryIndex({
-      indexName: 'EventsTypeIndex',
+      indexName: EVENT_TYPE_INDEX,
       partitionKey: {
         name: 'eventType',
         type: ddb.AttributeType.STRING
@@ -84,7 +86,8 @@ export class BackendStack extends Stack {
         ]
       },
       environment: {
-        EVENTS_TABLE: eventsTable.tableName
+        EVENTS_TABLE: eventsTable.tableName,
+        EVENT_TYPE_INDEX
       },
       logRetention: logs.RetentionDays.ONE_MONTH
     });
@@ -109,6 +112,9 @@ export class BackendStack extends Stack {
     const eventsApi = api.addResource('events');
     eventsApi.addMethod('GET', eventsLambdaIntegration);
     eventsApi.addMethod('POST', eventsLambdaIntegration);
+
+    const eventsTypeApi = eventsApi.addResource('{eventType}');
+    eventsTypeApi.addMethod('GET', eventsLambdaIntegration);
 
     // ROUTE53 MAPPING
     const apiRecord = new route53.ARecord(this, 'ApiRecord', {
