@@ -112,6 +112,7 @@ export class BackendStack extends Stack {
     const eventsApi = api.addResource('events');
     eventsApi.addMethod('GET', eventsLambdaIntegration);
     eventsApi.addMethod('POST', eventsLambdaIntegration);
+    eventsApi.addMethod('PUT', eventsLambdaIntegration);
 
     const eventsTypeApi = eventsApi.addResource('{eventType}');
     eventsTypeApi.addMethod('GET', eventsLambdaIntegration);

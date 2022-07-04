@@ -59,8 +59,33 @@ const getEventsByType = async (eventType: string): Promise<Array<Event>> => {
     }
 }
 
+const updateEvents = async (events: Event[]) => {
+    try {
+        const updates = events.map(async (event) => {
+            await ddb.update({
+                TableName: eventsTable,
+                Key: {
+                    eventId: event.eventId
+                },
+                UpdateExpression: 'set eventStatus = :eventStatus, description = :description, title = :title',
+                ExpressionAttributeValues: {
+                    ':eventStatus': event.eventStatus,
+                    ':description': event.description,
+                    ':title': event.title
+                }
+            }).promise();
+        });
+
+        await Promise.all(updates);
+    } catch(e) {
+        console.error(`Failed to update events`, e);
+        throw e;
+    }
+}
+
 export {
     createEvent,
     getAllEvents,
-    getEventsByType
+    getEventsByType,
+    updateEvents
 }
