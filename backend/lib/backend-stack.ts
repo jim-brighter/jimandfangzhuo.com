@@ -99,7 +99,7 @@ export class BackendStack extends Stack {
       handler: defaultErrorLambda,
       proxy: false,
       domainName: {
-        certificate: certmanager.Certificate.fromCertificateArn(this, 'AcmCert', 'arn:aws:acm:us-east-1:108929950724:certificate/820d277d-5890-4be7-9ce7-c3a22328e9c7'),
+        certificate: certmanager.Certificate.fromCertificateArn(this, 'AcmCert', 'arn:aws:acm:us-east-1:108929950724:certificate/f312d8ad-09ce-440a-807c-a4bc46cb0dd0'),
         domainName: 'api.jimandfangzhuo.com',
         securityPolicy: apigw.SecurityPolicy.TLS_1_2
       }

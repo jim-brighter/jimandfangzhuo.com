@@ -1,0 +1,30 @@
+{
+  "name": "frontend",
+  "version": "0.1.0",
+  "bin": {
+    "frontend": "bin/frontend.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk",
+    "deploy:frontend": "cdk deploy PlannerFrontend --require-approval never --outputs-file frontend-outputs.json",
+    "destroy:frontend": "cdk destroy PlannerFrontend -f"
+  },
+  "devDependencies": {
+    "@types/jest": "^28.1.4",
+    "@types/node": "18.0.1",
+    "@types/prettier": "2.6.3",
+    "jest": "^28.1.2",
+    "ts-jest": "^28.0.5",
+    "aws-cdk": "2.30.0",
+    "ts-node": "^10.8.2",
+    "typescript": "~4.7.4"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.30.0",
+    "constructs": "^10.1.43",
+    "source-map-support": "^0.5.21"
+  }
+}
