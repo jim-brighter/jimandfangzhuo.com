@@ -95,6 +95,24 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                     })
                 }
             }
+        case 'DELETE':
+            try {
+                const eventsToDelete = event.body && JSON.parse(event.body);
+                await eventService.deleteEvents(eventsToDelete);
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({
+                        message: 'Success'
+                    })
+                }
+            } catch(e) {
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({
+                        errorMessage: `Error deleting events`
+                    })
+                }
+            }
         default:
             return {
                 statusCode: 405,
