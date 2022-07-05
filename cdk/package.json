@@ -12,7 +12,9 @@
     "deploy:hostedzone": "cdk deploy PlannerHostedZone --require-approval never --outputs-file hosted-zone-outputs.json",
     "destroy:hostedzone": "cdk destroy PlannerHostedZone -f",
     "deploy:backend": "cdk deploy PlannerBackend --require-approval never --outputs-file backend-outputs.json",
-    "destroy:backend": "cdk destroy PlannerBackend -f"
+    "destroy:backend": "cdk destroy PlannerBackend -f",
+    "deploy:frontend": "cdk deploy PlannerFrontend --require-approval never --outputs-file frontend-outputs.json",
+    "destroy:frontend": "cdk destroy PlannerFrontend -f"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.101",
