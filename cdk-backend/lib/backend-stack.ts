@@ -78,7 +78,7 @@ export class BackendStack extends Stack {
     const eventsLambda = new nodejslambda.NodejsFunction(this, 'EventsHandler', {
       runtime: lambda.Runtime.NODEJS_16_X,
       handler: 'handler',
-      entry: path.join(__dirname, '/../src/events-lambda/events.ts'),
+      entry: path.join(__dirname, '/../../lambdas/events-lambda/events.ts'),
       bundling: {
         minify: true,
         externalModules: [
