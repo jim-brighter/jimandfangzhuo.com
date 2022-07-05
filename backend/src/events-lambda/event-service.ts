@@ -47,9 +47,11 @@ const getEventsByType = async (eventType: string): Promise<Array<Event>> => {
             TableName: eventsTable,
             IndexName: eventTypeIndex,
             ExpressionAttributeValues: {
-                ':eventType': eventType
+                ':eventType': eventType,
+                ':deleted': 'DELETED'
             },
-            KeyConditionExpression: 'eventType = :eventType'
+            KeyConditionExpression: 'eventType = :eventType',
+            FilterExpression: 'eventStatus <> :deleted'
         }).promise();
 
         return eventsByType.Items ? eventsByType.Items.map(i => i as Event) : [];
@@ -83,9 +85,32 @@ const updateEvents = async (events: Event[]) => {
     }
 }
 
+const deleteEvents = async (eventIds: string[]) => {
+    try {
+        const deletes = eventIds.map(async (id) => {
+            await ddb.update({
+                TableName: eventsTable,
+                Key: {
+                    eventId: id
+                },
+                UpdateExpression: 'set eventStatus = :eventStatus',
+                ExpressionAttributeValues: {
+                    ':eventStatus': 'DELETED'
+                }
+            }).promise();
+        });
+
+        await Promise.all(deletes);
+    } catch(e) {
+        console.error(`Failed to delete events`, e);
+        throw e;
+    }
+}
+
 export {
     createEvent,
     getAllEvents,
     getEventsByType,
-    updateEvents
+    updateEvents,
+    deleteEvents
 }
