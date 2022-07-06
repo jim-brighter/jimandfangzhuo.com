@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { FrontendStack } from '../lib/frontend-stack';
-import { BackendStack } from '../lib/backend-stack';
-import { HostedZoneStack } from '../lib/hosted-zone-stack';
+import { FrontendStack } from './frontend-stack';
+import { BackendStack } from './backend-stack';
+import { HostedZoneStack } from './hosted-zone-stack';
 
 const app = new cdk.App();
 
