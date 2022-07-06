@@ -33,7 +33,7 @@ export class FrontendStack extends Stack {
     });
 
     const frontendDeployment = new s3deployment.BucketDeployment(this, 'PlannerFrontendDeployment', {
-      sources: [s3deployment.Source.asset('./dist')],
+      sources: [s3deployment.Source.asset('./build')],
       destinationBucket: frontendRootBucket
     });
 
