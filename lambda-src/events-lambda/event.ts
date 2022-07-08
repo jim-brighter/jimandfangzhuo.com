@@ -46,13 +46,11 @@ export class PlannerEvent implements Event {
 
     validateNewEvent(): boolean {
         return this.title != undefined && this.title != null
-        && this.description != undefined && this.description != null
         && this.eventType != undefined && this.eventType != null && validTypes.includes(this.eventType);
     }
 
     validateUpdateEvent(): boolean {
         return this.title != undefined && this.title != null
-        && this.description != undefined && this.description != null
         && this.eventStatus != undefined && this.eventStatus != null && validStatuses.includes(this.eventStatus);
     }
 }

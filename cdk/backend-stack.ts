@@ -110,12 +110,20 @@ export class BackendStack extends Stack {
     const api = restApi.root.addResource('api');
 
     const eventsApi = api.addResource('events');
+    eventsApi.addCorsPreflight({
+      allowOrigins: ['*'],
+      allowHeaders: ['*']
+    });
     eventsApi.addMethod('GET', eventsLambdaIntegration);
     eventsApi.addMethod('POST', eventsLambdaIntegration);
     eventsApi.addMethod('PUT', eventsLambdaIntegration);
     eventsApi.addMethod('DELETE', eventsLambdaIntegration);
 
     const eventsTypeApi = eventsApi.addResource('{eventType}');
+    eventsTypeApi.addCorsPreflight({
+      allowOrigins: ['*'],
+      allowHeaders: ['*']
+    });
     eventsTypeApi.addMethod('GET', eventsLambdaIntegration);
 
     // ROUTE53 MAPPING

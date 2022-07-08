@@ -3,6 +3,11 @@ import { Event, PlannerEvent } from './event';
 import * as eventService from './event-service';
 
 export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    const headers = {
+        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS'
+    };
     switch(event.httpMethod) {
         case 'GET':
             if (event.pathParameters && event.pathParameters.eventType) {
@@ -10,11 +15,13 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                     const eventsByType: Event[] = await eventService.getEventsByType(event.pathParameters.eventType);
                     return {
                         statusCode: 200,
+                        headers,
                         body: JSON.stringify(eventsByType)
                     }
                 } catch(e) {
                     return {
                         statusCode: 500,
+                        headers,
                         body: JSON.stringify({
                             errorMessage: `Error retrieving events with type ${event.pathParameters.eventType}`
                         })
@@ -26,11 +33,13 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                     const allEvents: Event[] =  await eventService.getAllEvents();
                     return {
                         statusCode: 200,
+                        headers,
                         body: JSON.stringify(allEvents)
                     }
                 } catch(e) {
                     return {
                         statusCode: 500,
+                        headers,
                         body: JSON.stringify({
                             errorMessage: `Error retrieving all events`
                         })
@@ -44,11 +53,13 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                     eventContent = await eventService.createEvent(eventContent);
                     return {
                         statusCode: 201,
+                        headers,
                         body: JSON.stringify(eventContent)
                     }
                 } catch (e) {
                     return {
                         statusCode: 500,
+                        headers,
                         body: JSON.stringify({
                             errorMessage: `Error creating event with title ${eventContent.title}`
                         })
@@ -58,6 +69,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             else {
                 return {
                     statusCode: 400,
+                    headers,
                     body: JSON.stringify({
                         errorMessage: 'Invalid event'
                     })
@@ -72,6 +84,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                 if (!updateEvent.validateUpdateEvent()) {
                     return {
                         statusCode: 400,
+                        headers,
                         body: JSON.stringify({
                             errorMessage: `Invalid event with id ${updateEvent.eventId}`
                         })
@@ -83,6 +96,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                 await eventService.updateEvents(eventsContents);
                 return {
                     statusCode: 200,
+                    headers,
                     body: JSON.stringify({
                         message: 'Success'
                     })
@@ -90,6 +104,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             } catch(e) {
                 return {
                     statusCode: 500,
+                    headers,
                     body: JSON.stringify({
                         errorMessage: `Error updating events`
                     })
@@ -101,6 +116,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                 await eventService.deleteEvents(eventsToDelete);
                 return {
                     statusCode: 200,
+                    headers,
                     body: JSON.stringify({
                         message: 'Success'
                     })
@@ -108,6 +124,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             } catch(e) {
                 return {
                     statusCode: 500,
+                    headers,
                     body: JSON.stringify({
                         errorMessage: `Error deleting events`
                     })
@@ -116,6 +133,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         default:
             return {
                 statusCode: 405,
+                headers,
                 body: JSON.stringify({
                     errorMessage: 'Operation not supported'
                 })
