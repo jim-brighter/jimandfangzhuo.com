@@ -1,0 +1,49 @@
+.custom-image {
+    width: 200px;
+    position: relative;
+}
+
+.custom-image:hover {
+    cursor: pointer;
+}
+
+.custom-image>img {
+    width: 100%;
+    box-shadow: 0px 0px 4px -1px #444444;
+    z-index: 0;
+}
+
+.rotate0 {
+    transform: rotate(0deg)
+}
+
+.rotate90 {
+    transform: rotate(90deg)
+}
+
+.rotate180 {
+    transform: rotate(180deg)
+}
+
+.rotate270 {
+    transform: rotate(270deg)
+}
+
+.rotate-icon, .rotate-icon-modal {
+    color: whitesmoke;
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    z-index: 1;
+    opacity: 0.5;
+}
+
+.rotate-icon-modal {
+    top: 20px;
+    right: 20px;
+}
+
+.rotate-icon:hover, .rotate-icon-modal:hover {
+    opacity: 1;
+    cursor: pointer;
+}

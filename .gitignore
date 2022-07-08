@@ -117,3 +117,7 @@ cdk.out
 *-outputs.json
 
 build/
+
+dist/
+
+.angular/

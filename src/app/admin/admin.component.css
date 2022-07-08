@@ -1,0 +1,7 @@
+tr {
+    cursor: pointer;
+}
+
+.prewrapped {
+    white-space: pre-wrap;
+}

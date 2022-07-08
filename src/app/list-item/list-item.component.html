@@ -1,0 +1,25 @@
+<div class="row align-items-start" (mouseenter)="showButtons = true" (mouseleave)="showButtons = false">
+  <div class="col-9 d-inline-block">
+    <h6 *ngIf="!this.editing">{{plannerEvent.title}}</h6>
+    <p *ngIf="!this.editing" class="prewrapped">{{plannerEvent.description}}</p>
+    <form *ngIf="this.editing">
+      <div class="input-group pt-3">
+        <input [(ngModel)]="plannerEvent.title" type="text" autocomplete="off" class="form-control form-control-sm" name="edit-event-title" placeholder="Edit Event Title"/>
+      </div>
+      <div class="input-group pt-3" *ngIf="plannerEvent.title">
+        <textarea [(ngModel)]="plannerEvent.description" autocomplete="off" class="form-control form-control-sm" rows="2" name="edit-event-desc" placeholder="Edit Event Description"></textarea>
+      </div>
+      <div class="input-group pt-3">
+        <button *ngIf="plannerEvent.title" (click)="saveEvent()" class="btn btn-outline-primary">Save</button>
+      </div>
+    </form>
+  </div>
+  <div class="col-3 d-inline-block">
+    <button type="button" title="Edit" class="btn btn-outline-primary btn-sm me-2" [hidden]="!showButtons" (click)="editItem()"><fa-icon [icon]="faEdit"></fa-icon></button>
+    <button type="button" title="{{updateTitle}}" class="btn btn-outline-success btn-sm me-2" [hidden]="!showButtons" (click)="updateItem()">
+      <fa-icon *ngIf="updateAction === 'faCheck'" [icon]="faCheck"></fa-icon>
+      <fa-icon *ngIf="updateAction === 'faRedo'" [icon]="faRedo"></fa-icon>
+    </button>
+    <button type="button" title="Delete" class="btn btn-outline-danger btn-sm" [hidden]="!showButtons" (click)="deleteItem()"><fa-icon [icon]="faTrash"></fa-icon></button>
+  </div>
+</div>
