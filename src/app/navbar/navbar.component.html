@@ -1,0 +1,49 @@
+<ul class="container-fluid list-inline d-none d-md-inline-block d-md-flex justify-content-center text-center">
+  <li class="list-inline-item">
+    <h5 class="d-flex justify-content-center">
+      <a class="btn" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-do">Doing!</a>
+    </h5>
+  </li>
+  <li class="list-inline-item">
+    <h5 class="d-flex justify-content-center">
+      <a class="btn" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-eat">Eating!</a>
+    </h5>
+  </li>
+  <li class="list-inline-item">
+    <h5 class="d-flex justify-content-center">
+      <a class="btn" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-cook">Cooking!</a>
+    </h5>
+  </li>
+  <li class="list-inline-item">
+    <h5 class="d-flex justify-content-center">
+      <a class="btn" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-go">Going!</a>
+    </h5>
+  </li>
+  <li class="list-inline-item">
+    <h5 class="d-flex justify-content-center">
+      <a class="btn" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-watch">Watching!</a>
+    </h5>
+  </li>
+  <li class="list-inline-item">
+    <h5 class="d-flex justify-content-center">
+      <a class="btn" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-buy">Buying!</a>
+    </h5>
+  </li>
+  <li class="list-inline-item">
+    <h5 class="d-flex justify-content-center">
+      <a class="btn" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/photos">Photos!</a>
+    </h5>
+  </li>
+</ul>
+<div class="dropdown show d-inline-block d-md-none w-100">
+  <button class="btn dropdown-toggle w-100 mb-2" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" type="button" id="dropdownLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Choose A Page!</button>
+  <div class="dropdown-menu" aria-labelledby="dropdownLink">
+      <a class="dropdown-item" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-do">Doing!</a>
+      <a class="dropdown-item" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-eat">Eating!</a>
+      <a class="dropdown-item" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-cook">Cooking!</a>
+      <a class="dropdown-item" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-go">Going!</a>
+      <a class="dropdown-item" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-watch">Watching!</a>
+      <a class="dropdown-item" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/details/to-buy">Buying!</a>
+      <a class="dropdown-item" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="/photos">Photos!</a>
+  </div>
+</div>

@@ -1,0 +1,19 @@
+#background-wrapper {
+    background: black;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: -1;
+}
+
+#background {
+    background-image: url("/assets/background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.4;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    z-index: 0;
+}

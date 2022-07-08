@@ -1,13 +1,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "target": "ES2018",
-    "module": "CommonJS",
+    "target": "ES2015",
+    "module": "es2020",
     "lib": [
-      "es2018",
-      "dom",
-      "dom.iterable",
-      "esnext"
+      "es2017",
+      "dom"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -22,8 +20,8 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "declaration": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "noImplicitThis": true,
     "alwaysStrict": true,
     "noUnusedLocals": false,
@@ -40,7 +38,6 @@
     "downlevelIteration": true,
     "importHelpers": true,
     "outDir": "./dist/out-tsc",
-    "sourceMap": true,
     "emitDecoratorMetadata": true
   },
   "exclude": [

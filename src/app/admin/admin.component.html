@@ -1,0 +1,38 @@
+<div class="modal fade" id="descriptionModal" tabindex="-1" role="dialog" aria-labelledby="descriptionModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{eventTitle}}</h5>
+      </div>
+      <div class="modal-body">
+        <p class="prewrapped">{{descriptionText}}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="table-responsive px-5 pt-2">
+  <table class="table table-sm table-hover">
+    <thead>
+      <tr>
+        <th>Event ID</th>
+        <th>Event Title</th>
+        <th>Event Status</th>
+        <th>Event Type</th>
+        <th>Restore?</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let event of events" [ngClass]="{'table-danger': event.eventStatus === 'DELETED'}" data-toggle="modal" data-target="#descriptionModal" (click)="updateDescriptionModal(event)">
+        <td>{{event.id}}</td>
+        <td>{{event.title}}</td>
+        <td>{{event.eventStatus}}</td>
+        <td>{{event.eventType}}</td>
+        <td>
+          <button *ngIf="event.eventStatus === 'DELETED'" type="button" title="Restore" class="btn btn-outline-success btn-sm" (click)="restoreItem(event)">
+            <fa-icon [icon]="faTrashRestore"></fa-icon>
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
