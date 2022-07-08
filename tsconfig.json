@@ -1,4 +1,5 @@
 {
+  "compileOnSave": false,
   "compilerOptions": {
     "target": "ES2018",
     "module": "CommonJS",
@@ -34,12 +35,19 @@
     "strictPropertyInitialization": false,
     "typeRoots": [
       "./node_modules/@types"
-    ]
+    ],
+    "baseUrl": "./",
+    "downlevelIteration": true,
+    "importHelpers": true,
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true
   },
   "exclude": [
     "node_modules",
     "cdk.out",
     "public",
-    "build"
+    "build",
+    "dist"
   ]
 }
