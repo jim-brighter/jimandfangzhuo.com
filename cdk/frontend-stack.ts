@@ -18,7 +18,8 @@ export class FrontendStack extends Stack {
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: true,
       publicReadAccess: true,
-      websiteIndexDocument: 'index.html'
+      websiteIndexDocument: 'index.html',
+      websiteErrorDocument: 'index.html'
     });
 
     const frontendSubdomainBucket = new s3.Bucket(this, 'PlannerFrontendSubdomainBucket', {
@@ -58,6 +59,21 @@ export class FrontendStack extends Stack {
         }
       ],
       viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+      defaultRootObject: 'index.html',
+      errorConfigurations: [
+        {
+          errorCode: 404,
+          responsePagePath: '/',
+          responseCode: 200,
+          errorCachingMinTtl: 60
+        },
+        {
+          errorCode: 403,
+          responsePagePath: '/',
+          responseCode: 200,
+          errorCachingMinTtl: 60
+        }
+      ],
       viewerCertificate: {
         aliases: ['jimandfangzhuo.com'],
         props: {
