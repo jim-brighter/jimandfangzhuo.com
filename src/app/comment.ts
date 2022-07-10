@@ -1,10 +1,10 @@
 export class Comment {
-    id: number;
+    commentId: string;
     commentText: string;
-    createdTime: Date;
+    createdTime: number;
 
     clear(): void {
-        this.id = null;
+        this.commentId = null;
         this.commentText = null;
         this.createdTime = null;
     }
