@@ -8,6 +8,7 @@ import * as certmanager from 'aws-cdk-lib/aws-certificatemanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as logs from 'aws-cdk-lib/aws-logs';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 
 const EVENT_TYPE_INDEX = 'EventsTypeIndex';
 
@@ -56,6 +57,15 @@ export class BackendStack extends Stack {
       tableName: 'PlannerComments',
       removalPolicy: RemovalPolicy.DESTROY,
       billingMode: ddb.BillingMode.PAY_PER_REQUEST
+    });
+
+    // IMAGE S3 BUCKET
+
+    const imagesBucket = new s3.Bucket(this, 'PlannerImagesBucket', {
+      bucketName: 'jimandfangzhuo.com-images',
+      encryption: s3.BucketEncryption.S3_MANAGED,
+      removalPolicy: RemovalPolicy.RETAIN,
+      versioned: true
     });
 
     // LAMBDAS
