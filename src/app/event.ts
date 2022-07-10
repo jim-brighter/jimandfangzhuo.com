@@ -1,17 +1,17 @@
 export class PlannerEvent {
-    id: number;
+    eventId: string;
     title: string;
     description: string;
     eventType: string;
-    eventComments: string[];
     eventStatus: string;
+    createdTime: number;
 
     clear(): void {
-        this.id = null;
+        this.eventId = null;
         this.title = null;
         this.description = null;
         this.eventType = null;
-        this.eventComments = null;
         this.eventStatus = null;
+        this.createdTime = null;
     }
 }

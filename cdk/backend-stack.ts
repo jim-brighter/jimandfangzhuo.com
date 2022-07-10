@@ -8,7 +8,6 @@ import * as certmanager from 'aws-cdk-lib/aws-certificatemanager';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as logs from 'aws-cdk-lib/aws-logs';
-import * as path from 'path';
 
 const EVENT_TYPE_INDEX = 'EventsTypeIndex';
 
@@ -92,7 +91,25 @@ export class BackendStack extends Stack {
       logRetention: logs.RetentionDays.ONE_MONTH
     });
 
+    const commentsLambda = new nodejslambda.NodejsFunction(this, 'CommentsHandler', {
+      runtime: lambda.Runtime.NODEJS_16_X,
+      handler: 'handler',
+      entry: './lambda-src/comments-lambda/comments.ts',
+      bundling: {
+        minify: true,
+        externalModules: [
+          'aws-sdk'
+        ]
+      },
+      environment: {
+        COMMENTS_TABLE: commentsTable.tableName
+      },
+      logRetention: logs.RetentionDays.ONE_MONTH
+    });
+
     eventsTable.grantReadWriteData(eventsLambda);
+
+    commentsTable.grantReadWriteData(commentsLambda);
 
     // REST API
     const restApi = new apigw.LambdaRestApi(this, 'PlannerApi', {
@@ -106,6 +123,7 @@ export class BackendStack extends Stack {
     });
 
     const eventsLambdaIntegration = new apigw.LambdaIntegration(eventsLambda);
+    const commentsLambdaIntegration = new apigw.LambdaIntegration(commentsLambda);
 
     const api = restApi.root.addResource('api');
 
@@ -125,6 +143,14 @@ export class BackendStack extends Stack {
       allowHeaders: ['*']
     });
     eventsTypeApi.addMethod('GET', eventsLambdaIntegration);
+
+    const commentsApi = api.addResource('comments');
+    commentsApi.addCorsPreflight({
+      allowOrigins: ['*'],
+      allowHeaders: ['*']
+    });
+    commentsApi.addMethod('GET', commentsLambdaIntegration);
+    commentsApi.addMethod('POST', commentsLambdaIntegration);
 
     // ROUTE53 MAPPING
     const apiRecord = new route53.ARecord(this, 'ApiRecord', {

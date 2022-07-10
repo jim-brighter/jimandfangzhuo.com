@@ -34,7 +34,7 @@ const getAllEvents = async (): Promise<Array<Event>> => {
             TableName: eventsTable
         }).promise();
 
-        return allEvents.Items ? allEvents.Items.map(i => i as Event) : [];
+        return allEvents.Items ? allEvents.Items.map(i => i as Event).sort((a, b) => a.createdTime - b.createdTime) : [];
     } catch(e) {
         console.error(`Failed to retrieve all events`, e);
         throw e;
@@ -54,7 +54,7 @@ const getEventsByType = async (eventType: string): Promise<Array<Event>> => {
             FilterExpression: 'eventStatus <> :deleted'
         }).promise();
 
-        return eventsByType.Items ? eventsByType.Items.map(i => i as Event) : [];
+        return eventsByType.Items ? eventsByType.Items.map(i => i as Event).sort((a, b) => a.createdTime - b.createdTime) : [];
     } catch(e) {
         console.error(`Failed to retrieve events with type ${eventType}`, e);
         throw e;
