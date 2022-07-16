@@ -13,7 +13,7 @@ const TOKEN_EXPIRATION = 'tokenExpiration';
 export class AuthenticationService {
 
   authenticated = false;
-  accessToken: string;
+  idToken: string;
 
   // authToken: string;
   // csrfCookie: string;
@@ -47,7 +47,7 @@ export class AuthenticationService {
   async authenticate(credentials, callback) {
     try {
       const result = await Auth.signIn(credentials.username, credentials.password);
-      this.accessToken = result.storage['CognitoIdentityServiceProvider.1d7iiv4lebj54bhq29lf6fopru.fangzhuoxi.accessToken'];
+      this.idToken = result.signInUserSession.idToken.jwtToken;
       this.authenticated = true;
       return callback && callback();
     } catch(e) {
@@ -110,7 +110,7 @@ export class AuthenticationService {
 
   private wipeSession() {
     this.authenticated = false;
-    this.accessToken = null;
+    this.idToken = null;
     // this.authToken = null;
     // this.csrfCookie = null;
     // this.tokenExpiration = null;

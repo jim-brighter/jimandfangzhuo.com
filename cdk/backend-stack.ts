@@ -160,7 +160,12 @@ export class BackendStack extends Stack {
       }
     });
 
-    const clientId = client.userPoolClientId;
+
+    // AUTHORIZER
+    const authorizer = new apigw.CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
+      cognitoUserPools: [userPool],
+      authorizerName: 'PlannerCognitoAuthorizer'
+    });
 
     // REST API
     const restApi = new apigw.LambdaRestApi(this, 'PlannerApi', {
@@ -181,27 +186,30 @@ export class BackendStack extends Stack {
     const eventsApi = api.addResource('events');
     eventsApi.addCorsPreflight({
       allowOrigins: ['*'],
-      allowHeaders: ['*']
+      allowHeaders: ['*'],
+      allowCredentials: true
     });
-    eventsApi.addMethod('GET', eventsLambdaIntegration);
-    eventsApi.addMethod('POST', eventsLambdaIntegration);
-    eventsApi.addMethod('PUT', eventsLambdaIntegration);
-    eventsApi.addMethod('DELETE', eventsLambdaIntegration);
+    eventsApi.addMethod('GET', eventsLambdaIntegration, { authorizer });
+    eventsApi.addMethod('POST', eventsLambdaIntegration, { authorizer });
+    eventsApi.addMethod('PUT', eventsLambdaIntegration, { authorizer });
+    eventsApi.addMethod('DELETE', eventsLambdaIntegration, { authorizer });
 
     const eventsTypeApi = eventsApi.addResource('{eventType}');
     eventsTypeApi.addCorsPreflight({
       allowOrigins: ['*'],
-      allowHeaders: ['*']
+      allowHeaders: ['*'],
+      allowCredentials: true
     });
-    eventsTypeApi.addMethod('GET', eventsLambdaIntegration);
+    eventsTypeApi.addMethod('GET', eventsLambdaIntegration, { authorizer });
 
     const commentsApi = api.addResource('comments');
     commentsApi.addCorsPreflight({
       allowOrigins: ['*'],
-      allowHeaders: ['*']
+      allowHeaders: ['*'],
+      allowCredentials: true
     });
-    commentsApi.addMethod('GET', commentsLambdaIntegration);
-    commentsApi.addMethod('POST', commentsLambdaIntegration);
+    commentsApi.addMethod('GET', commentsLambdaIntegration, { authorizer });
+    commentsApi.addMethod('POST', commentsLambdaIntegration, { authorizer });
 
     // ROUTE53 MAPPING
     const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {

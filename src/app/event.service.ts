@@ -21,14 +21,22 @@ export class EventService {
     private errors: ErrorService) { }
 
   getEvents(): Observable<PlannerEvent[]> {
-    return this.http.get<PlannerEvent[]>(`${this.rootUrl + this.apiContext}`, {})
+    return this.http.get<PlannerEvent[]>(`${this.rootUrl + this.apiContext}`, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      }
+    })
       .pipe(
         catchError(this.errors.handleError('getEvents', new Array<PlannerEvent>()))
       );
   }
 
   getEventsByType(type): Observable<PlannerEvent[]> {
-    return this.http.get<PlannerEvent[]>(`${this.rootUrl + this.apiContext}/${type}`, {})
+    return this.http.get<PlannerEvent[]>(`${this.rootUrl + this.apiContext}/${type}`, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      }
+    })
       .pipe(
         catchError(this.errors.handleError('getEventsByType', new Array<PlannerEvent>()))
       );
@@ -36,7 +44,11 @@ export class EventService {
 
   saveEvent(event: PlannerEvent): Observable<PlannerEvent> {
     event.description = event.description || '';
-    return this.http.post<PlannerEvent>(`${this.rootUrl + this.apiContext}`, event, {})
+    return this.http.post<PlannerEvent>(`${this.rootUrl + this.apiContext}`, event, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      }
+    })
       .pipe(
         catchError(this.errors.handleError('saveEvent', new PlannerEvent()))
       );
@@ -44,6 +56,9 @@ export class EventService {
 
   deleteEvent(events: PlannerEvent[]): Observable<PlannerEvent> {
     return this.http.delete<PlannerEvent[]>(`${this.rootUrl + this.apiContext}`, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      },
       body: events
     })
       .pipe(
@@ -52,7 +67,11 @@ export class EventService {
   }
 
   updateEvents(events: PlannerEvent[]): Observable<PlannerEvent[]> {
-    return this.http.put<PlannerEvent[]>(`${this.rootUrl + this.apiContext}`, events, {})
+    return this.http.put<PlannerEvent[]>(`${this.rootUrl + this.apiContext}`, events, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      }
+    })
       .pipe(
         catchError(this.errors.handleError('updateEvents', new Array<PlannerEvent>()))
       );
