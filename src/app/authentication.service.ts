@@ -85,8 +85,15 @@ export class AuthenticationService {
     //   });
   }
 
-  logout() {
-    return;
+  async logout() {
+    try {
+      await Auth.signOut({
+        global: true
+      });
+      this.wipeSession();
+    } catch(e) {
+      console.error(e);
+    }
     // this.http.post(this.rootAuthUrl + `/logout?_csrf=${this.csrfCookie}`, {}, {
     //   responseType: 'text',
     //   headers: new HttpHeaders({
