@@ -19,26 +19,14 @@ export class ImageService {
   constructor(private http: HttpClient, private auth: AuthenticationService, private errors: ErrorService) { }
 
   uploadImages(images: FormData): Observable<PlannerImage[]> {
-    return this.http.post<FormData>(this.rootUrl + this.apiContext + `?_csrf=${this.auth.csrfCookie}`, images, {
-      headers: new HttpHeaders({
-        'X-Auth-Token': this.auth.authToken,
-        'X-Xsrf-Token': this.auth.csrfCookie
-      }),
-      withCredentials: true
-    })
+    return this.http.post<FormData>(this.rootUrl + this.apiContext, images, {})
       .pipe(
         catchError(this.errors.handleError('uploadImages', null))
       );
   }
 
   getAllImages(): Observable<PlannerImage[]> {
-    return this.http.get<PlannerImage[]>(this.rootUrl + this.apiContext, {
-      headers: new HttpHeaders({
-        'X-Auth-Token': this.auth.authToken,
-        'X-Xsrf-Token': this.auth.csrfCookie
-      }),
-      withCredentials: true
-    })
+    return this.http.get<PlannerImage[]>(this.rootUrl + this.apiContext, {})
       .pipe(
         catchError(this.errors.handleError('getAllImages', null))
       );

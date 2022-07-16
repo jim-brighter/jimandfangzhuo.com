@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, Injectable } from '@angular/core';
 import { HttpClientModule, HttpRequest, HttpHandler, HttpInterceptor, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms'; // <-- NgModel lives here
+import { AmplifyAuthenticatorModule } from '@aws-amplify/ui-angular';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
@@ -58,7 +59,8 @@ export class XhrInterceptor implements HttpInterceptor {
     HttpClientModule,
     FormsModule,
     FileUploadModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    AmplifyAuthenticatorModule
   ],
   providers: [
     EventService,
