@@ -10,6 +10,7 @@ import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
+import * as backup from 'aws-cdk-lib/aws-backup';
 
 const EVENT_TYPE_INDEX = 'EventsTypeIndex';
 
@@ -60,6 +61,15 @@ export class BackendStack extends Stack {
       tableName: 'PlannerComments',
       removalPolicy: RemovalPolicy.DESTROY,
       billingMode: ddb.BillingMode.PAY_PER_REQUEST
+    });
+
+    const plan = backup.BackupPlan.daily35DayRetention(this, 'BackupPlan');
+    plan.addSelection('BackupSelection', {
+      resources: [
+        backup.BackupResource.fromDynamoDbTable(eventsTable),
+        backup.BackupResource.fromDynamoDbTable(imagesTable),
+        backup.BackupResource.fromDynamoDbTable(commentsTable)
+      ]
     });
 
     // IMAGE S3 BUCKET
