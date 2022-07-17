@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { catchError } from 'rxjs/operators';
-import { environment } from '../environments/environment';
+import { HttpClient } from '@angular/common/http';
 import { ErrorService } from './error.service';
-import { Router } from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { Auth } from 'aws-amplify';
 
 const TOKEN_KEY = 'authToken';
 const CSRF_KEY = 'csrfToken';
@@ -15,12 +12,12 @@ const TOKEN_EXPIRATION = 'tokenExpiration';
 })
 export class AuthenticationService {
 
-  private rootAuthUrl = environment.plannerAuthBackend;
-
   authenticated = false;
-  authToken: string;
-  csrfCookie: string;
-  tokenExpiration: string;
+  idToken: string;
+
+  // authToken: string;
+  // csrfCookie: string;
+  // tokenExpiration: string;
 
   constructor(private http: HttpClient,
               private errors: ErrorService) {
@@ -29,9 +26,9 @@ export class AuthenticationService {
     const tokenExpiration = localStorage.getItem(TOKEN_EXPIRATION) || '';
     if (tokenAuth && tokenCsrf && (new Date().getTime() < parseInt(tokenExpiration))) {
       this.authenticated = true;
-      this.authToken = tokenAuth;
-      this.csrfCookie = tokenCsrf;
-      this.tokenExpiration = tokenExpiration;
+      // this.authToken = tokenAuth;
+      // this.csrfCookie = tokenCsrf;
+      // this.tokenExpiration = tokenExpiration;
     } else {
       this.wipeSession();
     }
@@ -47,12 +44,21 @@ export class AuthenticationService {
   //   }
   // }
 
-  authenticate(credentials, callback) {
-    const headers = new HttpHeaders(credentials ? {
-      authorization: 'Basic ' + btoa(credentials.username + ':' + credentials.password)
-    } : {});
+  async authenticate(credentials, callback) {
+    try {
+      const result = await Auth.signIn(credentials.username, credentials.password);
+      this.idToken = result.signInUserSession.idToken.jwtToken;
+      this.authenticated = true;
+      return callback && callback();
+    } catch(e) {
+      console.error(e);
+    }
 
-    this.authenticated = true;
+    // const headers = new HttpHeaders(credentials ? {
+    //   authorization: 'Basic ' + btoa(credentials.username + ':' + credentials.password)
+    // } : {});
+
+    // this.authenticated = true;
 
     // this.http.get(this.rootAuthUrl + '/token', { headers: headers, withCredentials: true })
     //   .pipe(
@@ -75,12 +81,19 @@ export class AuthenticationService {
     //     } else {
     //       this.wipeSession();
     //     }
-    //     return callback && callback();
+    //
     //   });
   }
 
-  logout() {
-    return;
+  async logout() {
+    try {
+      await Auth.signOut({
+        global: true
+      });
+      this.wipeSession();
+    } catch(e) {
+      console.error(e);
+    }
     // this.http.post(this.rootAuthUrl + `/logout?_csrf=${this.csrfCookie}`, {}, {
     //   responseType: 'text',
     //   headers: new HttpHeaders({
@@ -104,9 +117,10 @@ export class AuthenticationService {
 
   private wipeSession() {
     this.authenticated = false;
-    this.authToken = null;
-    this.csrfCookie = null;
-    this.tokenExpiration = null;
+    this.idToken = null;
+    // this.authToken = null;
+    // this.csrfCookie = null;
+    // this.tokenExpiration = null;
     localStorage.clear();
   }
 

@@ -19,14 +19,22 @@ export class CommentService {
   constructor(private http: HttpClient, private auth: AuthenticationService, private errors: ErrorService) { }
 
   getComments(): Observable<Comment[]> {
-    return this.http.get<Comment[]>(this.rootUrl + this.apiContext, {})
+    return this.http.get<Comment[]>(this.rootUrl + this.apiContext, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      }
+    })
       .pipe(
         catchError(this.errors.handleError('getComments', new Array<Comment>()))
       );
   }
 
   createComment(comment: Comment): Observable<Comment> {
-    return this.http.post<Comment>(this.rootUrl + this.apiContext, comment, {})
+    return this.http.post<Comment>(this.rootUrl + this.apiContext, comment, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      }
+    })
       .pipe(
         catchError(this.errors.handleError('createComment', new Comment()))
       );

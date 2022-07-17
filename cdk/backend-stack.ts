@@ -1,4 +1,4 @@
-import { RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import * as ddb from 'aws-cdk-lib/aws-dynamodb';
 import * as nodejslambda from 'aws-cdk-lib/aws-lambda-nodejs';
@@ -9,8 +9,11 @@ import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as cognito from 'aws-cdk-lib/aws-cognito';
 
 const EVENT_TYPE_INDEX = 'EventsTypeIndex';
+
+const CERT_ARN = 'arn:aws:acm:us-east-1:108929950724:certificate/f312d8ad-09ce-440a-807c-a4bc46cb0dd0';
 
 export class BackendStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
@@ -60,7 +63,6 @@ export class BackendStack extends Stack {
     });
 
     // IMAGE S3 BUCKET
-
     const imagesBucket = new s3.Bucket(this, 'PlannerImagesBucket', {
       bucketName: 'jimandfangzhuo.com-images',
       encryption: s3.BucketEncryption.S3_MANAGED,
@@ -121,12 +123,56 @@ export class BackendStack extends Stack {
 
     commentsTable.grantReadWriteData(commentsLambda);
 
+    // ACM
+    const cert = certmanager.Certificate.fromCertificateArn(this, 'AcmCert', CERT_ARN);
+
+    // COGNITO
+    const userPool = new cognito.UserPool(this, 'UserPool', {
+      userPoolName: 'PlannerUserPool',
+      passwordPolicy: {
+        requireDigits: false,
+        requireUppercase: false,
+        requireSymbols: false
+      }
+    });
+
+    const client = userPool.addClient('PlannerFrontend', {
+      userPoolClientName: 'planner-frontend',
+      accessTokenValidity: Duration.minutes(60 * 24),
+      authFlows: {
+        userPassword: true
+      },
+      supportedIdentityProviders: [cognito.UserPoolClientIdentityProvider.COGNITO],
+      oAuth: {
+        flows: {
+          authorizationCodeGrant: true
+        },
+        scopes: [cognito.OAuthScope.OPENID],
+        callbackUrls: ['https://jimandfangzhuo.com/details/to-do'],
+        logoutUrls: ['https://jimandfangzhuo.com']
+      }
+    });
+
+    const cognitoDomain = userPool.addDomain('PlannerCognitoDomain', {
+      customDomain: {
+        domainName: 'user.jimandfangzhuo.com',
+        certificate: cert
+      }
+    });
+
+
+    // AUTHORIZER
+    const authorizer = new apigw.CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
+      cognitoUserPools: [userPool],
+      authorizerName: 'PlannerCognitoAuthorizer'
+    });
+
     // REST API
     const restApi = new apigw.LambdaRestApi(this, 'PlannerApi', {
       handler: defaultErrorLambda,
       proxy: false,
       domainName: {
-        certificate: certmanager.Certificate.fromCertificateArn(this, 'AcmCert', 'arn:aws:acm:us-east-1:108929950724:certificate/f312d8ad-09ce-440a-807c-a4bc46cb0dd0'),
+        certificate: cert,
         domainName: 'api.jimandfangzhuo.com',
         securityPolicy: apigw.SecurityPolicy.TLS_1_2
       }
@@ -140,33 +186,46 @@ export class BackendStack extends Stack {
     const eventsApi = api.addResource('events');
     eventsApi.addCorsPreflight({
       allowOrigins: ['*'],
-      allowHeaders: ['*']
+      allowHeaders: ['*'],
+      allowCredentials: true
     });
-    eventsApi.addMethod('GET', eventsLambdaIntegration);
-    eventsApi.addMethod('POST', eventsLambdaIntegration);
-    eventsApi.addMethod('PUT', eventsLambdaIntegration);
-    eventsApi.addMethod('DELETE', eventsLambdaIntegration);
+    eventsApi.addMethod('GET', eventsLambdaIntegration, { authorizer });
+    eventsApi.addMethod('POST', eventsLambdaIntegration, { authorizer });
+    eventsApi.addMethod('PUT', eventsLambdaIntegration, { authorizer });
+    eventsApi.addMethod('DELETE', eventsLambdaIntegration, { authorizer });
 
     const eventsTypeApi = eventsApi.addResource('{eventType}');
     eventsTypeApi.addCorsPreflight({
       allowOrigins: ['*'],
-      allowHeaders: ['*']
+      allowHeaders: ['*'],
+      allowCredentials: true
     });
-    eventsTypeApi.addMethod('GET', eventsLambdaIntegration);
+    eventsTypeApi.addMethod('GET', eventsLambdaIntegration, { authorizer });
 
     const commentsApi = api.addResource('comments');
     commentsApi.addCorsPreflight({
       allowOrigins: ['*'],
-      allowHeaders: ['*']
+      allowHeaders: ['*'],
+      allowCredentials: true
     });
-    commentsApi.addMethod('GET', commentsLambdaIntegration);
-    commentsApi.addMethod('POST', commentsLambdaIntegration);
+    commentsApi.addMethod('GET', commentsLambdaIntegration, { authorizer });
+    commentsApi.addMethod('POST', commentsLambdaIntegration, { authorizer });
 
     // ROUTE53 MAPPING
+    const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
+      domainName: 'jimandfangzhuo.com'
+    });
+
     const apiRecord = new route53.ARecord(this, 'ApiRecord', {
-      zone: route53.HostedZone.fromLookup(this, 'HostedZone', { domainName: 'jimandfangzhuo.com' }),
+      zone: hostedZone,
       recordName: 'api',
       target: route53.RecordTarget.fromAlias(new targets.ApiGateway(restApi))
+    });
+
+    const userRecord = new route53.ARecord(this, 'CognitoRecord', {
+      zone: hostedZone,
+      recordName: 'user',
+      target: route53.RecordTarget.fromAlias(new targets.UserPoolDomainTarget(cognitoDomain))
     });
   }
 }

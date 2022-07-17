@@ -6,7 +6,8 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     const headers = {
         'Access-Control-Allow-Headers': '*',
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+        'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+        'Access-Control-Allow-Credentials': true
     };
     switch(event.httpMethod) {
         case 'GET':
