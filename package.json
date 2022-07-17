@@ -63,6 +63,7 @@
     "@types/prettier": "2.6.3",
     "aws-cdk": "2.32.1",
     "codelyzer": "^6.0.2",
+    "csv-parser": "^3.0.0",
     "esbuild": "^0.14.49",
     "jasmine-core": "~4.2.0",
     "jasmine-spec-reporter": "~7.0.0",
