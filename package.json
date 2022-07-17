@@ -20,7 +20,7 @@
     "ng": "ng",
     "angular:start": "ng serve --watch",
     "angular:build": "ng build",
-    "angular:build:prod": "NODE_OPTIONS='--max-old-space-size=1024' ng build -c production --output-path=dist",
+    "angular:build:prod": "ng build -c production --output-path=dist",
     "angular:test": "ng test",
     "angular:lint": "ng lint",
     "angular:e2e": "ng e2e",
