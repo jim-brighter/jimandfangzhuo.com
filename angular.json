@@ -54,7 +54,10 @@
               "url",
               "uuid",
               "xstate/lib/actions",
-              "zen-observable"
+              "zen-observable",
+              "paho-mqtt",
+              "events",
+              "cookie"
             ]
           },
           "configurations": {

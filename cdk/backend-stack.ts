@@ -129,9 +129,27 @@ export class BackendStack extends Stack {
       logRetention: logs.RetentionDays.ONE_MONTH
     });
 
+    const imagesLambda = new nodejslambda.NodejsFunction(this, 'ImagesHandler', {
+      runtime: lambda.Runtime.NODEJS_16_X,
+      handler: 'handler',
+      entry: './lambda-src/images-lambda/images.ts',
+      bundling: {
+        minify: true,
+        externalModules: [
+          'aws-sdk'
+        ]
+      },
+      environment: {
+        IMAGES_TABLE: imagesTable.tableName
+      },
+      logRetention: logs.RetentionDays.ONE_MONTH
+    });
+
     eventsTable.grantReadWriteData(eventsLambda);
 
     commentsTable.grantReadWriteData(commentsLambda);
+
+    imagesTable.grantReadWriteData(imagesLambda);
 
     // ACM
     const cert = certmanager.Certificate.fromCertificateArn(this, 'AcmCert', CERT_ARN);
@@ -148,7 +166,7 @@ export class BackendStack extends Stack {
 
     const client = userPool.addClient('PlannerFrontend', {
       userPoolClientName: 'planner-frontend',
-      accessTokenValidity: Duration.minutes(60 * 24),
+      accessTokenValidity: Duration.minutes(60 * 6),
       authFlows: {
         userPassword: true
       },
@@ -170,7 +188,6 @@ export class BackendStack extends Stack {
       }
     });
 
-
     // AUTHORIZER
     const authorizer = new apigw.CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
       cognitoUserPools: [userPool],
@@ -190,9 +207,11 @@ export class BackendStack extends Stack {
 
     const eventsLambdaIntegration = new apigw.LambdaIntegration(eventsLambda);
     const commentsLambdaIntegration = new apigw.LambdaIntegration(commentsLambda);
+    const imagesLambdaIntegration = new apigw.LambdaIntegration(imagesLambda);
 
     const api = restApi.root.addResource('api');
 
+    // API: Events
     const eventsApi = api.addResource('events');
     eventsApi.addCorsPreflight({
       allowOrigins: ['*'],
@@ -212,6 +231,7 @@ export class BackendStack extends Stack {
     });
     eventsTypeApi.addMethod('GET', eventsLambdaIntegration, { authorizer });
 
+    // API: Comments
     const commentsApi = api.addResource('comments');
     commentsApi.addCorsPreflight({
       allowOrigins: ['*'],
@@ -220,6 +240,15 @@ export class BackendStack extends Stack {
     });
     commentsApi.addMethod('GET', commentsLambdaIntegration, { authorizer });
     commentsApi.addMethod('POST', commentsLambdaIntegration, { authorizer });
+
+    // API: Images
+    const imagesApi = api.addResource('images');
+    imagesApi.addCorsPreflight({
+      allowOrigins: ['*'],
+      allowHeaders: ['*'],
+      allowCredentials: true
+    });
+    imagesApi.addMethod('GET', imagesLambdaIntegration, { authorizer });
 
     // ROUTE53 MAPPING
     const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
