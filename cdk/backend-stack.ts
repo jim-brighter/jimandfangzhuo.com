@@ -28,7 +28,7 @@ export class BackendStack extends Stack {
       },
       encryption: ddb.TableEncryption.AWS_MANAGED,
       tableName: 'PlannerEvents',
-      removalPolicy: RemovalPolicy.DESTROY,
+      removalPolicy: RemovalPolicy.RETAIN,
       billingMode: ddb.BillingMode.PAY_PER_REQUEST
     });
 
@@ -48,7 +48,7 @@ export class BackendStack extends Stack {
       },
       encryption: ddb.TableEncryption.AWS_MANAGED,
       tableName: 'PlannerImages',
-      removalPolicy: RemovalPolicy.DESTROY,
+      removalPolicy: RemovalPolicy.RETAIN,
       billingMode: ddb.BillingMode.PAY_PER_REQUEST
     });
 
@@ -59,7 +59,7 @@ export class BackendStack extends Stack {
       },
       encryption: ddb.TableEncryption.AWS_MANAGED,
       tableName: 'PlannerComments',
-      removalPolicy: RemovalPolicy.DESTROY,
+      removalPolicy: RemovalPolicy.RETAIN,
       billingMode: ddb.BillingMode.PAY_PER_REQUEST
     });
 
