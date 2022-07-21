@@ -23,8 +23,12 @@ export class LoginComponent implements OnInit {
 
   login(): boolean {
     this.authenticator.authenticate(this.credentials, () => {
-      const url = this.endpoint === 'photos' ? '/photos' : '/details/' + this.endpoint.toLowerCase().replace('_', '-');
-      this.router.navigateByUrl(url);
+      if (this.endpoint === 'photos' || this.endpoint === 'admin') {
+        this.router.navigateByUrl(`/${this.endpoint}`);
+      }
+      else {
+        this.router.navigateByUrl(`/details/${this.endpoint.toLowerCase().replace('_', '-')}`);
+      }
     });
     return false;
   }

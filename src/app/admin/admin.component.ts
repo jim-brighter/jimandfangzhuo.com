@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { EventService } from '../event.service';
 import { PlannerEvent } from '../event';
 
 import { faTrashRestore } from '@fortawesome/free-solid-svg-icons';
+import { AuthenticationService } from '../authentication.service';
+import { NavigationEnd, Router } from '@angular/router';
 
 const TO_DO = 'TO_DO';
 
@@ -11,7 +13,7 @@ const TO_DO = 'TO_DO';
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']
 })
-export class AdminComponent implements OnInit {
+export class AdminComponent {
 
   events: PlannerEvent[];
 
@@ -20,10 +22,23 @@ export class AdminComponent implements OnInit {
   descriptionText = '';
   eventTitle = '';
 
-  constructor(private eventService: EventService) { }
+  isLoading = true;
 
-  ngOnInit() {
-    this.populateEvents();
+  navigationSubscription
+
+  constructor(private eventService: EventService,
+    private authenticator: AuthenticationService,
+    private router: Router) {
+
+    this.navigationSubscription = this.router.events.subscribe((e: any) => {
+      if (e instanceof NavigationEnd && this.authenticated()) {
+        this.populateEvents();
+      }
+    });
+  }
+
+  authenticated(): boolean {
+    return this.authenticator.authenticated;
   }
 
   updateDescriptionModal(event: PlannerEvent): void {
@@ -34,6 +49,7 @@ export class AdminComponent implements OnInit {
   populateEvents(): void {
     this.eventService.getEvents().subscribe(data => {
       this.events = data;
+      this.isLoading = false;
     });
   }
 
