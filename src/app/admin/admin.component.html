@@ -10,8 +10,11 @@
     </div>
   </div>
 </div>
-<div class="table-responsive px-5 pt-2">
-  <table class="table table-sm table-hover">
+<div *ngIf="authenticated()" class="table-responsive px-5 pt-2">
+  <div *ngIf="isLoading">
+    <div class="spinner"></div>
+  </div>
+  <table *ngIf="!isLoading" class="table table-sm table-hover">
     <thead>
       <tr>
         <th>Event ID</th>
@@ -35,4 +38,11 @@
       </tr>
     </tbody>
   </table>
+</div>
+<div *ngIf="!authenticated()" class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-4 col-10">
+      <app-login [endpoint]="'admin'"></app-login>
+    </div>
+  </div>
 </div>
