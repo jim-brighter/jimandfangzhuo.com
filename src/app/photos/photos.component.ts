@@ -11,13 +11,13 @@ import { faSignOutAlt, faRotate } from '@fortawesome/free-solid-svg-icons';
   templateUrl: './photos.component.html',
   styleUrls: ['./photos.component.css']
 })
-export class PhotosComponent implements OnInit, OnDestroy {
+export class PhotosComponent implements OnDestroy {
 
   navigationSubscription;
 
   isLoading = true;
 
-  digitalOceanSpace = 'https://image-space-jbrighter92.nyc3.digitaloceanspaces.com/';
+  s3RootUrl = 'https://s3.amazonaws.com/jimandfangzhuo.com-images/';
   selectedImage: PlannerImage;
 
   faSignOutAlt = faSignOutAlt;
@@ -29,19 +29,13 @@ export class PhotosComponent implements OnInit, OnDestroy {
     private router: Router) {
 
       this.navigationSubscription = this.router.events.subscribe((e: any) => {
-        if (e instanceof NavigationEnd) {
+        if (e instanceof NavigationEnd && this.authenticated()) {
           this.getImages();
         }
       });
     }
 
   images: PlannerImage[];
-
-  ngOnInit() {
-    if (this.authenticated()) {
-      this.getImages();
-    }
-  }
 
   authenticated(): boolean {
     return this.authenticator.authenticated;
