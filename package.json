@@ -16,7 +16,7 @@
     "cdk:destroy:backend": "cdk destroy PlannerBackend -f",
     "cdk:deploy:frontend": "cdk deploy PlannerFrontend --require-approval never --outputs-file frontend-outputs.json",
     "cdk:destroy:frontend": "cdk destroy PlannerFrontend -f",
-    "cdk:deploy": "npm run cdk:deploy:backend && npm run cdk:deploy:frontend",
+    "cdk:deploy": "cdk deploy PlannerBackend PlannerFrontend --require-approval never --outputs-file frontend-backend-outputs.json",
     "ng": "ng",
     "angular:start": "ng serve --watch",
     "angular:build": "ng build",

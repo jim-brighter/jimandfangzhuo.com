@@ -34,6 +34,9 @@
           <button *ngIf="event.eventStatus === 'DELETED'" type="button" title="Restore" class="btn btn-outline-success btn-sm" (click)="restoreItem(event)">
             <fa-icon [icon]="faTrashRestore"></fa-icon>
           </button>
+          <button *ngIf="event.eventStatus === 'DELETED'" type="button" title="Permanently Delete" class="btn btn-outline-danger btn-sm" (click)="permanentlyDeleteItem(event)">
+            <fa-icon [icon]="faTrash"></fa-icon>
+          </button>
         </td>
       </tr>
     </tbody>

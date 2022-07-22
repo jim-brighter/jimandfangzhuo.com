@@ -87,15 +87,11 @@ const updateEvents = async (events: Event[]) => {
 
 const deleteEvents = async (eventIds: string[]) => {
     try {
-        const deletes = eventIds.map(async (id) => {
-            await ddb.update({
+        const deletes = eventIds.map(async (id: string) => {
+            await ddb.delete({
                 TableName: eventsTable,
                 Key: {
                     eventId: id
-                },
-                UpdateExpression: 'set eventStatus = :eventStatus',
-                ExpressionAttributeValues: {
-                    ':eventStatus': 'DELETED'
                 }
             }).promise();
         });

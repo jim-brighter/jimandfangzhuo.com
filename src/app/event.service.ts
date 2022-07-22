@@ -54,16 +54,16 @@ export class EventService {
       );
   }
 
-  deleteEvent(events: PlannerEvent[]): Observable<PlannerEvent> {
+  deleteEvent(eventIds: string[]): Observable<PlannerEvent> {
     return this.http.delete<PlannerEvent[]>(`${this.rootUrl + this.apiContext}`, {
       headers: {
         Authorization: `Bearer ${this.auth.idToken}`
       },
-      body: events
+      body: eventIds
     })
-      .pipe(
-        catchError(this.errors.handleError('deleteEvent', null))
-      );
+    .pipe(
+      catchError(this.errors.handleError('deleteEvent', null))
+    );
   }
 
   updateEvents(events: PlannerEvent[]): Observable<PlannerEvent[]> {

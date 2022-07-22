@@ -1,8 +1,8 @@
-import { Component, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component } from '@angular/core';
 import { EventService } from '../event.service';
 import { PlannerEvent } from '../event';
 
-import { faTrashRestore } from '@fortawesome/free-solid-svg-icons';
+import { faTrashRestore, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { AuthenticationService } from '../authentication.service';
 import { NavigationEnd, Router } from '@angular/router';
 
@@ -18,6 +18,7 @@ export class AdminComponent {
   events: PlannerEvent[];
 
   faTrashRestore = faTrashRestore;
+  faTrash = faTrash;
 
   descriptionText = '';
   eventTitle = '';
@@ -57,6 +58,12 @@ export class AdminComponent {
     event.eventStatus = TO_DO;
     const restoreArray = [event];
     this.eventService.updateEvents(restoreArray).subscribe(() => {
+      this.populateEvents();
+    });
+  }
+
+  permanentlyDeleteItem(event: PlannerEvent): void {
+    this.eventService.deleteEvent([event.eventId]).subscribe(() => {
       this.populateEvents();
     });
   }
