@@ -33,13 +33,7 @@ export class FrontendStack extends Stack {
       }
     });
 
-    const frontendDeployment = new s3deployment.BucketDeployment(this, 'PlannerFrontendDeployment', {
-      sources: [s3deployment.Source.asset('./dist')],
-      destinationBucket: frontendRootBucket
-    });
-
     // CLOUDFRONT DISTRIBUTION
-
     const distribution = new cloudfront.CloudFrontWebDistribution(this, 'PlannerDistribution', {
       originConfigs: [
         {
@@ -53,7 +47,9 @@ export class FrontendStack extends Stack {
               compress: true,
               allowedMethods: cloudfront.CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
               cachedMethods: cloudfront.CloudFrontAllowedCachedMethods.GET_HEAD_OPTIONS,
-              defaultTtl: Duration.minutes(1)
+              defaultTtl: Duration.days(1),
+              minTtl: Duration.days(1),
+              maxTtl: Duration.days(3)
             }
           ]
         }
@@ -65,13 +61,13 @@ export class FrontendStack extends Stack {
           errorCode: 404,
           responsePagePath: '/',
           responseCode: 200,
-          errorCachingMinTtl: 60
+          errorCachingMinTtl: Duration.days(1).toSeconds()
         },
         {
           errorCode: 403,
           responsePagePath: '/',
           responseCode: 200,
-          errorCachingMinTtl: 60
+          errorCachingMinTtl: Duration.days(1).toSeconds()
         }
       ],
       viewerCertificate: {
@@ -82,6 +78,13 @@ export class FrontendStack extends Stack {
           acmCertificateArn: 'arn:aws:acm:us-east-1:108929950724:certificate/f312d8ad-09ce-440a-807c-a4bc46cb0dd0'
         }
       }
+    });
+
+    // S3 Deployment
+    new s3deployment.BucketDeployment(this, 'PlannerFrontendDeployment', {
+      sources: [s3deployment.Source.asset('./dist')],
+      destinationBucket: frontendRootBucket,
+      distribution: distribution
     });
 
     // ROUTE53 MAPPING
