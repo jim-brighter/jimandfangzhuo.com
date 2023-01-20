@@ -10,34 +10,34 @@ import { PlannerEvent } from '../event';
 })
 export class UploadComponent implements OnInit {
 
-  public uploader: FileUploader = new FileUploader({});
+  // public uploader: FileUploader = new FileUploader({});
 
   constructor(private imageService: ImageService) { }
 
   ngOnInit() {
-    this.uploader.options.isHTML5 = true;
+    // this.uploader.options.isHTML5 = true;
   }
 
-  upload() {
-    let queueLength: number = this.uploader.queue.length;
-    let formData = new FormData();
+  // upload() {
+  //   let queueLength: number = this.uploader.queue.length;
+  //   let formData = new FormData();
 
-    if (queueLength > 0) {
-      for (let i = 0; i < queueLength; i++) {
-        formData.append('images', this.uploader.queue[i].file.rawFile);
-      }
-      formData.append('event', new Blob([JSON.stringify(new PlannerEvent())], {
-        type: 'application/json'
-      }));
+  //   if (queueLength > 0) {
+  //     for (let i = 0; i < queueLength; i++) {
+  //       formData.append('images', this.uploader.queue[i].file.rawFile);
+  //     }
+  //     formData.append('event', new Blob([JSON.stringify(new PlannerEvent())], {
+  //       type: 'application/json'
+  //     }));
 
-      this.imageService.uploadImages(formData).subscribe(data => {
-        if (data !== null) {
-          alert("Upload Success!");
-        }
-      });
-    } else {
-      console.log("no images selected");
-    }
-  }
+  //     this.imageService.uploadImages(formData).subscribe(data => {
+  //       if (data !== null) {
+  //         alert("Upload Success!");
+  //       }
+  //     });
+  //   } else {
+  //     console.log("no images selected");
+  //   }
+  // }
 
 }
