@@ -43,7 +43,7 @@
     "aws-amplify": "^5.0.11",
     "aws-cdk-lib": "2.61.1",
     "aws-sdk": "^2.1299.0",
-    "constructs": "^10.1.225",
+    "constructs": "^10.1.289",
     "core-js": "^3.27.2",
     "ng2-file-upload": "^3.0.0",
     "rxjs": "^7.8.0",
