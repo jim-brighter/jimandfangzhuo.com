@@ -29,7 +29,8 @@ export class BackendStack extends Stack {
       encryption: ddb.TableEncryption.AWS_MANAGED,
       tableName: 'PlannerEvents',
       removalPolicy: RemovalPolicy.RETAIN,
-      billingMode: ddb.BillingMode.PAY_PER_REQUEST
+      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
+      deletionProtection: true
     });
 
     eventsTable.addGlobalSecondaryIndex({
@@ -49,7 +50,8 @@ export class BackendStack extends Stack {
       encryption: ddb.TableEncryption.AWS_MANAGED,
       tableName: 'PlannerImages',
       removalPolicy: RemovalPolicy.RETAIN,
-      billingMode: ddb.BillingMode.PAY_PER_REQUEST
+      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
+      deletionProtection: true
     });
 
     const commentsTable = new ddb.Table(this, 'CommentsTable', {
@@ -60,7 +62,8 @@ export class BackendStack extends Stack {
       encryption: ddb.TableEncryption.AWS_MANAGED,
       tableName: 'PlannerComments',
       removalPolicy: RemovalPolicy.RETAIN,
-      billingMode: ddb.BillingMode.PAY_PER_REQUEST
+      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
+      deletionProtection: true
     });
 
     const plan = backup.BackupPlan.daily35DayRetention(this, 'BackupPlan');
@@ -82,7 +85,7 @@ export class BackendStack extends Stack {
 
     // LAMBDAS
     const defaultErrorLambda = new lambda.Function(this, 'DefaultErrorHandler', {
-      runtime: lambda.Runtime.NODEJS_16_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         exports.handler = async (event) => {
@@ -97,7 +100,7 @@ export class BackendStack extends Stack {
     });
 
     const eventsLambda = new nodejslambda.NodejsFunction(this, 'EventsHandler', {
-      runtime: lambda.Runtime.NODEJS_16_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: './lambda-src/events-lambda/events.ts',
       bundling: {
@@ -114,7 +117,7 @@ export class BackendStack extends Stack {
     });
 
     const commentsLambda = new nodejslambda.NodejsFunction(this, 'CommentsHandler', {
-      runtime: lambda.Runtime.NODEJS_16_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: './lambda-src/comments-lambda/comments.ts',
       bundling: {
@@ -130,7 +133,7 @@ export class BackendStack extends Stack {
     });
 
     const imagesLambda = new nodejslambda.NodejsFunction(this, 'ImagesHandler', {
-      runtime: lambda.Runtime.NODEJS_16_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       handler: 'handler',
       entry: './lambda-src/images-lambda/images.ts',
       bundling: {
