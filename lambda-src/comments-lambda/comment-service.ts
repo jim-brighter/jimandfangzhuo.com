@@ -1,10 +1,15 @@
-import * as aws from 'aws-sdk';
+import { DynamoDBDocumentClient, PutCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { Comment } from './comment';
 import * as crypto from 'crypto';
 
-const ddb = new aws.DynamoDB.DocumentClient({
-    region: process.env.AWS_REGION,
-    apiVersion: 'latest'
+const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({
+    region: process.env.AWS_REGION
+}),
+{
+    marshallOptions: {
+        convertClassInstanceToMap: true
+    }
 });
 
 const commentsTable = process.env.COMMENTS_TABLE || '';
@@ -14,12 +19,12 @@ const createComment = async(comment: Comment): Promise<Comment> => {
     comment.createdTime = new Date().getTime();
 
     try {
-        await ddb.put({
+        await ddb.send(new PutCommand({
             TableName: commentsTable,
             Item: comment
-        }).promise();
+        }));
     } catch(e) {
-        console.error(`Error saving new comment with text ${comment.commentText}`, JSON.stringify(e));
+        console.error(`Error saving new comment with text ${comment.commentText}`, e);
         throw e;
     }
 
@@ -28,9 +33,9 @@ const createComment = async(comment: Comment): Promise<Comment> => {
 
 const getAllComments = async(): Promise<Array<Comment>> => {
     try {
-        const allComments = await ddb.scan({
+        const allComments = await ddb.send(new ScanCommand({
             TableName: commentsTable
-        }).promise();
+        }));
 
         return allComments.Items ? allComments.Items.map(i => i as Comment).sort((a, b) => a.createdTime - b.createdTime) : [];
     } catch(e) {
