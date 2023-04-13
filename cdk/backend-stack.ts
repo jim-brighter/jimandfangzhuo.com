@@ -123,7 +123,8 @@ export class BackendStack extends Stack {
       bundling: {
         minify: true,
         externalModules: [
-          'aws-sdk'
+          '@aws-sdk/client-dynamodb',
+          '@aws-sdk/lib-dynamodb'
         ]
       },
       environment: {
