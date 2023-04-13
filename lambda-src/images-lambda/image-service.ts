@@ -1,19 +1,18 @@
-import * as aws from 'aws-sdk';
+import { DynamoDBDocumentClient, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { Image } from './image';
-import * as crypto from 'crypto';
 
-const ddb = new aws.DynamoDB.DocumentClient({
+const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({
     region: process.env.AWS_REGION,
-    apiVersion: 'latest'
-});
+}));
 
 const imagesTable = process.env.IMAGES_TABLE || '';
 
 const getAllImages = async(): Promise<Array<Image>> => {
     try {
-        const allImages = await ddb.scan({
+        const allImages = await ddb.send(new ScanCommand({
             TableName: imagesTable
-        }).promise();
+        }));
 
         return allImages.Items ? allImages.Items.map(i => i as Image) : [];
     } catch(e) {

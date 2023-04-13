@@ -1,11 +1,11 @@
-import * as aws from 'aws-sdk';
+import { DynamoDBDocumentClient, PutCommand, ScanCommand, QueryCommand, UpdateCommand, DeleteCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { Event } from './event';
 import * as crypto from 'crypto';
 
-const ddb = new aws.DynamoDB.DocumentClient({
+const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({
     region: process.env.AWS_REGION,
-    apiVersion: 'latest'
-});
+}));
 
 const eventsTable = process.env.EVENTS_TABLE || '';
 const eventTypeIndex = process.env.EVENT_TYPE_INDEX || '';
@@ -16,10 +16,10 @@ const createEvent = async (event: Event): Promise<Event> => {
     event.createdTime = new Date().getTime();
 
     try {
-        await ddb.put({
+        await ddb.send(new PutCommand({
             TableName: eventsTable,
             Item: event
-        }).promise();
+        }));
     } catch(e) {
         console.error(`Error saving new event with title ${event.title}`, JSON.stringify(e));
         throw e;
@@ -30,9 +30,9 @@ const createEvent = async (event: Event): Promise<Event> => {
 
 const getAllEvents = async (): Promise<Array<Event>> => {
     try {
-        const allEvents = await ddb.scan({
+        const allEvents = await ddb.send(new ScanCommand({
             TableName: eventsTable
-        }).promise();
+        }));
 
         return allEvents.Items ? allEvents.Items.map(i => i as Event).sort((a, b) => a.createdTime - b.createdTime) : [];
     } catch(e) {
@@ -43,7 +43,7 @@ const getAllEvents = async (): Promise<Array<Event>> => {
 
 const getEventsByType = async (eventType: string): Promise<Array<Event>> => {
     try {
-        const eventsByType = await ddb.query({
+        const eventsByType = await ddb.send(new QueryCommand({
             TableName: eventsTable,
             IndexName: eventTypeIndex,
             ExpressionAttributeValues: {
@@ -52,7 +52,7 @@ const getEventsByType = async (eventType: string): Promise<Array<Event>> => {
             },
             KeyConditionExpression: 'eventType = :eventType',
             FilterExpression: 'eventStatus <> :deleted'
-        }).promise();
+        }));
 
         return eventsByType.Items ? eventsByType.Items.map(i => i as Event).sort((a, b) => a.createdTime - b.createdTime) : [];
     } catch(e) {
@@ -64,7 +64,7 @@ const getEventsByType = async (eventType: string): Promise<Array<Event>> => {
 const updateEvents = async (events: Event[]) => {
     try {
         const updates = events.map(async (event) => {
-            await ddb.update({
+            await ddb.send(new UpdateCommand({
                 TableName: eventsTable,
                 Key: {
                     eventId: event.eventId
@@ -75,7 +75,7 @@ const updateEvents = async (events: Event[]) => {
                     ':description': event.description,
                     ':title': event.title
                 }
-            }).promise();
+            }));
         });
 
         await Promise.all(updates);
@@ -88,12 +88,12 @@ const updateEvents = async (events: Event[]) => {
 const deleteEvents = async (eventIds: string[]) => {
     try {
         const deletes = eventIds.map(async (id: string) => {
-            await ddb.delete({
+            await ddb.send(new DeleteCommand({
                 TableName: eventsTable,
                 Key: {
                     eventId: id
                 }
-            }).promise();
+            }));
         });
 
         await Promise.all(deletes);
