@@ -5,7 +5,12 @@ import * as crypto from 'crypto';
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({
     region: process.env.AWS_REGION,
-}));
+}),
+{
+    marshallOptions: {
+        convertClassInstanceToMap: true
+    }
+});
 
 const eventsTable = process.env.EVENTS_TABLE || '';
 const eventTypeIndex = process.env.EVENT_TYPE_INDEX || '';
@@ -21,7 +26,7 @@ const createEvent = async (event: Event): Promise<Event> => {
             Item: event
         }));
     } catch(e) {
-        console.error(`Error saving new event with title ${event.title}`, JSON.stringify(e));
+        console.error(`Error saving new event with title ${event.title}`, e);
         throw e;
     }
 
