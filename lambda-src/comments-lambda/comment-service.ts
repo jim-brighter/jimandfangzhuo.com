@@ -5,7 +5,12 @@ import * as crypto from 'crypto';
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({
     region: process.env.AWS_REGION
-}));
+}),
+{
+    marshallOptions: {
+        convertClassInstanceToMap: true
+    }
+});
 
 const commentsTable = process.env.COMMENTS_TABLE || '';
 
@@ -19,7 +24,7 @@ const createComment = async(comment: Comment): Promise<Comment> => {
             Item: comment
         }));
     } catch(e) {
-        console.error(`Error saving new comment with text ${comment.commentText}`, JSON.stringify(e));
+        console.error(`Error saving new comment with text ${comment.commentText}`, e);
         throw e;
     }
 
