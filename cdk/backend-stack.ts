@@ -30,7 +30,8 @@ export class BackendStack extends Stack {
       tableName: 'PlannerEvents',
       removalPolicy: RemovalPolicy.RETAIN,
       billingMode: ddb.BillingMode.PAY_PER_REQUEST,
-      deletionProtection: true
+      deletionProtection: true,
+      pointInTimeRecovery: true
     });
 
     eventsTable.addGlobalSecondaryIndex({
@@ -51,7 +52,8 @@ export class BackendStack extends Stack {
       tableName: 'PlannerImages',
       removalPolicy: RemovalPolicy.RETAIN,
       billingMode: ddb.BillingMode.PAY_PER_REQUEST,
-      deletionProtection: true
+      deletionProtection: true,
+      pointInTimeRecovery: true
     });
 
     const commentsTable = new ddb.Table(this, 'CommentsTable', {
@@ -63,7 +65,8 @@ export class BackendStack extends Stack {
       tableName: 'PlannerComments',
       removalPolicy: RemovalPolicy.RETAIN,
       billingMode: ddb.BillingMode.PAY_PER_REQUEST,
-      deletionProtection: true
+      deletionProtection: true,
+      pointInTimeRecovery: true
     });
 
     const plan = backup.BackupPlan.daily35DayRetention(this, 'BackupPlan');
