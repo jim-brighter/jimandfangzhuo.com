@@ -19,7 +19,13 @@ export class FrontendStack extends Stack {
       versioned: true,
       publicReadAccess: true,
       websiteIndexDocument: 'index.html',
-      websiteErrorDocument: 'index.html'
+      websiteErrorDocument: 'index.html',
+      lifecycleRules: [{
+        enabled: true,
+        expiredObjectDeleteMarker: true,
+        noncurrentVersionExpiration: Duration.days(30),
+        noncurrentVersionsToRetain: 1
+      }]
     });
 
     const frontendSubdomainBucket = new s3.Bucket(this, 'PlannerFrontendSubdomainBucket', {
