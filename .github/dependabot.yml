@@ -6,7 +6,19 @@
 version: 2
 updates:
   - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
+    directory: "/cdk" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "jim-brighter"
+  - package-ecosystem: "npm"
+    directory: "/lambda"
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "jim-brighter"
+  - package-ecosystem: "npm"
+    directory: "/ui"
     schedule:
       interval: "weekly"
     assignees:
