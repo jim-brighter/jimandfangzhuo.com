@@ -3,11 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { environment } from '../environments/environment';
-import { PlannerEvent } from './event';
+import { environment } from '../../environments/environment';
+import { PlannerEvent } from '../types/event';
 import { AuthenticationService } from './authentication.service';
 import { ErrorService } from './error.service';
-import { SuccessResponse } from './success-response';
+import { SuccessResponse } from '../types/success-response';
 
 @Injectable({
   providedIn: 'root'

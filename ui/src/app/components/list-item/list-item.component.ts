@@ -1,5 +1,5 @@
 import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
-import { PlannerEvent } from '../event';
+import { PlannerEvent } from '../../types/event';
 import { faEdit, faCheck, faRedo, faTrash } from '@fortawesome/free-solid-svg-icons';
 
 @Component({

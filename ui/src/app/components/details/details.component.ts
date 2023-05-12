@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
 import { Location } from '@angular/common';
-import { AuthenticationService } from '../authentication.service';
-import { ErrorService } from '../error.service';
+import { AuthenticationService } from '../../services/authentication.service';
+import { ErrorService } from '../../services/error.service';
 import { faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 
 
