@@ -1,8 +1,8 @@
 import { Component, OnDestroy } from '@angular/core';
-import { PlannerImage } from '../image';
-import { ImageService } from '../image.service';
-import { ErrorService } from '../error.service';
-import { AuthenticationService } from '../authentication.service';
+import { PlannerImage } from '../../types/image';
+import { ImageService } from '../../services/image.service';
+import { ErrorService } from '../../services/error.service';
+import { AuthenticationService } from '../../services/authentication.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { faSignOutAlt, faRotate } from '@fortawesome/free-solid-svg-icons';
 

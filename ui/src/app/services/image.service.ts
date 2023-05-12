@@ -3,8 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { environment } from '../environments/environment';
-import { PlannerImage } from './image';
+import { environment } from '../../environments/environment';
+import { PlannerImage } from '../types/image';
 import { AuthenticationService } from './authentication.service';
 import { ErrorService } from './error.service';
 

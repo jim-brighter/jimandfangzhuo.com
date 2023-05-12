@@ -3,8 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-import { environment } from '../environments/environment';
-import { Comment } from './comment';
+import { environment } from '../../environments/environment';
+import { Comment } from '../types/comment';
 import { AuthenticationService } from './authentication.service';
 import { ErrorService } from './error.service';
 

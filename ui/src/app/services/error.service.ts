@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { PlannerError } from './planner-error';
+import { PlannerError } from '../types/planner-error';
 
 @Injectable({
   providedIn: 'root'

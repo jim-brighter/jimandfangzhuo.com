@@ -2,8 +2,8 @@ import { Component, Input, OnChanges } from '@angular/core';
 
 import { faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons';
 
-import { EventService } from '../event.service';
-import { PlannerEvent } from '../event';
+import { EventService } from '../../services/event.service';
+import { PlannerEvent } from '../../types/event';
 
 const listMap: { [id: string]: string } = {
   'TO_DO': 'Done',

@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { EventService } from '../event.service';
-import { PlannerEvent } from '../event';
+import { EventService } from '../../services/event.service';
+import { PlannerEvent } from '../../types/event';
 
 import { faTrashRestore, faTrash } from '@fortawesome/free-solid-svg-icons';
-import { AuthenticationService } from '../authentication.service';
+import { AuthenticationService } from '../../services/authentication.service';
 import { NavigationEnd, Router } from '@angular/router';
 
 const TO_DO = 'TO_DO';
