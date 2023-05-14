@@ -6,7 +6,7 @@
       {{listTitle}}
     </h5>
   </a>
-  <ul class="col-12 list-group-flush collapse show border-top" id="toDoCollapse">
+  <ul class="col-12 list-group list-group-flush collapse show border-top" id="toDoCollapse">
     <li class="list-group-item" *ngFor="let plannerEvent of toDoEvents">
       <app-list-item [plannerEvent]="plannerEvent" (itemToDelete)="onDelete($event)" (itemToUpdate)="onComplete($event)" (itemToEdit)="onEdit($event)"></app-list-item>
     </li>
@@ -31,7 +31,7 @@
       {{completedListTitle}}
     </h5>
   </a>
-  <ul class="col-12 collapse list-group-flush border-top" id="doneCollapse">
+  <ul class="col-12 collapse list-group list-group-flush border-top" id="doneCollapse">
     <li class="list-group-item" *ngFor="let plannerEvent of completeEvents">
       <app-list-item [plannerEvent]="plannerEvent" (itemToDelete)="onDelete($event)" (itemToUpdate)="onRedo($event)" (itemToEdit)="onEdit($event)"></app-list-item>
     </li>
