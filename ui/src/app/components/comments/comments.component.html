@@ -1,6 +1,6 @@
 <div *ngIf="!isLoading" class="container-fluid row align-items-start">
   <h5>Comments</h5>
-  <ul class="col-12 list-group-flush d-inline-block border-top">
+  <ul class="col-12 list-group list-group-flush d-inline-block border-top">
     <li class="list-group-item" *ngFor="let comment of comments">
       <app-comment-item [comment]="comment"></app-comment-item>
     </li>
