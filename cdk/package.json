@@ -20,7 +20,7 @@
     "deploy": "npm run cdk:angular:build && npm run cdk:deploy"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.1",
+    "@types/jest": "^29.5.2",
     "@types/node": "20.2.5",
     "aws-cdk": "2.81.0",
     "esbuild": "^0.17.19",
