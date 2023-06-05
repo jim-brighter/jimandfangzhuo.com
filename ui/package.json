@@ -19,7 +19,7 @@
     "@angular/forms": "^16.0.3",
     "@angular/platform-browser": "^16.0.3",
     "@angular/platform-browser-dynamic": "^16.0.3",
-    "@angular/router": "^16.0.3",
+    "@angular/router": "^16.0.4",
     "@aws-amplify/ui-angular": "^3.2.18",
     "@fortawesome/angular-fontawesome": "^0.13.0",
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
