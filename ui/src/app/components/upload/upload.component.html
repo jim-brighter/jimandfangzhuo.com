@@ -3,12 +3,12 @@
     <li class="list-inline-item">
       <h2 class="d-flex">Photos!</h2>
     </li>
-    <!-- <li class="list-inline-item align-text-bottom">
-      <input class="fileInput d-flex" type="file" ng2FileSelect [uploader]="uploader" multiple id="fileInput" name="fileInput" data-multiple-caption="{count} files"/>
-      <label class="btn btn-outline-primary btn-sm d-flex" for="fileInput">{{uploader.queue.length == 0 ? 'Select Files' : uploader.queue.length + ' files selected'}}</label>
+    <li class="list-inline-item align-text-bottom">
+      <input class="fileInput d-flex" (change)="onFileChange($event)" type="file" id="fileInput" name="fileInput"/>
+      <label class="btn btn-outline-primary btn-sm d-flex" for="fileInput">{{files.length}} Files Selected</label>
     </li>
     <li class="list-inline-item align-text-bottom">
-      <button [disabled]="uploader.queue.length < 1" class="btn btn-outline-success btn-sm d-flex" (click)="upload()" type="submit">Upload</button>
-    </li> -->
+      <button [disabled]="files.length === 0" class="btn btn-outline-success btn-sm d-flex" (click)="upload()" type="submit">Upload</button>
+    </li>
   </div>
 </form>

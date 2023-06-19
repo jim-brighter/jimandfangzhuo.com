@@ -18,16 +18,16 @@ export class ImageService {
 
   constructor(private http: HttpClient, private auth: AuthenticationService, private errors: ErrorService) { }
 
-  // uploadImages(images: FormData): Observable<PlannerImage[]> {
-  //   return this.http.post<FormData>(this.rootUrl + this.apiContext, images, {
-  //     headers: {
-  //       Authorization: `Bearer ${this.auth.idToken}`
-  //     }
-  //   })
-  //     .pipe(
-  //       catchError(this.errors.handleError('uploadImages', null))
-  //     );
-  // }
+  uploadImages(images: FormData): Observable<any> {
+    return this.http.post<any>(this.rootUrl + this.apiContext, images, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      }
+    })
+      .pipe(
+        catchError(this.errors.handleError('uploadImages', ''))
+      );
+  }
 
   getAllImages(): Observable<PlannerImage[]> {
     return this.http.get<PlannerImage[]>(this.rootUrl + this.apiContext, {
