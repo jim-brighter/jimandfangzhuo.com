@@ -24,6 +24,7 @@ export class AdminComponent {
   eventTitle = '';
 
   isLoading = true;
+  isAuthenticated = false;
 
   navigationSubscription
 
@@ -31,15 +32,16 @@ export class AdminComponent {
     private authenticator: AuthenticationService,
     private router: Router) {
 
-    this.navigationSubscription = this.router.events.subscribe((e: any) => {
-      if (e instanceof NavigationEnd && this.authenticated()) {
+    this.navigationSubscription = this.router.events.subscribe(async (e: any) => {
+      if (e instanceof NavigationEnd && await this.authenticated()) {
+        this.isAuthenticated = true;
         this.populateEvents();
       }
     });
   }
 
-  authenticated(): boolean {
-    return this.authenticator.authenticated;
+  async authenticated(): Promise<boolean> {
+    return await this.authenticator.authenticated();
   }
 
   updateDescriptionModal(event: PlannerEvent): void {

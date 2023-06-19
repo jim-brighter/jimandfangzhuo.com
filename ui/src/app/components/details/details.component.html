@@ -8,7 +8,7 @@
     <button *ngIf="i === 0" type="button" class="btn-close" aria-label="Close" (click)="errors.clear()"></button>
   </span>
 </div>
-<div *ngIf="authenticated()" class="container-fluid" id="all-container">
+<div *ngIf="isAuthenticated" class="container-fluid" id="all-container">
   <app-logout></app-logout>
   <div class="d-block d-md-none">
     <ul class="nav nav-tabs col-12 nav-fill my-4">
@@ -29,7 +29,7 @@
     </div>
   </div>
 </div>
-<div *ngIf="!authenticated()" class="container-fluid">
+<div *ngIf="!isAuthenticated" class="container-fluid">
   <div class="row justify-content-center">
     <div class="col-sm-4 col-10">
       <app-login [endpoint]="list"></app-login>
