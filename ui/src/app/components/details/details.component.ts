@@ -20,6 +20,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
   navigationSubscription;
 
+  isAuthenticated = false;
+
   hideLists = false;
   hideComments = false;
 
@@ -33,8 +35,9 @@ export class DetailsComponent implements OnInit, OnDestroy {
     private authenticator: AuthenticationService,
     public errors: ErrorService) {
 
-      this.navigationSubscription = this.router.events.subscribe((e: any) => {
-        if (e instanceof NavigationEnd) {
+      this.navigationSubscription = this.router.events.subscribe(async (e: any) => {
+        if (e instanceof NavigationEnd && await this.authenticated()) {
+          this.isAuthenticated = true;
           this.getList();
         }
       });
@@ -48,8 +51,8 @@ export class DetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  authenticated(): boolean {
-    return this.authenticator.authenticated;
+  async authenticated(): Promise<boolean> {
+    return await this.authenticator.authenticated();
   }
 
   getList(): void {

@@ -16,6 +16,7 @@ export class PhotosComponent implements OnDestroy {
   navigationSubscription;
 
   isLoading = true;
+  isAuthenticated = false;
 
   s3RootUrl = 'https://s3.amazonaws.com/jimandfangzhuo.com-images/';
   selectedImage: PlannerImage = new PlannerImage();
@@ -28,17 +29,18 @@ export class PhotosComponent implements OnDestroy {
     private authenticator: AuthenticationService,
     private router: Router) {
 
-      this.navigationSubscription = this.router.events.subscribe((e: any) => {
-        if (e instanceof NavigationEnd && this.authenticated()) {
-          this.getImages();
-        }
-      });
-    }
+    this.navigationSubscription = this.router.events.subscribe(async (e: any) => {
+      if (e instanceof NavigationEnd && await this.authenticated()) {
+        this.isAuthenticated = true;
+        this.getImages()
+      }
+    });
+  }
 
   images: PlannerImage[] = [];
 
-  authenticated(): boolean {
-    return this.authenticator.authenticated;
+  async authenticated(): Promise<boolean> {
+    return await this.authenticator.authenticated();
   }
 
   getImages(): void {

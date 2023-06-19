@@ -18,7 +18,6 @@ import { ListItemComponent } from '../components/list-item/list-item.component';
 import { CommentService } from '../services/comment.service';
 import { CommentItemComponent } from '../components/comment-item/comment-item.component';
 import { UploadComponent } from '../components/upload/upload.component';
-// import { FileUploadModule } from 'ng2-file-upload';
 import { ImageService } from '../services/image.service';
 import { PhotosComponent } from '../components/photos/photos.component';
 import { LoginComponent } from '../components/login/login.component';

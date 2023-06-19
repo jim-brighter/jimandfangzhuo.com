@@ -3,27 +3,25 @@ import { HttpClient } from '@angular/common/http';
 import { ErrorService } from './error.service';
 import { Auth } from 'aws-amplify';
 
-const TOKEN_KEY = 'authToken';
-const CSRF_KEY = 'csrfToken';
-const TOKEN_EXPIRATION = 'tokenExpiration';
-
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService {
 
-  authenticated = false;
   idToken: string = '';
 
   constructor(private http: HttpClient,
               private errors: ErrorService) {
-    const tokenAuth = localStorage.getItem(TOKEN_KEY);
-    const tokenCsrf = localStorage.getItem(CSRF_KEY);
-    const tokenExpiration = localStorage.getItem(TOKEN_EXPIRATION) || '';
-    if (tokenAuth && tokenCsrf && (new Date().getTime() < parseInt(tokenExpiration))) {
-      this.authenticated = true;
-    } else {
-      this.wipeSession();
+
+  }
+
+  async authenticated(): Promise<boolean> {
+    try {
+      let user = await Auth.currentAuthenticatedUser();
+      this.idToken = user.signInUserSession.idToken.jwtToken;
+      return true;
+    } catch(e) {
+      return false;
     }
   }
 
@@ -31,7 +29,6 @@ export class AuthenticationService {
     try {
       const result = await Auth.signIn(credentials.username, credentials.password);
       this.idToken = result.signInUserSession.idToken.jwtToken;
-      this.authenticated = true;
       return callback && callback();
     } catch(e) {
       console.error(e);
@@ -55,7 +52,6 @@ export class AuthenticationService {
   }
 
   private wipeSession() {
-    this.authenticated = false;
     this.idToken = '';
     localStorage.clear();
   }

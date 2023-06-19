@@ -6,13 +6,12 @@
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-body">
-        <img *ngIf="!!selectedImage" class="w-100" src="{{s3RootUrl + selectedImage.s3ObjectKey}}"/>
-        <!-- <span class="rotate-icon-modal" (click)="rotate(selectedImage)"><fa-icon [icon]="faRotate"></fa-icon></span> -->
+        <img *ngIf="!!selectedImage.s3ObjectKey" class="w-100" src="{{s3RootUrl + selectedImage.s3ObjectKey}}"/>
       </div>
     </div>
   </div>
 </div>
-<div *ngIf="authenticated() && !isLoading" class="container-fluid">
+<div *ngIf="isAuthenticated && !isLoading" class="container-fluid">
   <app-logout></app-logout>
   <div class="container-fluid justify-content-center align-content-center text-center">
     <span *ngFor="let errorMessage of errors.getErrors()" class="d-block alert alert-danger">{{errorMessage}}</span>
@@ -26,15 +25,14 @@
     <ul class="list-inline d-inline-block">
       <li class="list-inline-item custom-image p-1" *ngFor="let image of images">
         <img data-bs-toggle="modal" data-bs-target="#zoomModal" (click)="zoomImage(image)" src="{{s3RootUrl + image.s3ObjectKey}}"/>
-        <!-- <span class="rotate-icon" (click)="rotate(image)"><fa-icon [icon]="faRotate"></fa-icon></span> -->
       </li>
     </ul>
   </div>
 </div>
-<div *ngIf="authenticated() && isLoading">
+<div *ngIf="isAuthenticated && isLoading">
   <div class="spinner"></div>
 </div>
-<div *ngIf="!authenticated()" class="container-fluid">
+<div *ngIf="!isAuthenticated" class="container-fluid">
   <div class="row justify-content-center">
     <div class="col-sm-4 col-10">
       <app-login [endpoint]="'photos'"></app-login>
