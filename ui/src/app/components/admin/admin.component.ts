@@ -34,14 +34,15 @@ export class AdminComponent {
 
     this.navigationSubscription = this.router.events.subscribe(async (e: any) => {
       if (e instanceof NavigationEnd && await this.authenticated()) {
-        this.isAuthenticated = true;
         this.populateEvents();
       }
     });
   }
 
   async authenticated(): Promise<boolean> {
-    return await this.authenticator.authenticated();
+    const authStatus = await this.authenticator.authenticated();
+    this.isAuthenticated = authStatus;
+    return authStatus;
   }
 
   updateDescriptionModal(event: PlannerEvent): void {

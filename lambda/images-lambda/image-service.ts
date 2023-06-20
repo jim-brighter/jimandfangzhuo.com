@@ -35,32 +35,35 @@ const getAllImages = async(): Promise<Array<Image>> => {
 
 const saveImages = async(body: any): Promise<void> => {
     try {
-        let imageData: string = body.imageData;
-        const prefix: string = imageData.split(',')[0];
+        const imageData: string = body.imageData;
+
+        const splitImageData = imageData.split(',')[0];
+
+        const base64EncodedImage = splitImageData[1];
+        const data: Buffer = Buffer.from(base64EncodedImage, 'base64')
+
+        const prefix: string = splitImageData[0];
         const contentType: string = prefix.split(';')[0].split(':')[1];
         const extension: string = contentType.split('/')[1];
         const key: string = `${crypto.randomUUID()}.${extension}`;
 
-        imageData = imageData.replace(`${prefix},`, '');
-        const data: Buffer = Buffer.from(imageData, 'base64')
-
-        const putCommand: PutObjectCommand = new PutObjectCommand({
+        const s3PutCommand: PutObjectCommand = new PutObjectCommand({
             Bucket: bucketName,
             Key: key,
             ContentType: contentType,
             ACL: 'public-read',
             Body: data
         });
-        await s3.send(putCommand);
+        await s3.send(s3PutCommand);
 
-        const image: any = {
-            imageId: crypto.randomUUID(),
-            s3ObjectKey: key
-        };
-        await ddb.send(new PutCommand({
+        const ddbPutCommand: PutCommand = new PutCommand({
             TableName: imagesTable,
-            Item: image
-        }));
+            Item: {
+                imageId: crypto.randomUUID(),
+                s3ObjectKey: key
+            }
+        });
+        await ddb.send(ddbPutCommand);
     } catch(e) {
         console.error(`Failed to upload images`, e);
         throw e;
