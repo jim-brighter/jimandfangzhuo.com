@@ -37,7 +37,7 @@ const saveImages = async(body: any): Promise<void> => {
     try {
         const imageData: string = body.imageData;
 
-        const splitImageData = imageData.split(',')[0];
+        const splitImageData = imageData.split(',');
 
         const base64EncodedImage = splitImageData[1];
         const data: Buffer = Buffer.from(base64EncodedImage, 'base64')
