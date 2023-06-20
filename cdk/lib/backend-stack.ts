@@ -107,11 +107,7 @@ export class BackendStack extends Stack {
       handler: 'handler',
       entry: '../lambda/events-lambda/events.ts',
       bundling: {
-        minify: true,
-        externalModules: [
-          '@aws-sdk/client-dynamodb',
-          '@aws-sdk/lib-dynamodb'
-        ]
+        minify: true
       },
       environment: {
         EVENTS_TABLE: eventsTable.tableName,
@@ -125,11 +121,7 @@ export class BackendStack extends Stack {
       handler: 'handler',
       entry: '../lambda/comments-lambda/comments.ts',
       bundling: {
-        minify: true,
-        externalModules: [
-          '@aws-sdk/client-dynamodb',
-          '@aws-sdk/lib-dynamodb'
-        ]
+        minify: true
       },
       environment: {
         COMMENTS_TABLE: commentsTable.tableName
@@ -142,14 +134,11 @@ export class BackendStack extends Stack {
       handler: 'handler',
       entry: '../lambda/images-lambda/images.ts',
       bundling: {
-        minify: true,
-        externalModules: [
-          '@aws-sdk/client-dynamodb',
-          '@aws-sdk/lib-dynamodb'
-        ]
+        minify: true
       },
       environment: {
-        IMAGES_TABLE: imagesTable.tableName
+        IMAGES_TABLE: imagesTable.tableName,
+        BUCKET_NAME: imagesBucket.bucketName
       },
       logRetention: logs.RetentionDays.ONE_MONTH
     });
@@ -159,6 +148,9 @@ export class BackendStack extends Stack {
     commentsTable.grantReadWriteData(commentsLambda);
 
     imagesTable.grantReadWriteData(imagesLambda);
+
+    imagesBucket.grantReadWrite(imagesLambda);
+    imagesBucket.grantPutAcl(imagesLambda);
 
     // ACM
     const cert = certmanager.Certificate.fromCertificateArn(this, 'AcmCert', CERT_ARN);
@@ -258,6 +250,7 @@ export class BackendStack extends Stack {
       allowCredentials: true
     });
     imagesApi.addMethod('GET', imagesLambdaIntegration, { authorizer });
+    imagesApi.addMethod('POST', imagesLambdaIntegration, { authorizer });
 
     // ROUTE53 MAPPING
     const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {

@@ -1,43 +1,40 @@
-import { Component, OnInit } from '@angular/core';
-// import { FileUploader } from 'ng2-file-upload';
+import { Component } from '@angular/core';
 import { ImageService } from '../../services/image.service';
-import { PlannerEvent } from '../../types/event';
+import { ImageUploadRequest } from 'src/app/types/image-upload-request';
 
 @Component({
   selector: 'app-upload',
   templateUrl: './upload.component.html',
   styleUrls: ['./upload.component.css']
 })
-export class UploadComponent implements OnInit {
+export class UploadComponent {
 
-  // public uploader: FileUploader = new FileUploader({});
+  files: FileList[] = [];
 
   constructor(private imageService: ImageService) { }
 
-  ngOnInit() {
-    // this.uploader.options.isHTML5 = true;
+  onFileChange(event: any) {
+    this.files = [];
+    this.files.push(event.target.files);
   }
 
-  // upload() {
-  //   let queueLength: number = this.uploader.queue.length;
-  //   let formData = new FormData();
+  upload() {
+    if (this.files.length > 0) {
+      const imageRequest = new ImageUploadRequest();
 
-  //   if (queueLength > 0) {
-  //     for (let i = 0; i < queueLength; i++) {
-  //       formData.append('images', this.uploader.queue[i].file.rawFile);
-  //     }
-  //     formData.append('event', new Blob([JSON.stringify(new PlannerEvent())], {
-  //       type: 'application/json'
-  //     }));
-
-  //     this.imageService.uploadImages(formData).subscribe(data => {
-  //       if (data !== null) {
-  //         alert("Upload Success!");
-  //       }
-  //     });
-  //   } else {
-  //     console.log("no images selected");
-  //   }
-  // }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        imageRequest.imageData = reader.result as string;
+        this.imageService.uploadImages(imageRequest).subscribe(data => {
+          if (data.statusMessage === 'OK') {
+            alert("Upload Success!");
+          }
+        });
+      }
+      reader.readAsDataURL(this.files[0][0]);
+    } else {
+      console.log("no images selected");
+    }
+  }
 
 }

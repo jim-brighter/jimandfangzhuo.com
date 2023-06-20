@@ -1,5 +1,5 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Image, PlannerImage } from './image';
+import { Image } from './image';
 import * as imageService from './image-service';
 
 
@@ -29,6 +29,26 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                 }
             }
         case 'POST':
+            try {
+                const body = event.body && JSON.parse(event.body);
+                await imageService.saveImages(body);
+                return {
+                    statusCode: 201,
+                    headers,
+                    body: JSON.stringify({
+                        statusMessage: 'OK'
+                    })
+                }
+            } catch(e) {
+                console.error(e);
+                return {
+                    statusCode: 500,
+                    headers,
+                    body: JSON.stringify({
+                        errorMessage: 'Error uploading images'
+                    })
+                }
+            }
         default:
             return {
                 statusCode: 405,
