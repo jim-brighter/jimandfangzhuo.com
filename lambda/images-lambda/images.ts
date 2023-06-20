@@ -1,8 +1,6 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { Image } from './image';
-import * as multipartParser from 'parse-multipart-data';
 import * as imageService from './image-service';
-import { ImageUpload } from './image-upload-request';
 
 
 export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -32,10 +30,8 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             }
         case 'POST':
             try {
-                const boundary = multipartParser.getBoundary(event.headers['content-type'] || '');
-                let body = multipartParser.parse(Buffer.from(event.body || ''), boundary);
-                body = body.filter(i => i.name === 'images');
-                await imageService.saveImages(body[0] as ImageUpload);
+                const body = event.body && JSON.parse(event.body);
+                await imageService.saveImages(body);
                 return {
                     statusCode: 201,
                     headers,

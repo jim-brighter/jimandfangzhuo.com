@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ImageService } from '../../services/image.service';
-import { PlannerEvent } from '../../types/event';
+import { ImageUploadRequest } from 'src/app/types/image-upload-request';
 
 @Component({
   selector: 'app-upload',
@@ -19,23 +19,19 @@ export class UploadComponent {
   }
 
   upload() {
-    let formData = new FormData();
-
     if (this.files.length > 0) {
-      for (let i = 0; i < this.files.length; i++) {
-        for (let j = 0; j < this.files[i].length; j++) {
-          formData.append('images', this.files[i][j]);
-        }
-      }
-      formData.append('event', new Blob([JSON.stringify(new PlannerEvent())], {
-        type: 'application/json'
-      }));
+      const imageRequest = new ImageUploadRequest();
 
-      this.imageService.uploadImages(formData).subscribe(data => {
-        if (data.statusMessage === 'OK') {
-          alert("Upload Success!");
-        }
-      });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        imageRequest.imageData = reader.result as string;
+        this.imageService.uploadImages(imageRequest).subscribe(data => {
+          if (data.statusMessage === 'OK') {
+            alert("Upload Success!");
+          }
+        });
+      }
+      reader.readAsDataURL(this.files[0][0]);
     } else {
       console.log("no images selected");
     }

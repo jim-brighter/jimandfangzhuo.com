@@ -1,7 +1,6 @@
 import { DynamoDBDocumentClient, PutCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { Image } from './image';
-import { ImageUploadRequest } from './image-upload-request';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import * as crypto from 'crypto';
 
@@ -34,26 +33,27 @@ const getAllImages = async(): Promise<Array<Image>> => {
     }
 }
 
-const saveImages = async(body: ImageUploadRequest): Promise<void> => {
+const saveImages = async(body: any): Promise<void> => {
     try {
-        const contentType: string = body.type;
+        let imageData: string = body.imageData;
+        const prefix: string = imageData.split(',')[0];
+        const contentType: string = prefix.split(';')[0].split(':')[1];
         const extension: string = contentType.split('/')[1];
-        const key = `${crypto.randomUUID()}.${extension}`;
+        const key: string = `${crypto.randomUUID()}.${extension}`;
 
-        console.log(`Saving ${body.filename} as ${key}`);
+        imageData = imageData.replace(`${prefix},`, '');
+        const data: Buffer = Buffer.from(imageData, 'base64')
 
-        const putCommand = new PutObjectCommand({
+        const putCommand: PutObjectCommand = new PutObjectCommand({
             Bucket: bucketName,
             Key: key,
             ContentType: contentType,
-            ContentEncoding: '',
-            ContentLength: body.data.length,
             ACL: 'public-read',
-            Body: body.data
+            Body: data
         });
         await s3.send(putCommand);
 
-        const image = {
+        const image: any = {
             imageId: crypto.randomUUID(),
             s3ObjectKey: key
         };
