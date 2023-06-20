@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { ErrorService } from './error.service';
 import { Auth } from 'aws-amplify';
 
@@ -10,8 +9,7 @@ export class AuthenticationService {
 
   idToken: string = '';
 
-  constructor(private http: HttpClient,
-              private errors: ErrorService) {
+  constructor(private errors: ErrorService) {
 
   }
 
