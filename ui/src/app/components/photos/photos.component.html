@@ -12,7 +12,6 @@
   </div>
 </div>
 <div *ngIf="isAuthenticated && !isLoading" class="container-fluid">
-  <app-logout></app-logout>
   <div class="container-fluid justify-content-center align-content-center text-center">
     <span *ngFor="let errorMessage of errors.getErrors()" class="d-block alert alert-danger">{{errorMessage}}</span>
   </div>
