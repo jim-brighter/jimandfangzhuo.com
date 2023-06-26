@@ -1,7 +1,7 @@
 <ul class="container-fluid list-inline d-none d-md-inline-block d-md-flex justify-content-center text-center">
   <li class="list-inline-item" *ngFor="let route of routerMapping | keyvalue:onCompare">
     <h5 class="d-flex justify-content-center">
-      <a class="btn" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="{{route.key}}">{{route.value}}</a>
+      <a class="btn" [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" routerLink="{{route.key}}"><fa-icon [icon]="route.value.icon"></fa-icon> {{route.value.text}}</a>
     </h5>
   </li>
   <li class="list-inline-item" *ngIf="showLogout()">
