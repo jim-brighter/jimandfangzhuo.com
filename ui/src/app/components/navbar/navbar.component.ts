@@ -2,7 +2,14 @@ import { KeyValue } from '@angular/common';
 import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSignOutAlt,
+  faPersonSkiing,
+  faUtensils,
+  faKitchenSet,
+  faPlaneDeparture,
+  faTv,
+  faMoneyBillWave,
+  faImage } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-navbar',
@@ -16,13 +23,34 @@ export class NavbarComponent implements OnInit {
   faSignOutAlt = faSignOutAlt;
 
   routerMapping = {
-    "/details/to-do": "Doing!",
-    "/details/to-eat": "Eating!",
-    "/details/to-cook": "Cooking!",
-    "/details/to-go": "Going!",
-    "/details/to-watch": "Watching!",
-    "/details/to-buy": "Buying!",
-    "/photos": "Photos!"
+    "/details/to-do": {
+      text: "Doing!",
+      icon: faPersonSkiing
+    },
+    "/details/to-eat": {
+      text: "Eating!",
+      icon: faUtensils
+    },
+    "/details/to-cook": {
+      text: "Cooking!",
+      icon: faKitchenSet
+    },
+    "/details/to-go": {
+      text: "Going!",
+      icon: faPlaneDeparture
+    },
+    "/details/to-watch": {
+      text: "Watching!",
+      icon: faTv
+    },
+    "/details/to-buy": {
+      text: "Buying!",
+      icon: faMoneyBillWave
+    },
+    "/photos": {
+      text: "Photos!",
+      icon: faImage
+    }
   }
 
   constructor(private authenticator: AuthenticationService, private router: Router) { }
