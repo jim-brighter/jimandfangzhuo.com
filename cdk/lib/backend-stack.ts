@@ -83,6 +83,7 @@ export class BackendStack extends Stack {
       bucketName: 'jimandfangzhuo.com-images',
       encryption: s3.BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.RETAIN,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       versioned: true
     });
 
@@ -140,7 +141,8 @@ export class BackendStack extends Stack {
         IMAGES_TABLE: imagesTable.tableName,
         BUCKET_NAME: imagesBucket.bucketName
       },
-      logRetention: logs.RetentionDays.ONE_MONTH
+      logRetention: logs.RetentionDays.ONE_MONTH,
+      timeout: Duration.seconds(10)
     });
 
     eventsTable.grantReadWriteData(eventsLambda);

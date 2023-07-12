@@ -1,7 +1,7 @@
 import { DynamoDBDocumentClient, PutCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { Image } from './image';
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import * as crypto from 'crypto';
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({
@@ -19,6 +19,22 @@ const s3 = new S3Client({
 
 const imagesTable = process.env.IMAGES_TABLE || '';
 const bucketName = process.env.BUCKET_NAME;
+
+const getImage = async(imageId: string): Promise<string> => {
+    try {
+        const getObjectCommand: GetObjectCommand = new GetObjectCommand({
+            Bucket: bucketName,
+            Key: imageId
+        });
+
+        const image = await s3.send(getObjectCommand);
+
+        return `data:${image.ContentType};base64,${await image.Body?.transformToString('base64')}`;
+    } catch(e) {
+        console.error(`Failed to retrieve image ${imageId}`);
+        throw e;
+    }
+}
 
 const getAllImages = async(): Promise<Array<Image>> => {
     try {
@@ -71,6 +87,7 @@ const saveImages = async(body: any): Promise<void> => {
 }
 
 export {
+    getImage,
     getAllImages,
     saveImages
 }

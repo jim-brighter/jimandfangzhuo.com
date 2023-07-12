@@ -12,20 +12,41 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     };
     switch(event.httpMethod) {
         case 'GET':
-            try {
-                const allImages: Image[] = await imageService.getAllImages();
-                return {
-                    statusCode: 200,
-                    headers,
-                    body: JSON.stringify(allImages)
+            if (event.queryStringParameters?.imageId) {
+                try {
+                    return {
+                        statusCode: 200,
+                        headers,
+                        body: JSON.stringify({
+                            base64Image: await imageService.getImage(event.queryStringParameters.imageId)
+                        })
+                    }
+                } catch(e) {
+                    return {
+                        statusCode: 500,
+                        headers,
+                        body: JSON.stringify({
+                            errorMessage: `Error retrieving image ${event.queryStringParameters.imageId}`
+                        })
+                    }
                 }
-            } catch(e) {
-                return {
-                    statusCode: 500,
-                    headers,
-                    body: JSON.stringify({
-                        errorMessage: 'Error retrieving all images'
-                    })
+            }
+            else {
+                try {
+                    const allImages: Image[] = await imageService.getAllImages();
+                    return {
+                        statusCode: 200,
+                        headers,
+                        body: JSON.stringify(allImages)
+                    }
+                } catch(e) {
+                    return {
+                        statusCode: 500,
+                        headers,
+                        body: JSON.stringify({
+                            errorMessage: 'Error retrieving all images'
+                        })
+                    }
                 }
             }
         case 'POST':
