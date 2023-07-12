@@ -19,7 +19,7 @@ export class PhotosComponent implements OnDestroy {
   isAuthenticated = false;
 
   s3RootUrl = 'https://s3.amazonaws.com/jimandfangzhuo.com-images/';
-  selectedImage: PlannerImage = new PlannerImage();
+  selectedImage: string = '';
 
   faSignOutAlt = faSignOutAlt;
   faRotate = faRotate;
@@ -37,6 +37,7 @@ export class PhotosComponent implements OnDestroy {
   }
 
   images: PlannerImage[] = [];
+  base64Images: string[] = [];
 
   async authenticated(): Promise<boolean> {
     const authStatus = await this.authenticator.authenticated();
@@ -48,10 +49,18 @@ export class PhotosComponent implements OnDestroy {
     this.imageService.getAllImages().subscribe(data => {
       this.images = data;
       this.isLoading = false;
+
+      this.images = this.images.reverse();
+
+      this.images.forEach(image => {
+        this.imageService.getImage(image.s3ObjectKey).subscribe(imageData => {
+          this.base64Images.push(imageData.base64Image);
+        });
+      })
     });
   }
 
-  zoomImage(image: PlannerImage): void {
+  zoomImage(image: string): void {
     this.selectedImage = image;
   }
 

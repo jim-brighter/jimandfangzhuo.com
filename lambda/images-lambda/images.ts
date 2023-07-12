@@ -13,6 +13,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
     switch(event.httpMethod) {
         case 'GET':
             if (event.queryStringParameters?.imageId) {
+                console.log(`Retrieving image ${event.queryStringParameters.imageId}`);
                 try {
                     return {
                         statusCode: 200,

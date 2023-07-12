@@ -8,6 +8,7 @@ import { PlannerImage } from '../types/image';
 import { AuthenticationService } from './authentication.service';
 import { ErrorService } from './error.service';
 import { ImageUploadRequest } from '../types/image-upload-request';
+import { Base64EncodedImage } from '../types/Base64EncodedImage';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,17 @@ export class ImageService {
       .pipe(
         catchError(this.errors.handleError('uploadImages', ''))
       );
+  }
+
+  getImage(imageId: string): Observable<Base64EncodedImage> {
+    return this.http.get<Base64EncodedImage>(this.rootUrl + this.apiContext + `?imageId=${imageId}`, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      }
+    })
+    .pipe(
+      catchError(this.errors.handleError('getImage', new Base64EncodedImage()))
+    )
   }
 
   getAllImages(): Observable<PlannerImage[]> {

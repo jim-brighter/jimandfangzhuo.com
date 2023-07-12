@@ -6,7 +6,7 @@
   <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-body">
-        <img *ngIf="!!selectedImage.s3ObjectKey" class="w-100" src="{{s3RootUrl + selectedImage.s3ObjectKey}}"/>
+        <img *ngIf="!!selectedImage" class="w-100" src="{{selectedImage}}"/>
       </div>
     </div>
   </div>
@@ -22,8 +22,8 @@
   </div>
   <div class="container-fluid d-flex">
     <ul class="list-inline d-inline-block">
-      <li class="list-inline-item custom-image p-1" *ngFor="let image of images">
-        <img data-bs-toggle="modal" data-bs-target="#zoomModal" (click)="zoomImage(image)" src="{{s3RootUrl + image.s3ObjectKey}}"/>
+      <li class="list-inline-item custom-image p-1" *ngFor="let image of base64Images">
+        <img data-bs-toggle="modal" data-bs-target="#zoomModal" (click)="zoomImage(image)" src="{{image}}"/>
       </li>
     </ul>
   </div>
