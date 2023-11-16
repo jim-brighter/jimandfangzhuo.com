@@ -16,11 +16,14 @@ export class AuthenticationService {
   async authenticated(): Promise<boolean> {
     try {
       const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
-      this.idToken = idToken?.toString() || '';
-      return true;
+      if (idToken) {
+        this.idToken = idToken?.toString() || '';
+        return true;
+      }
     } catch(e) {
-      return false;
+      console.error('failed to get auth info', e);
     }
+    return false;
   }
 
   async authenticate(credentials: {username: string, password: string}, callback: () => void) {
