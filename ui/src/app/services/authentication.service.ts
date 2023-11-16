@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { ErrorService } from './error.service';
-import { Auth } from 'aws-amplify';
+import { signIn, signOut, fetchAuthSession } from 'aws-amplify/auth'
 
 @Injectable({
   providedIn: 'root'
@@ -15,8 +15,8 @@ export class AuthenticationService {
 
   async authenticated(): Promise<boolean> {
     try {
-      let user = await Auth.currentAuthenticatedUser();
-      this.idToken = user.signInUserSession.idToken.jwtToken;
+      const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
+      this.idToken = idToken?.toString() || '';
       return true;
     } catch(e) {
       return false;
@@ -25,8 +25,11 @@ export class AuthenticationService {
 
   async authenticate(credentials: {username: string, password: string}, callback: () => void) {
     try {
-      const result = await Auth.signIn(credentials.username, credentials.password);
-      this.idToken = result.signInUserSession.idToken.jwtToken;
+      const { isSignedIn, nextStep } = await signIn({username: credentials.username, password: credentials.password});
+      if (isSignedIn) {
+        const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
+        this.idToken = idToken?.toString() || '';
+      }
       return callback && callback();
     } catch(e) {
       console.error(e);
@@ -35,18 +38,13 @@ export class AuthenticationService {
 
   async logout() {
     try {
-      await Auth.signOut({
+      await signOut({
         global: true
       });
       this.wipeSession();
     } catch(e) {
       console.error(e);
     }
-  }
-
-  private handleError<T> (operation = 'operation', result ?: T) {
-    this.wipeSession();
-    return this.errors.handleError(operation, result);
   }
 
   private wipeSession() {
