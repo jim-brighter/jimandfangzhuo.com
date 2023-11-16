@@ -169,7 +169,8 @@ export class BackendStack extends Stack {
       userPoolClientName: 'planner-frontend',
       accessTokenValidity: Duration.minutes(60 * 6),
       authFlows: {
-        userPassword: true
+        userPassword: true,
+        userSrp: true
       },
       supportedIdentityProviders: [cognito.UserPoolClientIdentityProvider.COGNITO],
       oAuth: {
