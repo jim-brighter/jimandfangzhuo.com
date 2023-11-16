@@ -8,10 +8,10 @@ import { Amplify } from 'aws-amplify';
 
 Amplify.configure({
   Auth: {
-    region: 'us-east-1',
-    userPoolId: 'us-east-1_PyYSUal4X',
-    userPoolWebClientId: '1d7iiv4lebj54bhq29lf6fopru',
-    authenticationFlowType: 'USER_PASSWORD_AUTH'
+    Cognito: {
+      userPoolId: 'us-east-1_PyYSUal4X',
+      userPoolClientId: '1d7iiv4lebj54bhq29lf6fopru'
+    }
   }
 });
 
