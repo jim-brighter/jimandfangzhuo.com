@@ -35,6 +35,3 @@ updates:
       all:
         patterns:
           - "*"
-        exclude-patterns:
-          - "typescript"
-          - "zone.js"
