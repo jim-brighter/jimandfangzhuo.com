@@ -1,6 +1,9 @@
 <div class="p-3">
-    <h1>Christmas 2023</h1>
+    <h1>🎄 Christmas 2023 🎄</h1>
     <ul>
-        <li>Set of new plates</li>
+        <li *ngFor="let item of data">
+            <a *ngIf="item.link" target="_blank" rel="noopener noreferrer" href="{{item.link || 'https://jimandfanghzuo.com/christmas'}}">{{item.name}}</a>
+            <span *ngIf="!item.link">{{item.name}}</span>
+        </li>
     </ul>
 </div>
