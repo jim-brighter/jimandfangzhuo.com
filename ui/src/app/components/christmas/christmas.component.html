@@ -1,8 +1,9 @@
 <div class="p-3">
     <h1>🎄 Christmas 2023 🎄</h1>
     <ul>
-        <li>Set of new plates</li>
-        <li><a target="_blank" rel="noopener noreferrer" href="https://www.amazon.com/Harry-Potter-Prisoner-Azkaban-MinaLima/dp/1338815288">Harry Potter 3 Minalima book</a></li>
-        <li><a target="_blank" rel="noopener noreferrer" href="https://www.llbean.com/llb/shop/118952?page=womens-1912-flannel-pajamas-plaid-misses-regular&bc=12-27-613&feat=613-GN1&csp=f&attrValue_0=Black%20Watch&pos=1">Pajamas - Fangzhuo (regular small)</a></li>
+        <li *ngFor="let item of data">
+            <a *ngIf="item.link" target="_blank" rel="noopener noreferrer" href="{{item.link || 'https://jimandfanghzuo.com/christmas'}}">{{item.name}}</a>
+            <span *ngIf="!item.link">{{item.name}}</span>
+        </li>
     </ul>
 </div>
