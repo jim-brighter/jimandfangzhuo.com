@@ -10,13 +10,13 @@ export class ChristmasComponent {
 
     navigationSubscription;
 
-    data = [
+    data: {name: string, link?: string}[] = [
         {
             name: 'Harry Potter 3 Minalima book',
             link: 'https://www.amazon.com/Harry-Potter-Prisoner-Azkaban-MinaLima/dp/1338815288'
         },
         {
-            name: 'Set of new plates'
+            name: 'Set of new plates (dinner plates, small plates, bowls)'
         },
         {
             name: 'Pajamas - Fangzhuo (regular small)',
@@ -27,7 +27,7 @@ export class ChristmasComponent {
             link: 'https://www.amazon.com/dp/B0CD7DKXLF?ref_=cm_sw_r_apin_dp_8VMNWW8AV09ENVKYQRY5&language=en-US&th=1'
         },
         {
-            name: 'Gift cards - Costco, Target, Amazon'
+            name: 'Gift cards - Costco, Target, Amazon, Nintendo eShop, Steam'
         }
     ]
 
