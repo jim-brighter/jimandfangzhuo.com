@@ -69,12 +69,26 @@ export class BackendStack extends Stack {
       pointInTimeRecovery: true
     });
 
+    const christmasTable = new ddb.Table(this, 'ChristmasTable', {
+      partitionKey: {
+        name: 'itemId',
+        type: ddb.AttributeType.STRING
+      },
+      encryption: ddb.TableEncryption.AWS_MANAGED,
+      tableName: 'PlannerChristmas',
+      removalPolicy: RemovalPolicy.RETAIN,
+      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
+      deletionProtection: true,
+      pointInTimeRecovery: true
+    });
+
     const plan = backup.BackupPlan.daily35DayRetention(this, 'BackupPlan');
     plan.addSelection('BackupSelection', {
       resources: [
         backup.BackupResource.fromDynamoDbTable(eventsTable),
         backup.BackupResource.fromDynamoDbTable(imagesTable),
-        backup.BackupResource.fromDynamoDbTable(commentsTable)
+        backup.BackupResource.fromDynamoDbTable(commentsTable),
+        backup.BackupResource.fromDynamoDbTable(christmasTable)
       ]
     });
 
@@ -143,11 +157,23 @@ export class BackendStack extends Stack {
       logRetention: logs.RetentionDays.ONE_MONTH
     });
 
+    const christmasLambda = new nodejslambda.NodejsFunction(this, 'ChristmasHandler', {
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'handler',
+      entry: '../lambda/christmas-lambda/christmas.ts',
+      bundling: {
+        minify: true
+      },
+      environment: {
+        CHRISTMAS_TABLE: christmasTable.tableName
+      },
+      logRetention: logs.RetentionDays.FIVE_DAYS
+    });
+
     eventsTable.grantReadWriteData(eventsLambda);
-
     commentsTable.grantReadWriteData(commentsLambda);
-
     imagesTable.grantReadWriteData(imagesLambda);
+    christmasTable.grantReadWriteData(christmasLambda);
 
     imagesBucket.grantReadWrite(imagesLambda);
     imagesBucket.grantPutAcl(imagesLambda);
@@ -210,6 +236,7 @@ export class BackendStack extends Stack {
     const eventsLambdaIntegration = new apigw.LambdaIntegration(eventsLambda);
     const commentsLambdaIntegration = new apigw.LambdaIntegration(commentsLambda);
     const imagesLambdaIntegration = new apigw.LambdaIntegration(imagesLambda);
+    const christmasLambdaIntegration = new apigw.LambdaIntegration(christmasLambda);
 
     const api = restApi.root.addResource('api');
 
@@ -252,6 +279,16 @@ export class BackendStack extends Stack {
     });
     imagesApi.addMethod('GET', imagesLambdaIntegration, { authorizer });
     imagesApi.addMethod('POST', imagesLambdaIntegration, { authorizer });
+
+    // API: Christmas
+    const christmasApi = api.addResource('christmas');
+    christmasApi.addCorsPreflight({
+      allowOrigins: ['*'],
+      allowHeaders: ['*'],
+      allowCredentials: true
+    });
+    christmasApi.addMethod('GET', christmasLambdaIntegration);
+    christmasApi.addMethod('POST', christmasLambdaIntegration);
 
     // ROUTE53 MAPPING
     const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {

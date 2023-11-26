@@ -11,7 +11,6 @@ export class FrontendStack extends Stack {
     super(scope, id, props);
 
     // S3 SITE
-
     const frontendRootBucket = new s3.Bucket(this, 'PlannerFrontendRootBucket', {
       bucketName: 'jimandfangzhuo.com',
       encryption: s3.BucketEncryption.S3_MANAGED,
@@ -94,7 +93,6 @@ export class FrontendStack extends Stack {
     });
 
     // ROUTE53 MAPPING
-
     const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
       domainName: 'jimandfangzhuo.com'
     });
