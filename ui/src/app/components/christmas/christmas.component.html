@@ -5,7 +5,7 @@
             <a *ngIf="item.itemLink" target="_blank" rel="noopener noreferrer" href="{{item.itemLink || 'https://jimandfanghzuo.com/christmas'}}">{{item.itemName}}</a>
             <span *ngIf="!item.itemLink">{{item.itemName}}</span>
         </li>
-        <li>
+        <li *ngIf="isAuthenticated">
             <form [ngClass]="{'w-25': screenWidth >= 800, 'w-50': screenWidth < 800}">
                 <div class="input-group">
                     <input [(ngModel)]="newItem.itemName" type="text" autocomplete="off" class="form-control form-control-sm" name="new-item-name" placeholder="New Item Name"/>

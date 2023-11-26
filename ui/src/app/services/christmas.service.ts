@@ -4,6 +4,7 @@ import { environment } from 'src/environments/environment';
 import { ErrorService } from './error.service';
 import { Observable, catchError } from 'rxjs';
 import { ChristmasItem } from '../types/christmas';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +14,7 @@ export class ChristmasService {
   private rootUrl = environment.plannerBackendRootUrl;
   private apiContext = environment.plannerBackendChristmasContext;
 
-  constructor(private http: HttpClient, private errors: ErrorService) { }
+  constructor(private http: HttpClient, private errors: ErrorService, private auth: AuthenticationService) { }
 
   getItems(): Observable<ChristmasItem[]> {
     return this.http.get<ChristmasItem[]>(this.rootUrl + this.apiContext, {})
@@ -23,7 +24,11 @@ export class ChristmasService {
   }
 
   createItem(item: ChristmasItem): Observable<ChristmasItem> {
-    return this.http.post<ChristmasItem>(this.rootUrl + this.apiContext, item, {})
+    return this.http.post<ChristmasItem>(this.rootUrl + this.apiContext, item, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      }
+    })
     .pipe(
       catchError(this.errors.handleError('createItem', new ChristmasItem()))
     )
