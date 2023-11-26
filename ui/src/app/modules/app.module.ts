@@ -25,6 +25,7 @@ import { AuthenticationService } from '../services/authentication.service';
 import { ErrorService } from '../services/error.service';
 import { AdminComponent } from '../components/admin/admin.component';
 import { ChristmasComponent } from '../components/christmas/christmas.component';
+import { ChristmasService } from '../services/christmas.service';
 
 @Injectable()
 export class XhrInterceptor implements HttpInterceptor {
@@ -66,6 +67,7 @@ export class XhrInterceptor implements HttpInterceptor {
     ImageService,
     AuthenticationService,
     ErrorService,
+    ChristmasService,
     {provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true}
   ],
   bootstrap: [AppComponent]

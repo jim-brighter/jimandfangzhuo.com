@@ -4,5 +4,6 @@ export const environment = {
   plannerBackendEventsContext: '/api/events',
   plannerBackendCommentsContext: '/api/comments',
   plannerBackendImageContext: '/api/images',
+  plannerBackendChristmasContext: '/api/christmas',
   plannerAuthBackend: ''
 };
