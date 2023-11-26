@@ -45,6 +45,26 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                     })
                 }
             }
+        case 'PUT':
+            let updateItem: ChristmasItem = new ChristmasItemImpl(event.body && JSON.parse(event.body));
+            try {
+                await christmasService.updateItem(updateItem);
+                return {
+                    statusCode: 200,
+                    headers,
+                    body: JSON.stringify({
+                        message: 'Success'
+                    })
+                }
+            } catch(e) {
+                return {
+                    statusCode: 500,
+                    headers,
+                    body: JSON.stringify({
+                        errorMessage: 'Error updating item'
+                    })
+                }
+            }
         default:
             return {
                 statusCode: 405,

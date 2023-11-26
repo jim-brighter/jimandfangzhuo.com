@@ -1,4 +1,4 @@
-import { DynamoDBDocumentClient, PutCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { DynamoDBDocumentClient, PutCommand, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { ChristmasItem, ChristmasItemImpl } from './christmas-types';
 import * as crypto from 'crypto';
@@ -32,6 +32,25 @@ const createItem = async(item: ChristmasItem): Promise<ChristmasItem> => {
     return item;
 }
 
+const updateItem = async(item: ChristmasItem) => {
+    try {
+        await ddb.send(new UpdateCommand({
+            TableName: christmasTable,
+            Key: {
+                itemId: item.itemId
+            },
+            UpdateExpression: 'set itemName = :itemName, itemLink = :itemLink',
+            ExpressionAttributeValues: {
+                ':itemName': item.itemName,
+                ':itemLink': item.itemLink
+            }
+        }));
+    } catch(e) {
+        console.error(`Failed to update item`, e);
+        throw e;
+    }
+}
+
 const getAllItems = async(): Promise<Array<ChristmasItem>> => {
     try {
         const allItems = await ddb.send(new ScanCommand({
@@ -51,5 +70,6 @@ const getAllItems = async(): Promise<Array<ChristmasItem>> => {
 
 export {
     createItem,
+    updateItem,
     getAllItems
 }
