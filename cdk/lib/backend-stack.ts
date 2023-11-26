@@ -288,7 +288,7 @@ export class BackendStack extends Stack {
       allowCredentials: true
     });
     christmasApi.addMethod('GET', christmasLambdaIntegration);
-    christmasApi.addMethod('POST', christmasLambdaIntegration);
+    christmasApi.addMethod('POST', christmasLambdaIntegration, { authorizer });
 
     // ROUTE53 MAPPING
     const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {

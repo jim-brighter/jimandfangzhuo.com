@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { NavigationEnd, Router } from '@angular/router';
+import { AuthenticationService } from "src/app/services/authentication.service";
 import { ChristmasService } from "src/app/services/christmas.service";
 import { ChristmasItem } from "src/app/types/christmas";
 
@@ -13,6 +14,7 @@ export class ChristmasComponent implements OnDestroy, OnInit {
     navigationSubscription;
 
     isLoading = true;
+    isAuthenticated = false;
 
     year = new Date().getFullYear();
 
@@ -22,9 +24,11 @@ export class ChristmasComponent implements OnDestroy, OnInit {
 
     screenWidth = 0;
 
-    constructor(private christmasService: ChristmasService, private router: Router) {
+    constructor(private christmasService: ChristmasService, private router: Router,
+        private authenticator: AuthenticationService) {
         this.navigationSubscription = this.router.events.subscribe(async (e: any) => {
             if (e instanceof NavigationEnd) {
+                await this.authenticated();
                 this.christmasService.getItems().subscribe(data => {
                     this.data = data;
                     this.isLoading = false;
@@ -35,6 +39,12 @@ export class ChristmasComponent implements OnDestroy, OnInit {
 
     ngOnInit() {
         this.screenWidth = window.screen.width;
+    }
+
+    async authenticated(): Promise<boolean> {
+        const authStatus = await this.authenticator.authenticated();
+        this.isAuthenticated = authStatus;
+        return authStatus;
     }
 
     saveNewItem(): void {
