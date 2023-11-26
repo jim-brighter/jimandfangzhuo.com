@@ -5,6 +5,7 @@ import { ErrorService } from './error.service';
 import { Observable, catchError } from 'rxjs';
 import { ChristmasItem } from '../types/christmas';
 import { AuthenticationService } from './authentication.service';
+import { SuccessResponse } from '../types/success-response';
 
 @Injectable({
   providedIn: 'root'
@@ -32,5 +33,16 @@ export class ChristmasService {
     .pipe(
       catchError(this.errors.handleError('createItem', new ChristmasItem()))
     )
+  }
+
+  updateItem(item: ChristmasItem): Observable<SuccessResponse> {
+    return this.http.put<SuccessResponse>(this.rootUrl + this.apiContext, item, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      }
+    })
+    .pipe(
+      catchError(this.errors.handleError('updateItem', new SuccessResponse()))
+    );
   }
 }
