@@ -28,6 +28,9 @@ export class ChristmasComponent {
         },
         {
             name: 'Gift cards - Costco, Target, Amazon, Nintendo eShop, Steam'
+        },
+        {
+            name: 'Long sleeve shirt (S) or sweater (M) for Jim'
         }
     ]
 
