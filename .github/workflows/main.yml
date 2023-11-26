@@ -17,7 +17,7 @@ jobs:
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::108929950724:role/GithubRole-jimandfangzhuo.com
+          role-to-assume: arn:aws:iam::108929950724:role/GithubRole
           aws-region: us-east-1
       - name: Checkout
         uses: actions/checkout@v4
