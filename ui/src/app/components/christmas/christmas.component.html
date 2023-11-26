@@ -1,9 +1,25 @@
 <div class="p-3">
-    <h1>🎄 Christmas 2023 🎄</h1>
+    <h1>🎄 Christmas {{year}} 🎄</h1>
     <ul>
         <li *ngFor="let item of data">
-            <a *ngIf="item.link" target="_blank" rel="noopener noreferrer" href="{{item.link || 'https://jimandfanghzuo.com/christmas'}}">{{item.name}}</a>
-            <span *ngIf="!item.link">{{item.name}}</span>
+            <a *ngIf="item.itemLink" target="_blank" rel="noopener noreferrer" href="{{item.itemLink || 'https://jimandfanghzuo.com/christmas'}}">{{item.itemName}}</a>
+            <span *ngIf="!item.itemLink">{{item.itemName}}</span>
+        </li>
+        <li>
+            <form [ngClass]="{'w-25': screenWidth >= 800, 'w-50': screenWidth < 800}">
+                <div class="input-group">
+                    <input [(ngModel)]="newItem.itemName" type="text" autocomplete="off" class="form-control form-control-sm" name="new-item-name" placeholder="New Item Name"/>
+                </div>
+                <div class="input-group" *ngIf="newItem.itemName">
+                    <input [(ngModel)]="newItem.itemLink" type="text" autocomplete="off" class="form-control form-control-sm" name="new-item-link" placeholder="Link"/>
+                </div>
+                <div class="input-group">
+                    <button *ngIf="newItem.itemName" (click)="saveNewItem()" class="btn btn-outline-primary">Save</button>
+                </div>
+            </form>
         </li>
     </ul>
+</div>
+<div *ngIf="isLoading">
+    <div class="spinner"></div>
 </div>
