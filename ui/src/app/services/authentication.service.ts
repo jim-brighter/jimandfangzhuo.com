@@ -33,9 +33,10 @@ export class AuthenticationService {
         const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
         this.idToken = idToken?.toString() || '';
       }
+      this.errors.clear();
       return callback && callback();
     } catch(e) {
-      console.error(e);
+      this.errors.addError(400, 'Login failed, try again');
     }
   }
 
