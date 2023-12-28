@@ -102,7 +102,7 @@ export class BackendStack extends Stack {
 
     // LAMBDAS
     const defaultErrorLambda = new lambda.Function(this, 'DefaultErrorHandler', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         exports.handler = async (event) => {
@@ -117,7 +117,7 @@ export class BackendStack extends Stack {
     });
 
     const eventsLambda = new nodejslambda.NodejsFunction(this, 'EventsHandler', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'handler',
       entry: '../lambda/events-lambda/events.ts',
       bundling: {
@@ -131,7 +131,7 @@ export class BackendStack extends Stack {
     });
 
     const commentsLambda = new nodejslambda.NodejsFunction(this, 'CommentsHandler', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'handler',
       entry: '../lambda/comments-lambda/comments.ts',
       bundling: {
@@ -144,7 +144,7 @@ export class BackendStack extends Stack {
     });
 
     const imagesLambda = new nodejslambda.NodejsFunction(this, 'ImagesHandler', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'handler',
       entry: '../lambda/images-lambda/images.ts',
       bundling: {
@@ -158,7 +158,7 @@ export class BackendStack extends Stack {
     });
 
     const christmasLambda = new nodejslambda.NodejsFunction(this, 'ChristmasHandler', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'handler',
       entry: '../lambda/christmas-lambda/christmas.ts',
       bundling: {
