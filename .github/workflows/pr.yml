@@ -1,31 +1,27 @@
-name: Deploy
+name: PR Build
 on:
-  push:
-    branches:
-      - main
+  pull_request:
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
   cancel-in-progress: false
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
     steps:
-      - name: Configure AWS
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::108929950724:role/GithubRole
-          aws-region: us-east-1
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Deploy
+      - name: Build
+        env:
+          CDK_DEFAULT_ACCOUNT: 108929950724
+          CDK_DEFAULT_REGION: us-east-1
         run: |
           cd cdk
           npm i
-          npm run deploy
+          npm run synth -- -q
