@@ -18,7 +18,8 @@
     "cdk:deploy": "cdk deploy PlannerBackend PlannerFrontend --require-approval never --outputs-file frontend-backend-outputs.json",
     "cdk:angular:build": "cd ../ui && npm i && npm run angular:build:prod && cd ../cdk",
     "cdk:lambda:install": "cd ../lambda && npm i && cd ../cdk",
-    "deploy": "npm run cdk:lambda:install && npm run cdk:angular:build && npm run cdk:deploy"
+    "deploy": "npm run cdk:lambda:install && npm run cdk:angular:build && npm run cdk:deploy",
+    "synth": "npm run cdk:lambda:install && npm run cdk:angular:build && cdk synth PlannerBackend PlannerFrontend"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",
