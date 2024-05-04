@@ -2,7 +2,12 @@ import { DynamoDBDocumentClient, PutCommand, ScanCommand } from '@aws-sdk/lib-dy
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { Image } from './image';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import convert from 'heic-convert';
 import * as crypto from 'crypto';
+
+const HEIC_CONTENT_TYPE = 'image/heic';
+const JPEG_CONTENT_TYPE = 'image/jpeg';
+const JPEG_EXTENSION = 'jpeg';
 
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({
     region: process.env.AWS_REGION,
@@ -40,11 +45,23 @@ const saveImages = async(body: any): Promise<void> => {
         const splitImageData = imageData.split(',');
 
         const base64EncodedImage = splitImageData[1];
-        const data: Buffer = Buffer.from(base64EncodedImage, 'base64')
+        let data: Buffer = Buffer.from(base64EncodedImage, 'base64')
 
         const prefix: string = splitImageData[0];
-        const contentType: string = prefix.split(';')[0].split(':')[1];
-        const extension: string = contentType.split('/')[1];
+        let contentType: string = prefix.split(';')[0].split(':')[1];
+        let extension: string = contentType.split('/')[1];
+
+        if (contentType === HEIC_CONTENT_TYPE) {
+            data = await convert({
+                buffer: data,
+                format: 'JPEG',
+                quality: 1
+            });
+
+            contentType = JPEG_CONTENT_TYPE;
+            extension = JPEG_EXTENSION;
+        }
+
         const key: string = `${crypto.randomUUID()}.${extension}`;
 
         const s3PutCommand: PutObjectCommand = new PutObjectCommand({
