@@ -97,7 +97,13 @@ export class BackendStack extends Stack {
       bucketName: 'jimandfangzhuo.com-images',
       encryption: s3.BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.RETAIN,
-      versioned: true
+      versioned: true,
+      lifecycleRules: [{
+        enabled: true,
+        expiredObjectDeleteMarker: true,
+        noncurrentVersionExpiration: Duration.days(30),
+        noncurrentVersionsToRetain: 0
+      }]
     });
 
     // LAMBDAS
