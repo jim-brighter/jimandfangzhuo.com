@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
-      contents: read
+      contents: write
     steps:
       - name: Configure AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -20,10 +20,36 @@ jobs:
           aws-region: us-east-1
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-tags: true
+          fetch-depth: 0
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Create Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          last_release=$(git describe --abbrev=0 --tags | sed -e 's/v//')
+
+          last_major_version=$(echo $last_release | cut -d '.' -f 1)
+          last_minor_version=$(echo $last_release | cut -d '.' -f 2)
+          last_patch_version=$(echo $last_release | cut -d '.' -f 3)
+
+          # this is stupid but I might want to build on it later
+          new_major_version=$last_major_version
+          new_minor_version=$last_minor_version
+          new_patch_version=$((last_patch_version+1))
+
+          new_release="v$new_major_version.$new_minor_version.$new_patch_version"
+
+          echo "Last Release: $last_release"
+          echo "New Release: $new_release"
+
+          gh release create "$new_release" \
+          --title "$new_release" \
+          --generate-notes
       - name: Deploy
         run: |
           cd cdk
