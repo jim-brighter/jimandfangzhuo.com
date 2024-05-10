@@ -29,8 +29,8 @@ jobs:
           node-version: 20
       - name: Create Release
         env:
-          GH_TOKEN: ${{ github.token }}
-        uses: jim-brighter/github-release-action@v1
+          GITHUB_TOKEN: ${{ github.token }}
+        uses: jim-brighter/github-release-action@v2
         with:
           major-version: 1
           minor-version: 0
