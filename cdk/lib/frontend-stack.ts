@@ -17,6 +17,8 @@ export class FrontendStack extends Stack {
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: true,
       publicReadAccess: true,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
+      accessControl: s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
       websiteIndexDocument: 'index.html',
       websiteErrorDocument: 'index.html',
       lifecycleRules: [{
