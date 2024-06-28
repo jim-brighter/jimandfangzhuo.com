@@ -7,16 +7,16 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.139",
-    "@types/node": "20.14.3",
+    "@types/aws-lambda": "^8.10.140",
+    "@types/node": "20.14.8",
     "esbuild": "^0.21.5",
     "ts-node": "^10.9.2",
-    "typescript": "~5.4.5"
+    "typescript": "~5.5.2"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.598.0",
-    "@aws-sdk/client-s3": "^3.598.0",
-    "@aws-sdk/lib-dynamodb": "^3.598.0",
+    "@aws-sdk/client-dynamodb": "^3.602.0",
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/lib-dynamodb": "^3.602.0",
     "heic-convert": "^2.1.0"
   }
 }
