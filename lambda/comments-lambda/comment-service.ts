@@ -16,7 +16,7 @@ const commentsTable = process.env.COMMENTS_TABLE || '';
 
 const createComment = async(comment: Comment): Promise<Comment> => {
     comment.commentId = crypto.randomUUID();
-    comment.createdTime = new Date().getTime();
+    comment.createdTime = Date.now();
 
     try {
         await ddb.send(new PutCommand({

@@ -16,7 +16,7 @@ const christmasTable = process.env.CHRISTMAS_TABLE || '';
 
 const createItem = async(item: ChristmasItem): Promise<ChristmasItem> => {
     item.itemId = crypto.randomUUID();
-    item.createdTime = new Date().getTime();
+    item.createdTime = Date.now();
     item.itemYear = new Date().getFullYear();
 
     try {
