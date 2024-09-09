@@ -18,7 +18,7 @@ const eventTypeIndex = process.env.EVENT_TYPE_INDEX || '';
 const createEvent = async (event: Event): Promise<Event> => {
     event.eventId = crypto.randomUUID();
     event.eventStatus = 'TO_DO';
-    event.createdTime = new Date().getTime();
+    event.createdTime = Date.now();
 
     try {
         await ddb.send(new PutCommand({
