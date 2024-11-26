@@ -38,38 +38,36 @@ export class XhrInterceptor implements HttpInterceptor {
 }
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    CommentsComponent,
-    ListsComponent,
-    DetailsComponent,
-    HomeComponent,
-    NavbarComponent,
-    ListItemComponent,
-    CommentItemComponent,
-    UploadComponent,
-    PhotosComponent,
-    LoginComponent,
-    AdminComponent,
-    ChristmasComponent
-  ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    FormsModule,
-    FontAwesomeModule,
-    AmplifyAuthenticatorModule
-  ],
-  providers: [
-    EventService,
-    CommentService,
-    ImageService,
-    AuthenticationService,
-    ErrorService,
-    ChristmasService,
-    {provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true}
-  ],
-  bootstrap: [AppComponent]
+    declarations: [AppComponent],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        FormsModule,
+        FontAwesomeModule,
+        AmplifyAuthenticatorModule,
+        CommentsComponent,
+        ListsComponent,
+        DetailsComponent,
+        HomeComponent,
+        NavbarComponent,
+        ListItemComponent,
+        CommentItemComponent,
+        UploadComponent,
+        PhotosComponent,
+        LoginComponent,
+        AdminComponent,
+        ChristmasComponent
+    ],
+    providers: [
+        EventService,
+        CommentService,
+        ImageService,
+        AuthenticationService,
+        ErrorService,
+        ChristmasService,
+        { provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true }
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule { }

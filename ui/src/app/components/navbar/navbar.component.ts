@@ -1,6 +1,6 @@
-import { KeyValue } from '@angular/common';
+import { KeyValue, NgFor, NgClass, NgIf, KeyValuePipe } from '@angular/common';
 import { Component, OnInit, Input } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { faSignOutAlt,
   faPersonSkiing,
@@ -10,12 +10,13 @@ import { faSignOutAlt,
   faTv,
   faMoneyBillWave,
   faImage } from '@fortawesome/free-solid-svg-icons';
+import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css'],
-  standalone: false
+    selector: 'app-navbar',
+    templateUrl: './navbar.component.html',
+    styleUrls: ['./navbar.component.css'],
+    imports: [NgFor, NgClass, RouterLink, FaIconComponent, NgIf, KeyValuePipe]
 })
 export class NavbarComponent implements OnInit {
 

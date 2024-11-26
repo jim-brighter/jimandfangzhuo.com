@@ -5,12 +5,16 @@ import { ErrorService } from '../../services/error.service';
 import { AuthenticationService } from '../../services/authentication.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { faSignOutAlt, faRotate } from '@fortawesome/free-solid-svg-icons';
+import { NavbarComponent } from '../navbar/navbar.component';
+import { NgIf, NgFor } from '@angular/common';
+import { UploadComponent } from '../upload/upload.component';
+import { LoginComponent } from '../login/login.component';
 
 @Component({
-  selector: 'app-photos',
-  templateUrl: './photos.component.html',
-  styleUrls: ['./photos.component.css'],
-  standalone: false
+    selector: 'app-photos',
+    templateUrl: './photos.component.html',
+    styleUrls: ['./photos.component.css'],
+    imports: [NavbarComponent, NgIf, NgFor, UploadComponent, LoginComponent]
 })
 export class PhotosComponent implements OnDestroy {
 

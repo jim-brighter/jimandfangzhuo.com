@@ -1,19 +1,23 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { Location } from '@angular/common';
+import { Location, NgFor, NgIf, NgClass } from '@angular/common';
 import { AuthenticationService } from '../../services/authentication.service';
 import { ErrorService } from '../../services/error.service';
 import { faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { NavbarComponent } from '../navbar/navbar.component';
+import { ListsComponent } from '../lists/lists.component';
+import { CommentsComponent } from '../comments/comments.component';
+import { LoginComponent } from '../login/login.component';
 
 
 const MIN_WIDTH = 768;
 
 @Component({
-  selector: 'app-details',
-  templateUrl: './details.component.html',
-  styleUrls: ['./details.component.css'],
-  standalone: false
+    selector: 'app-details',
+    templateUrl: './details.component.html',
+    styleUrls: ['./details.component.css'],
+    imports: [NavbarComponent, NgFor, NgIf, NgClass, ListsComponent, CommentsComponent, LoginComponent]
 })
 export class DetailsComponent implements OnInit, OnDestroy {
 
