@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { ImageService } from '../../services/image.service';
 import { ImageUploadRequest } from 'src/app/types/image-upload-request';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-upload',
-  templateUrl: './upload.component.html',
-  styleUrls: ['./upload.component.css'],
-  standalone: false
+    selector: 'app-upload',
+    templateUrl: './upload.component.html',
+    styleUrls: ['./upload.component.css'],
+    imports: [FormsModule]
 })
 export class UploadComponent {
 
