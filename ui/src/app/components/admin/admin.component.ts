@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { EventService } from '../../services/event.service';
 import { PlannerEvent } from '../../types/event';
 
@@ -17,7 +17,7 @@ const TO_DO = 'TO_DO';
     styleUrls: ['./admin.component.css'],
     imports: [NgIf, NgFor, NgClass, FaIconComponent, LoginComponent]
 })
-export class AdminComponent {
+export class AdminComponent implements OnDestroy, OnInit {
 
   events: PlannerEvent[] = [];
 
@@ -41,6 +41,10 @@ export class AdminComponent {
         this.populateEvents();
       }
     });
+  }
+
+
+  ngOnInit() {
   }
 
   async authenticated(): Promise<boolean> {
@@ -73,6 +77,12 @@ export class AdminComponent {
     this.eventService.deleteEvent([event.eventId]).subscribe(() => {
       this.populateEvents();
     });
+  }
+
+  ngOnDestroy() {
+    if (this.navigationSubscription) {
+      this.navigationSubscription.unsubscribe();
+    }
   }
 
 }
