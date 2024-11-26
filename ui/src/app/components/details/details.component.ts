@@ -12,7 +12,8 @@ const MIN_WIDTH = 768;
 @Component({
   selector: 'app-details',
   templateUrl: './details.component.html',
-  styleUrls: ['./details.component.css']
+  styleUrls: ['./details.component.css'],
+  standalone: false
 })
 export class DetailsComponent implements OnInit, OnDestroy {
 

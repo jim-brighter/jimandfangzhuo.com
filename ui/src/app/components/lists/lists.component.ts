@@ -21,7 +21,8 @@ const DELETED = 'DELETED';
 @Component({
   selector: 'app-lists',
   templateUrl: './lists.component.html',
-  styleUrls: ['./lists.component.css']
+  styleUrls: ['./lists.component.css'],
+  standalone: false
 })
 export class ListsComponent implements OnChanges {
 

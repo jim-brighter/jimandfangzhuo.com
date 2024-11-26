@@ -9,7 +9,8 @@ import { faSignOutAlt, faRotate } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-photos',
   templateUrl: './photos.component.html',
-  styleUrls: ['./photos.component.css']
+  styleUrls: ['./photos.component.css'],
+  standalone: false
 })
 export class PhotosComponent implements OnDestroy {
 

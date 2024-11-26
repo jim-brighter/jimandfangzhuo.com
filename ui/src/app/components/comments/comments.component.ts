@@ -6,7 +6,8 @@ import { Comment } from '../../types/comment';
 @Component({
   selector: 'app-comments',
   templateUrl: './comments.component.html',
-  styleUrls: ['./comments.component.css']
+  styleUrls: ['./comments.component.css'],
+  standalone: false
 })
 export class CommentsComponent implements OnInit {
 

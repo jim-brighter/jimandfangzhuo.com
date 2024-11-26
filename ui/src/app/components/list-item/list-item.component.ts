@@ -5,7 +5,8 @@ import { faEdit, faCheck, faRedo, faTrash } from '@fortawesome/free-solid-svg-ic
 @Component({
   selector: 'app-list-item',
   templateUrl: './list-item.component.html',
-  styleUrls: ['./list-item.component.css']
+  styleUrls: ['./list-item.component.css'],
+  standalone: false
 })
 export class ListItemComponent implements OnInit {
 
