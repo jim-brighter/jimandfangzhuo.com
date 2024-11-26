@@ -4,7 +4,8 @@ import { Comment } from '../../types/comment';
 @Component({
   selector: 'app-comment-item',
   templateUrl: './comment-item.component.html',
-  styleUrls: ['./comment-item.component.css']
+  styleUrls: ['./comment-item.component.css'],
+  standalone: false
 })
 export class CommentItemComponent implements OnInit {
 

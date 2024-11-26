@@ -8,7 +8,8 @@ import { faEdit } from "@fortawesome/free-solid-svg-icons";
 @Component({
     selector: 'app-christmas',
     templateUrl: './christmas.component.html',
-    styleUrls: ['./christmas.component.css']
+    styleUrls: ['./christmas.component.css'],
+    standalone: false
 })
 export class ChristmasComponent implements OnDestroy, OnInit {
 
