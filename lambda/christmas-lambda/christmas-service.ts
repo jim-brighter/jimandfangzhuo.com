@@ -1,4 +1,4 @@
-import { DynamoDBDocumentClient, PutCommand, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
+import { DeleteCommand, DynamoDBDocumentClient, PutCommand, ScanCommand, UpdateCommand } from '@aws-sdk/lib-dynamodb';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { ChristmasItem, ChristmasItemImpl } from './christmas-types';
 import * as crypto from 'crypto';
@@ -68,8 +68,27 @@ const getAllItems = async(): Promise<Array<ChristmasItem>> => {
     }
 }
 
+const deleteItems = async(items: string[]): Promise<void> => {
+    try {
+        const deletes = items.map(async (id: string) => {
+            await ddb.send(new DeleteCommand({
+                TableName: christmasTable,
+                Key: {
+                    itemId: id
+                }
+            }));
+        });
+
+        await Promise.all(deletes);
+    } catch (e) {
+        console.error(`Failed to delete items`, e);
+        throw e;
+    }
+}
+
 export {
     createItem,
     updateItem,
-    getAllItems
+    getAllItems,
+    deleteItems
 }

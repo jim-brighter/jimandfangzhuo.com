@@ -65,6 +65,26 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                     })
                 }
             }
+        case 'DELETE':
+            try {
+                const itemsToDelete = event.body && JSON.parse(event.body);
+                await christmasService.deleteItems(itemsToDelete);
+                return {
+                    statusCode: 200,
+                    headers,
+                    body: JSON.stringify({
+                        message: 'Success'
+                    })
+                }
+            } catch(e) {
+                return {
+                    statusCode: 500,
+                    headers,
+                    body: JSON.stringify({
+                        errorMessage: `Error deleting items`
+                    })
+                }
+            }
         default:
             return {
                 statusCode: 405,

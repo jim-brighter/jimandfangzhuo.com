@@ -295,6 +295,7 @@ export class BackendStack extends Stack {
     christmasApi.addMethod('GET', christmasLambdaIntegration);
     christmasApi.addMethod('POST', christmasLambdaIntegration, { authorizer });
     christmasApi.addMethod('PUT', christmasLambdaIntegration, { authorizer });
+    christmasApi.addMethod('DELETE', christmasLambdaIntegration, { authorizer });
 
     // ROUTE53 MAPPING
     const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
