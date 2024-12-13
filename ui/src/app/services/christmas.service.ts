@@ -45,4 +45,16 @@ export class ChristmasService {
       catchError(this.errors.handleError('updateItem', new SuccessResponse()))
     );
   }
+
+  deleteItem(items: string[]): Observable<SuccessResponse> {
+    return this.http.delete<SuccessResponse>(this.rootUrl + this.apiContext, {
+      headers: {
+        Authorization: `Bearer ${this.auth.idToken}`
+      },
+      body: items
+    })
+    .pipe(
+      catchError(this.errors.handleError('deleteItem', new SuccessResponse()))
+    )
+  }
 }

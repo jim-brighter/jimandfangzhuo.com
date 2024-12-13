@@ -3,7 +3,7 @@ import { NavigationEnd, Router } from '@angular/router';
 import { AuthenticationService } from "src/app/services/authentication.service";
 import { ChristmasService } from "src/app/services/christmas.service";
 import { ChristmasItem } from "src/app/types/christmas";
-import { faEdit } from "@fortawesome/free-solid-svg-icons";
+import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { NgClass, NgFor, NgIf } from "@angular/common";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { FormsModule } from "@angular/forms";
@@ -17,6 +17,7 @@ import { FormsModule } from "@angular/forms";
 export class ChristmasComponent implements OnDestroy, OnInit {
 
     faEdit = faEdit;
+    faTrash = faTrash;
 
     navigationSubscription;
 
@@ -80,6 +81,12 @@ export class ChristmasComponent implements OnDestroy, OnInit {
             this.editing = -1;
             this.retrieveItems();
         });
+    }
+
+    deleteItem(item: ChristmasItem): void {
+        this.christmasService.deleteItem([item.itemId]).subscribe(() => {
+            this.retrieveItems();
+        })
     }
 
     ngOnDestroy() {

@@ -4,6 +4,7 @@
         <li class="w-100 pt-2" *ngFor="let item of data; index as i">
             <a *ngIf="editing != i && item.itemLink" class="d-inline-block w-75 align-top" target="_blank" rel="noopener noreferrer" href="{{item.itemLink || 'https://jimandfanghzuo.com/christmas'}}">{{item.itemName}}</a>
             <span *ngIf="editing != i && !item.itemLink" class="d-inline-block w-75 align-top">{{item.itemName}}</span>
+            <button *ngIf="isAuthenticated" class="d-inline-block w-25 align-top" type="button" title="Delete" class="btn btn-outline-danger btn-sm float-end" (click)="deleteItem(item)"><fa-icon [icon]="faTrash"></fa-icon></button>
             <button *ngIf="isAuthenticated && editing != i" class="d-inline-block w-25 align-top" type="button" title="Edit" class="btn btn-outline-primary btn-sm float-end" (click)="editItem(i)"><fa-icon [icon]="faEdit"></fa-icon></button>
             <form *ngIf="editing == i">
                 <div class="input-group">
