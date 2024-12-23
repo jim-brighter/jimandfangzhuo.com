@@ -9,14 +9,14 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.146",
     "@types/node": "22.10.2",
-    "esbuild": "^0.24.0",
+    "esbuild": "^0.24.2",
     "ts-node": "^10.9.2",
     "typescript": "~5.7.2"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.713.0",
-    "@aws-sdk/client-s3": "^3.713.0",
-    "@aws-sdk/lib-dynamodb": "^3.713.0",
+    "@aws-sdk/client-dynamodb": "^3.716.0",
+    "@aws-sdk/client-s3": "^3.717.0",
+    "@aws-sdk/lib-dynamodb": "^3.716.0",
     "heic-convert": "^2.1.0"
   }
 }
