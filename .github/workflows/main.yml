@@ -30,10 +30,11 @@ jobs:
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        uses: jim-brighter/github-release-action@v2
+        uses: jim-brighter/github-release-action@v3
         with:
           major-version: 1
           minor-version: 0
+          num_releases_to_keep: 10
       - name: Deploy
         run: |
           cd cdk
