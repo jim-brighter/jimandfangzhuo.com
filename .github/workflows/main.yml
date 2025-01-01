@@ -30,7 +30,7 @@ jobs:
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
-        uses: jim-brighter/github-release-action@v3
+        uses: jim-brighter/github-release-action@v4
         with:
           major-version: 1
           minor-version: 0
