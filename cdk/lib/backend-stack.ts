@@ -132,7 +132,7 @@ export class BackendStack extends Stack {
         EVENTS_TABLE: eventsTable.tableName,
         EVENT_TYPE_INDEX
       },
-      logRetention: logs.RetentionDays.ONE_MONTH
+      logRetention: logs.RetentionDays.THREE_DAYS
     });
 
     const commentsLambda = new nodejslambda.NodejsFunction(this, 'CommentsHandler', {
@@ -145,7 +145,7 @@ export class BackendStack extends Stack {
       environment: {
         COMMENTS_TABLE: commentsTable.tableName
       },
-      logRetention: logs.RetentionDays.ONE_MONTH
+      logRetention: logs.RetentionDays.THREE_DAYS
     });
 
     const imagesLambda = new nodejslambda.NodejsFunction(this, 'ImagesHandler', {
@@ -159,7 +159,7 @@ export class BackendStack extends Stack {
         IMAGES_TABLE: imagesTable.tableName,
         BUCKET_NAME: imagesBucket.bucketName
       },
-      logRetention: logs.RetentionDays.ONE_MONTH
+      logRetention: logs.RetentionDays.THREE_DAYS
     });
 
     const christmasLambda = new nodejslambda.NodejsFunction(this, 'ChristmasHandler', {
@@ -172,7 +172,7 @@ export class BackendStack extends Stack {
       environment: {
         CHRISTMAS_TABLE: christmasTable.tableName
       },
-      logRetention: logs.RetentionDays.FIVE_DAYS
+      logRetention: logs.RetentionDays.THREE_DAYS
     });
 
     eventsTable.grantReadWriteData(eventsLambda);

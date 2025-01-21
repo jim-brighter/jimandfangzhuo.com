@@ -24,7 +24,7 @@ export class FrontendStack extends Stack {
       lifecycleRules: [{
         enabled: true,
         expiredObjectDeleteMarker: true,
-        noncurrentVersionExpiration: Duration.days(30)
+        noncurrentVersionExpiration: Duration.days(3)
       }]
     });
 
