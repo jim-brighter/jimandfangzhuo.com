@@ -40,51 +40,39 @@ export class FrontendStack extends Stack {
     });
 
     // CLOUDFRONT DISTRIBUTION
-    const distribution = new cloudfront.CloudFrontWebDistribution(this, 'PlannerDistribution', {
-      originConfigs: [
-        {
-          s3OriginSource: {
-            s3BucketSource: frontendRootBucket
-          },
-          behaviors: [
-            {
-              isDefaultBehavior: true,
-              pathPattern: '*',
-              compress: true,
-              allowedMethods: cloudfront.CloudFrontAllowedMethods.GET_HEAD_OPTIONS,
-              cachedMethods: cloudfront.CloudFrontAllowedCachedMethods.GET_HEAD_OPTIONS,
-              defaultTtl: Duration.days(90),
-              minTtl: Duration.days(30),
-              maxTtl: Duration.days(365)
-            }
-          ]
-        }
-      ],
-      viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    const distribution = new cloudfront.Distribution(this, 'PlannerDistribution', {
+      defaultBehavior: {
+        compress: true,
+        origin: new origins.S3StaticWebsiteOrigin(frontendRootBucket),
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+        cachedMethods: cloudfront.CachedMethods.CACHE_GET_HEAD_OPTIONS,
+        cachePolicy: new cloudfront.CachePolicy(this, 'CachePolicy', {
+          defaultTtl: Duration.days(90),
+          minTtl: Duration.days(30),
+          maxTtl: Duration.days(365)
+        })
+      },
+      certificate: certmanager.Certificate.fromCertificateArn(this, 'PlannerCert', 'arn:aws:acm:us-east-1:108929950724:certificate/f312d8ad-09ce-440a-807c-a4bc46cb0dd0'),
+      sslSupportMethod: cloudfront.SSLMethod.SNI,
+      minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
+      domainNames: ['jimandfangzhuo.com'],
       defaultRootObject: 'index.html',
-      errorConfigurations: [
+      errorResponses: [
         {
-          errorCode: 404,
+          httpStatus: 404,
           responsePagePath: '/',
-          responseCode: 200,
-          errorCachingMinTtl: Duration.days(30).toSeconds()
+          responseHttpStatus: 200,
+          ttl: Duration.days(30)
         },
         {
-          errorCode: 403,
+          httpStatus: 403,
           responsePagePath: '/',
-          responseCode: 200,
-          errorCachingMinTtl: Duration.days(30).toSeconds()
+          responseHttpStatus: 200,
+          ttl: Duration.days(30)
         }
-      ],
-      viewerCertificate: {
-        aliases: ['jimandfangzhuo.com'],
-        props: {
-          minimumProtocolVersion: 'TLSv1.2_2021',
-          sslSupportMethod: 'sni-only',
-          acmCertificateArn: 'arn:aws:acm:us-east-1:108929950724:certificate/f312d8ad-09ce-440a-807c-a4bc46cb0dd0'
-        }
-      }
-    });
+      ]
+    })
 
     // S3 Deployment
     new s3deployment.BucketDeployment(this, 'PlannerFrontendDeployment', {
