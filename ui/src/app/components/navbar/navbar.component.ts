@@ -1,7 +1,7 @@
-import { KeyValue, NgFor, NgClass, NgIf, KeyValuePipe } from '@angular/common';
-import { Component, OnInit, Input } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { KeyValue, NgFor, NgClass, NgIf, KeyValuePipe } from '@angular/common'
+import { Component, OnInit, Input } from '@angular/core'
+import { Router, RouterLink } from '@angular/router'
+import { AuthenticationService } from 'src/app/services/authentication.service'
 import { faSignOutAlt,
   faPersonSkiing,
   faUtensils,
@@ -9,8 +9,8 @@ import { faSignOutAlt,
   faPlaneDeparture,
   faTv,
   faMoneyBillWave,
-  faImage } from '@fortawesome/free-solid-svg-icons';
-import { FaIconComponent } from '@fortawesome/angular-fontawesome';
+  faImage } from '@fortawesome/free-solid-svg-icons'
+import { FaIconComponent } from '@fortawesome/angular-fontawesome'
 
 @Component({
     selector: 'app-navbar',
@@ -20,9 +20,9 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 })
 export class NavbarComponent implements OnInit {
 
-  @Input() linkColor: string = '';
+  @Input() linkColor: string = ''
 
-  faSignOutAlt = faSignOutAlt;
+  faSignOutAlt = faSignOutAlt
 
   routerMapping = {
     "/details/to-do": {
@@ -61,16 +61,16 @@ export class NavbarComponent implements OnInit {
   }
 
   onCompare(_left: KeyValue<any, any>, _right: KeyValue<any, any>): number {
-    return 1;
+    return 1
   }
 
   showLogout(): boolean {
-    return this.router.url !== '/';
+    return this.router.url !== '/'
   }
 
   logout(): void {
-    this.authenticator.logout();
-    this.router.navigateByUrl('/');
+    this.authenticator.logout()
+    this.router.navigateByUrl('/')
   }
 
 }

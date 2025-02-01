@@ -1,17 +1,17 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core'
 
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router';
-import { Location, NgFor, NgIf, NgClass } from '@angular/common';
-import { AuthenticationService } from '../../services/authentication.service';
-import { ErrorService } from '../../services/error.service';
-import { faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
-import { NavbarComponent } from '../navbar/navbar.component';
-import { ListsComponent } from '../lists/lists.component';
-import { CommentsComponent } from '../comments/comments.component';
-import { LoginComponent } from '../login/login.component';
+import { ActivatedRoute, Router, NavigationEnd } from '@angular/router'
+import { Location, NgFor, NgIf, NgClass } from '@angular/common'
+import { AuthenticationService } from '../../services/authentication.service'
+import { ErrorService } from '../../services/error.service'
+import { faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { NavbarComponent } from '../navbar/navbar.component'
+import { ListsComponent } from '../lists/lists.component'
+import { CommentsComponent } from '../comments/comments.component'
+import { LoginComponent } from '../login/login.component'
 
 
-const MIN_WIDTH = 768;
+const MIN_WIDTH = 768
 
 @Component({
     selector: 'app-details',
@@ -21,17 +21,17 @@ const MIN_WIDTH = 768;
 })
 export class DetailsComponent implements OnInit, OnDestroy {
 
-  list: string = '';
+  list: string = ''
 
-  navigationSubscription;
+  navigationSubscription
 
-  isAuthenticated = false;
+  isAuthenticated = false
 
-  hideLists = false;
-  hideComments = false;
+  hideLists = false
+  hideComments = false
 
-  faSignOutAlt = faSignOutAlt;
-  faTimes = faTimes;
+  faSignOutAlt = faSignOutAlt
+  faTimes = faTimes
 
   constructor(
     private route: ActivatedRoute,
@@ -42,47 +42,47 @@ export class DetailsComponent implements OnInit, OnDestroy {
 
       this.navigationSubscription = this.router.events.subscribe(async (e: any) => {
         if (e instanceof NavigationEnd && await this.authenticated()) {
-          this.getList();
+          this.getList()
         }
-      });
+      })
     }
 
   ngOnInit() {
-    this.getList();
+    this.getList()
     if (window.innerWidth <= MIN_WIDTH) {
-      this.hideComments = true;
-      this.hideLists = false;
+      this.hideComments = true
+      this.hideLists = false
     }
   }
 
   async authenticated(): Promise<boolean> {
-    const authStatus = await this.authenticator.authenticated();
-    this.isAuthenticated = authStatus;
-    return authStatus;
+    const authStatus = await this.authenticator.authenticated()
+    this.isAuthenticated = authStatus
+    return authStatus
   }
 
   getList(): void {
-    const list = this.enumify(this.route.snapshot.paramMap.get('list') || '');
-    this.list = list;
+    const list = this.enumify(this.route.snapshot.paramMap.get('list') || '')
+    this.list = list
   }
 
   private enumify(listname: string): string {
-    return listname.replace('-', '_').toUpperCase();
+    return listname.replace('-', '_').toUpperCase()
   }
 
   goToDetails(): void {
-    this.hideComments = true;
-    this.hideLists = false;
+    this.hideComments = true
+    this.hideLists = false
   }
 
   goToComments(): void {
-    this.hideLists = true;
-    this.hideComments = false;
+    this.hideLists = true
+    this.hideComments = false
   }
 
   ngOnDestroy() {
     if (this.navigationSubscription) {
-      this.navigationSubscription.unsubscribe();
+      this.navigationSubscription.unsubscribe()
     }
   }
 

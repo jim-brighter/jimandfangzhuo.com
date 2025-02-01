@@ -1,19 +1,19 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
-import { ErrorService } from './error.service';
-import { Observable, catchError } from 'rxjs';
-import { ChristmasItem } from '../types/christmas';
-import { AuthenticationService } from './authentication.service';
-import { SuccessResponse } from '../types/success-response';
+import { HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core'
+import { environment } from 'src/environments/environment'
+import { ErrorService } from './error.service'
+import { Observable, catchError } from 'rxjs'
+import { ChristmasItem } from '../types/christmas'
+import { AuthenticationService } from './authentication.service'
+import { SuccessResponse } from '../types/success-response'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChristmasService {
 
-  private rootUrl = environment.plannerBackendRootUrl;
-  private apiContext = environment.plannerBackendChristmasContext;
+  private rootUrl = environment.plannerBackendRootUrl
+  private apiContext = environment.plannerBackendChristmasContext
 
   constructor(private http: HttpClient, private errors: ErrorService, private auth: AuthenticationService) { }
 
@@ -21,7 +21,7 @@ export class ChristmasService {
     return this.http.get<ChristmasItem[]>(this.rootUrl + this.apiContext, {})
     .pipe(
       catchError(this.errors.handleError('getItems', new Array<ChristmasItem>()))
-    );
+    )
   }
 
   createItem(item: ChristmasItem): Observable<ChristmasItem> {
@@ -43,7 +43,7 @@ export class ChristmasService {
     })
     .pipe(
       catchError(this.errors.handleError('updateItem', new SuccessResponse()))
-    );
+    )
   }
 
   deleteItem(items: string[]): Observable<SuccessResponse> {

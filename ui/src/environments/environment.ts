@@ -10,7 +10,7 @@ export const environment = {
   plannerBackendImageContext: '/api/images',
   plannerBackendChristmasContext: '/api/christmas',
   plannerAuthBackend: 'http://localhost:8282'
-};
+}
 
 /*
  * In development mode, to ignore zone related error stack frames such as

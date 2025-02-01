@@ -1,6 +1,6 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { Comment } from '../../types/comment';
-import { DatePipe } from '@angular/common';
+import { Component, OnInit, Input } from '@angular/core'
+import { Comment } from '../../types/comment'
+import { DatePipe } from '@angular/common'
 
 @Component({
     selector: 'app-comment-item',
@@ -10,7 +10,7 @@ import { DatePipe } from '@angular/common';
 })
 export class CommentItemComponent implements OnInit {
 
-  @Input() comment: Comment = new Comment();
+  @Input() comment: Comment = new Comment()
 
   constructor() { }
 

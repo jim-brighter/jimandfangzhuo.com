@@ -6,4 +6,4 @@ export const environment = {
   plannerBackendImageContext: '/api/images',
   plannerBackendChristmasContext: '/api/christmas',
   plannerAuthBackend: ''
-};
+}

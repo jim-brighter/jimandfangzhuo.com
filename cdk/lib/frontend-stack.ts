@@ -1,14 +1,16 @@
-import { Stack, StackProps, RemovalPolicy, Duration } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-import * as s3 from 'aws-cdk-lib/aws-s3';
-import * as s3deployment from 'aws-cdk-lib/aws-s3-deployment';
-import * as route53 from 'aws-cdk-lib/aws-route53';
-import * as targets from 'aws-cdk-lib/aws-route53-targets';
-import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import { Stack, StackProps, RemovalPolicy, Duration } from 'aws-cdk-lib'
+import { Construct } from 'constructs'
+import * as s3 from 'aws-cdk-lib/aws-s3'
+import * as s3deployment from 'aws-cdk-lib/aws-s3-deployment'
+import * as route53 from 'aws-cdk-lib/aws-route53'
+import * as targets from 'aws-cdk-lib/aws-route53-targets'
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront'
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins'
+import * as certmanager from 'aws-cdk-lib/aws-certificatemanager'
 
 export class FrontendStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
-    super(scope, id, props);
+    super(scope, id, props)
 
     // S3 SITE
     const frontendRootBucket = new s3.Bucket(this, 'PlannerFrontendRootBucket', {
@@ -26,7 +28,7 @@ export class FrontendStack extends Stack {
         expiredObjectDeleteMarker: true,
         noncurrentVersionExpiration: Duration.days(3)
       }]
-    });
+    })
 
     const frontendSubdomainBucket = new s3.Bucket(this, 'PlannerFrontendSubdomainBucket', {
       bucketName: 'www.jimandfangzhuo.com',
@@ -37,7 +39,7 @@ export class FrontendStack extends Stack {
         hostName: 'jimandfangzhuo.com',
         protocol: s3.RedirectProtocol.HTTPS
       }
-    });
+    })
 
     // CLOUDFRONT DISTRIBUTION
     const distribution = new cloudfront.Distribution(this, 'PlannerDistribution', {
@@ -79,19 +81,19 @@ export class FrontendStack extends Stack {
       sources: [s3deployment.Source.asset('../ui/dist')],
       destinationBucket: frontendRootBucket,
       distribution: distribution
-    });
+    })
 
     // ROUTE53 MAPPING
     const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
       domainName: 'jimandfangzhuo.com'
-    });
+    })
 
     const rootARecord = new route53.ARecord(this, 'PlannerRootRecord', {
       zone: hostedZone,
       target: {
         aliasTarget: new targets.CloudFrontTarget(distribution)
       }
-    });
+    })
 
     const subdomainARecord = new route53.ARecord(this, 'PlannerSubdomainRecord', {
       zone: hostedZone,
@@ -99,6 +101,6 @@ export class FrontendStack extends Stack {
       target: {
         aliasTarget: new targets.BucketWebsiteTarget(frontendSubdomainBucket)
       }
-    });
+    })
   }
 }

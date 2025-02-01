@@ -1,21 +1,21 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { Injectable } from '@angular/core'
+import { HttpClient } from '@angular/common/http'
+import { Observable } from 'rxjs'
+import { catchError } from 'rxjs/operators'
 
-import { environment } from '../../environments/environment';
-import { PlannerImage } from '../types/image';
-import { AuthenticationService } from './authentication.service';
-import { ErrorService } from './error.service';
-import { ImageUploadRequest } from '../types/image-upload-request';
+import { environment } from '../../environments/environment'
+import { PlannerImage } from '../types/image'
+import { AuthenticationService } from './authentication.service'
+import { ErrorService } from './error.service'
+import { ImageUploadRequest } from '../types/image-upload-request'
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageService {
 
-  private rootUrl = environment.plannerBackendRootUrl;
-  private apiContext = environment.plannerBackendImageContext;
+  private rootUrl = environment.plannerBackendRootUrl
+  private apiContext = environment.plannerBackendImageContext
 
   constructor(private http: HttpClient, private auth: AuthenticationService, private errors: ErrorService) { }
 
@@ -27,7 +27,7 @@ export class ImageService {
     })
       .pipe(
         catchError(this.errors.handleError('uploadImages', ''))
-      );
+      )
   }
 
   getAllImages(): Observable<PlannerImage[]> {
@@ -38,6 +38,6 @@ export class ImageService {
     })
       .pipe(
         catchError(this.errors.handleError('getAllImages', []))
-      );
+      )
   }
 }
