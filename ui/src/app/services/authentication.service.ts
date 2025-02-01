@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { ErrorService } from './error.service';
+import { Injectable } from '@angular/core'
+import { ErrorService } from './error.service'
 import { signIn, signOut, fetchAuthSession } from 'aws-amplify/auth'
 
 @Injectable({
@@ -7,7 +7,7 @@ import { signIn, signOut, fetchAuthSession } from 'aws-amplify/auth'
 })
 export class AuthenticationService {
 
-  idToken: string = '';
+  idToken: string = ''
 
   constructor(private errors: ErrorService) {
 
@@ -15,28 +15,28 @@ export class AuthenticationService {
 
   async authenticated(): Promise<boolean> {
     try {
-      const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
+      const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {}
       if (idToken) {
-        this.idToken = idToken?.toString() || '';
-        return true;
+        this.idToken = idToken?.toString() || ''
+        return true
       }
     } catch(e) {
-      console.error('failed to get auth info', e);
+      console.error('failed to get auth info', e)
     }
-    return false;
+    return false
   }
 
   async authenticate(credentials: {username: string, password: string}, callback: () => void) {
     try {
-      const { isSignedIn, nextStep } = await signIn({username: credentials.username, password: credentials.password});
+      const { isSignedIn, nextStep } = await signIn({username: credentials.username, password: credentials.password})
       if (isSignedIn) {
-        const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {};
-        this.idToken = idToken?.toString() || '';
+        const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {}
+        this.idToken = idToken?.toString() || ''
       }
-      this.errors.clear();
-      return callback && callback();
+      this.errors.clear()
+      return callback && callback()
     } catch(e) {
-      this.errors.addError(400, 'Login failed, try again');
+      this.errors.addError(400, 'Login failed, try again')
     }
   }
 
@@ -44,16 +44,16 @@ export class AuthenticationService {
     try {
       await signOut({
         global: true
-      });
-      this.wipeSession();
+      })
+      this.wipeSession()
     } catch(e) {
-      console.error(e);
+      console.error(e)
     }
   }
 
   private wipeSession() {
-    this.idToken = '';
-    localStorage.clear();
+    this.idToken = ''
+    localStorage.clear()
   }
 
 }

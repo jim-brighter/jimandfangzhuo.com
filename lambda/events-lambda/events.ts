@@ -1,6 +1,6 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Event, PlannerEvent } from './event';
-import * as eventService from './event-service';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { Event, PlannerEvent } from './event'
+import * as eventService from './event-service'
 
 export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const headers = {
@@ -8,12 +8,12 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
         'Access-Control-Allow-Credentials': true
-    };
+    }
     switch(event.httpMethod) {
         case 'GET':
             if (event.pathParameters && event.pathParameters.eventType) {
                 try {
-                    const eventsByType: Event[] = await eventService.getEventsByType(event.pathParameters.eventType);
+                    const eventsByType: Event[] = await eventService.getEventsByType(event.pathParameters.eventType)
                     return {
                         statusCode: 200,
                         headers,
@@ -31,7 +31,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             }
             else {
                 try {
-                    const allEvents: Event[] =  await eventService.getAllEvents();
+                    const allEvents: Event[] =  await eventService.getAllEvents()
                     return {
                         statusCode: 200,
                         headers,
@@ -48,10 +48,10 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                 }
             }
         case 'POST':
-            let eventContent: Event = new PlannerEvent(event.body && JSON.parse(event.body));
+            let eventContent: Event = new PlannerEvent(event.body && JSON.parse(event.body))
             if (eventContent.validateNewEvent()) {
                 try {
-                    eventContent = await eventService.createEvent(eventContent);
+                    eventContent = await eventService.createEvent(eventContent)
                     return {
                         statusCode: 201,
                         headers,
@@ -78,8 +78,8 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             }
         case 'PUT':
             const eventsContents: Event[] = event.body && JSON.parse(event.body).map((i: any) => {
-                return new PlannerEvent(i);
-            });
+                return new PlannerEvent(i)
+            })
 
             for (let updateEvent of eventsContents) {
                 if (!updateEvent.validateUpdateEvent()) {
@@ -94,7 +94,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             }
 
             try {
-                await eventService.updateEvents(eventsContents);
+                await eventService.updateEvents(eventsContents)
                 return {
                     statusCode: 200,
                     headers,
@@ -113,8 +113,8 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             }
         case 'DELETE':
             try {
-                const eventsToDelete = event.body && JSON.parse(event.body);
-                await eventService.deleteEvents(eventsToDelete);
+                const eventsToDelete = event.body && JSON.parse(event.body)
+                await eventService.deleteEvents(eventsToDelete)
                 return {
                     statusCode: 200,
                     headers,

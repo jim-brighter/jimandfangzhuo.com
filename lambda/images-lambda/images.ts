@@ -1,6 +1,6 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Image } from './image';
-import * as imageService from './image-service';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { Image } from './image'
+import * as imageService from './image-service'
 
 
 export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
@@ -9,11 +9,11 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET,POST,PUT,DELETE,OPTIONS',
         'Access-Control-Allow-Credentials': true
-    };
+    }
     switch(event.httpMethod) {
         case 'GET':
             try {
-                const allImages: Image[] = await imageService.getAllImages();
+                const allImages: Image[] = await imageService.getAllImages()
                 return {
                     statusCode: 200,
                     headers,
@@ -30,8 +30,8 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             }
         case 'POST':
             try {
-                const body = event.body && JSON.parse(event.body);
-                await imageService.saveImages(body);
+                const body = event.body && JSON.parse(event.body)
+                await imageService.saveImages(body)
                 return {
                     statusCode: 201,
                     headers,
@@ -40,7 +40,7 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                     })
                 }
             } catch(e) {
-                console.error(e);
+                console.error(e)
                 return {
                     statusCode: 500,
                     headers,

@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component } from '@angular/core'
+import { RouterOutlet } from '@angular/router'
 
 @Component({
     selector: 'app-root',
@@ -8,12 +8,12 @@ import { RouterOutlet } from '@angular/router';
     imports: [RouterOutlet]
 })
 export class AppComponent {
-  title = 'app';
+  title = 'app'
   constructor() {
     if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      document.documentElement.setAttribute('data-bs-theme', 'dark');
+      document.documentElement.setAttribute('data-bs-theme', 'dark')
     } else {
-      document.documentElement.setAttribute('data-bs-theme', 'light');
+      document.documentElement.setAttribute('data-bs-theme', 'light')
     }
   }
 }

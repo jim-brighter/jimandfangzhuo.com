@@ -1,3 +1,3 @@
 export class ImageUploadRequest {
-    imageData: string = '';
+    imageData: string = ''
 }

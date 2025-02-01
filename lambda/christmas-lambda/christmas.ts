@@ -1,6 +1,6 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { ChristmasItem, ChristmasItemImpl } from "./christmas-types";
-import * as christmasService from './christmas-service';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda"
+import { ChristmasItem, ChristmasItemImpl } from "./christmas-types"
+import * as christmasService from './christmas-service'
 
 export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const headers = {
@@ -8,11 +8,11 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
         'Access-Control-Allow-Credentials': true
-    };
+    }
     switch(event.httpMethod) {
         case 'GET':
             try {
-                const allItems: ChristmasItem[] = await christmasService.getAllItems();
+                const allItems: ChristmasItem[] = await christmasService.getAllItems()
                 return {
                     statusCode: 200,
                     headers,
@@ -28,9 +28,9 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                 }
             }
         case 'POST':
-            let item: ChristmasItem = new ChristmasItemImpl(event.body && JSON.parse(event.body));
+            let item: ChristmasItem = new ChristmasItemImpl(event.body && JSON.parse(event.body))
             try {
-                item = await christmasService.createItem(item);
+                item = await christmasService.createItem(item)
                 return {
                     statusCode: 201,
                     headers,
@@ -46,9 +46,9 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                 }
             }
         case 'PUT':
-            let updateItem: ChristmasItem = new ChristmasItemImpl(event.body && JSON.parse(event.body));
+            let updateItem: ChristmasItem = new ChristmasItemImpl(event.body && JSON.parse(event.body))
             try {
-                await christmasService.updateItem(updateItem);
+                await christmasService.updateItem(updateItem)
                 return {
                     statusCode: 200,
                     headers,
@@ -67,8 +67,8 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
             }
         case 'DELETE':
             try {
-                const itemsToDelete = event.body && JSON.parse(event.body);
-                await christmasService.deleteItems(itemsToDelete);
+                const itemsToDelete = event.body && JSON.parse(event.body)
+                await christmasService.deleteItems(itemsToDelete)
                 return {
                     statusCode: 200,
                     headers,

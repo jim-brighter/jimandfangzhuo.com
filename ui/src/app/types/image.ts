@@ -1,4 +1,4 @@
 export class PlannerImage {
-    imageId: string = '';
-    s3ObjectKey: string = '';
+    imageId: string = ''
+    s3ObjectKey: string = ''
 }

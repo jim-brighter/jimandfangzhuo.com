@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core'
 
-import { CommentService } from '../../services/comment.service';
-import { Comment } from '../../types/comment';
-import { NgIf, NgFor } from '@angular/common';
-import { CommentItemComponent } from '../comment-item/comment-item.component';
-import { FormsModule } from '@angular/forms';
+import { CommentService } from '../../services/comment.service'
+import { Comment } from '../../types/comment'
+import { NgIf, NgFor } from '@angular/common'
+import { CommentItemComponent } from '../comment-item/comment-item.component'
+import { FormsModule } from '@angular/forms'
 
 @Component({
     selector: 'app-comments',
@@ -14,30 +14,30 @@ import { FormsModule } from '@angular/forms';
 })
 export class CommentsComponent implements OnInit {
 
-  comments: Comment[] = [];
+  comments: Comment[] = []
 
-  newComment: Comment = new Comment();
+  newComment: Comment = new Comment()
 
-  isLoading = true;
+  isLoading = true
 
   constructor(private commentService: CommentService) { }
 
   ngOnInit() {
-    this.retrieveComments();
+    this.retrieveComments()
   }
 
   retrieveComments(): void {
     this.commentService.getComments().subscribe(data => {
-      this.comments = data;
-      this.isLoading = false;
-    });
+      this.comments = data
+      this.isLoading = false
+    })
   }
 
   saveNewComment(): void {
     this.commentService.createComment(this.newComment).subscribe(data => {
-      this.comments.push(data);
-      this.newComment.clear();
-    });
+      this.comments.push(data)
+      this.newComment.clear()
+    })
   }
 
 }

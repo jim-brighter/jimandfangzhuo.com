@@ -1,6 +1,6 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { Comment, PlannerComment } from './comment';
-import * as commentService from './comment-service';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda'
+import { Comment, PlannerComment } from './comment'
+import * as commentService from './comment-service'
 
 export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const headers = {
@@ -8,11 +8,11 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
         'Access-Control-Allow-Credentials': true
-    };
+    }
     switch(event.httpMethod) {
         case 'GET':
             try {
-                const allComments: Comment[] = await commentService.getAllComments();
+                const allComments: Comment[] = await commentService.getAllComments()
                 return {
                     statusCode: 200,
                     headers,
@@ -28,10 +28,10 @@ export const handler = async(event: APIGatewayProxyEvent): Promise<APIGatewayPro
                 }
             }
         case 'POST':
-            let commentContent: Comment = new PlannerComment(event.body && JSON.parse(event.body));
+            let commentContent: Comment = new PlannerComment(event.body && JSON.parse(event.body))
             if (commentContent.validateNewComment()) {
                 try {
-                    commentContent = await commentService.createComment(commentContent);
+                    commentContent = await commentService.createComment(commentContent)
                     return {
                         statusCode: 201,
                         headers,
