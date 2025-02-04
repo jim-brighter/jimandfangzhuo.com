@@ -1,20 +1,30 @@
 <div class="p-3">
-    <h1>🎄 Christmas {{year}} 🎄</h1>
+    <h1>🎄 Christmas {{ year }} 🎄</h1>
     <ul [ngClass]="{'w-50': screenWidth >= 800, 'w-100': screenWidth < 800}">
-        <li class="w-100 pt-2" *ngFor="let item of data; index as i">
-            <a *ngIf="editing != i && item.itemLink" class="d-inline-block w-75 align-top" target="_blank" rel="noopener noreferrer" href="{{item.itemLink || 'https://jimandfanghzuo.com/christmas'}}">{{item.itemName}}</a>
+        <li *ngFor="let item of data; index as i" class="w-100 pt-2">
+            <a *ngIf="editing != i && item.itemLink" class="d-inline-block w-75 align-top" href="{{item.itemLink || 'https://jimandfanghzuo.com/christmas'}}"
+               rel="noopener noreferrer" target="_blank">{{item.itemName}}</a>
             <span *ngIf="editing != i && !item.itemLink" class="d-inline-block w-75 align-top">{{item.itemName}}</span>
-            <button *ngIf="isAuthenticated" class="d-inline-block w-25 align-top" type="button" title="Delete" class="btn btn-outline-danger btn-sm float-end" (click)="deleteItem(item)"><fa-icon [icon]="faTrash"></fa-icon></button>
-            <button *ngIf="isAuthenticated && editing != i" class="d-inline-block w-25 align-top" type="button" title="Edit" class="btn btn-outline-primary btn-sm float-end" (click)="editItem(i)"><fa-icon [icon]="faEdit"></fa-icon></button>
+            <button (click)="deleteItem(item)" *ngIf="isAuthenticated" class="btn btn-outline-danger btn-sm float-end" class="d-inline-block w-25 align-top"
+                    title="Delete" type="button">
+                <fa-icon [icon]="faTrash"></fa-icon>
+            </button>
+            <button (click)="editItem(i)" *ngIf="isAuthenticated && editing != i" class="btn btn-outline-primary btn-sm float-end"
+                    class="d-inline-block w-25 align-top" title="Edit" type="button">
+                <fa-icon [icon]="faEdit"></fa-icon>
+            </button>
             <form *ngIf="editing == i">
                 <div class="input-group">
-                    <input [(ngModel)]="item.itemName" type="text" autocomplete="off" class="form-control form-control-sm" name="edit-item-name" placeholder="Item Name"/>
+                    <input [(ngModel)]="item.itemName" autocomplete="off" class="form-control form-control-sm"
+                           name="edit-item-name" placeholder="Item Name" type="text"/>
                 </div>
                 <div class="input-group">
-                    <input [(ngModel)]="item.itemLink" type="text" autocomplete="off" class="form-control form-control-sm" name="edit-item-link" placeholder="Item Link"/>
+                    <input [(ngModel)]="item.itemLink" autocomplete="off" class="form-control form-control-sm"
+                           name="edit-item-link" placeholder="Item Link" type="text"/>
                 </div>
                 <div class="input-group">
-                    <button *ngIf="item.itemName" (click)="saveEditItem(item)" class="btn btn-outline-primary">Save</button>
+                    <button (click)="saveEditItem(item)" *ngIf="item.itemName" class="btn btn-outline-primary">Save
+                    </button>
                     <button (click)="cancelEdit()" class="btn btn-outline-primary">Cancel</button>
                 </div>
             </form>
@@ -22,13 +32,16 @@
         <li *ngIf="isAuthenticated">
             <form>
                 <div class="input-group">
-                    <input [(ngModel)]="newItem.itemName" type="text" autocomplete="off" class="form-control form-control-sm" name="new-item-name" placeholder="New Item Name"/>
+                    <input [(ngModel)]="newItem.itemName" autocomplete="off" class="form-control form-control-sm"
+                           name="new-item-name" placeholder="New Item Name" type="text"/>
                 </div>
-                <div class="input-group" *ngIf="newItem.itemName">
-                    <input [(ngModel)]="newItem.itemLink" type="text" autocomplete="off" class="form-control form-control-sm" name="new-item-link" placeholder="Link"/>
+                <div *ngIf="newItem.itemName" class="input-group">
+                    <input [(ngModel)]="newItem.itemLink" autocomplete="off" class="form-control form-control-sm"
+                           name="new-item-link" placeholder="Link" type="text"/>
                 </div>
                 <div class="input-group">
-                    <button *ngIf="newItem.itemName" (click)="saveNewItem()" class="btn btn-outline-primary">Save</button>
+                    <button (click)="saveNewItem()" *ngIf="newItem.itemName" class="btn btn-outline-primary">Save
+                    </button>
                 </div>
             </form>
         </li>

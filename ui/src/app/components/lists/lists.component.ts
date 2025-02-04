@@ -4,7 +4,7 @@ import { faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons'
 
 import { EventService } from '../../services/event.service'
 import { PlannerEvent } from '../../types/event'
-import { NgIf, NgFor } from '@angular/common'
+import { NgFor, NgIf } from '@angular/common'
 import { FaIconComponent } from '@fortawesome/angular-fontawesome'
 import { ListItemComponent } from '../list-item/list-item.component'
 import { FormsModule } from '@angular/forms'
@@ -23,10 +23,10 @@ const COMPLETE = 'COMPLETE'
 const DELETED = 'DELETED'
 
 @Component({
-    selector: 'app-lists',
-    templateUrl: './lists.component.html',
-    styleUrls: ['./lists.component.css'],
-    imports: [NgIf, FaIconComponent, NgFor, ListItemComponent, FormsModule]
+  selector: 'app-lists',
+  templateUrl: './lists.component.html',
+  styleUrls: ['./lists.component.css'],
+  imports: [NgIf, FaIconComponent, NgFor, ListItemComponent, FormsModule]
 })
 export class ListsComponent implements OnChanges {
 
@@ -50,7 +50,8 @@ export class ListsComponent implements OnChanges {
 
   @Input() list: string = ''
 
-  constructor(private eventService: EventService) { }
+  constructor(private eventService: EventService) {
+  }
 
   ngOnChanges() {
     this.isLoading = true

@@ -1,13 +1,13 @@
-<form role="form" (submit)="login()">
-  <label for="username" class="form-label">Username: </label>
-  <div class="input-group">
-    <input type="text" class="form-control" id="username" name="username" [(ngModel)]="credentials.username"/>
-  </div>
-  <label for="password" class="form-label pt-2">Password: </label>
-  <div class="input-group">
-    <input type="password" class="form-control" id="password" name="password" [(ngModel)]="credentials.password"/>
-  </div>
-  <div class="input-group pt-3">
-    <button type="submit" class="btn btn-outline-primary">Login</button>
-  </div>
+<form (submit)="login()" role="form">
+    <label class="form-label" for="username">Username: </label>
+    <div class="input-group">
+        <input [(ngModel)]="credentials.username" class="form-control" id="username" name="username" type="text"/>
+    </div>
+    <label class="form-label pt-2" for="password">Password: </label>
+    <div class="input-group">
+        <input [(ngModel)]="credentials.password" class="form-control" id="password" name="password" type="password"/>
+    </div>
+    <div class="input-group pt-3">
+        <button class="btn btn-outline-primary" type="submit">Login</button>
+    </div>
 </form>

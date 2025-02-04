@@ -1,37 +1,39 @@
 <div class="container-fluid" id="header">
-  <h1 class="container-fluid d-flex justify-content-center">Jim and Fangzhuo's Fun Life</h1>
-  <app-navbar></app-navbar>
+    <h1 class="container-fluid d-flex justify-content-center">Jim and Fangzhuo's Fun Life</h1>
+    <app-navbar></app-navbar>
 </div>
 <div class="container-fluid justify-content-center align-content-center text-center">
   <span *ngFor="let errorMessage of errors.getErrors(); let i = index" class="d-block alert alert-danger">
-    {{errorMessage.errorMessage}}
-    <button *ngIf="i === 0" type="button" class="btn-close" aria-label="Close" (click)="errors.clear()"></button>
+    {{ errorMessage.errorMessage }}
+      <button (click)="errors.clear()" *ngIf="i === 0" aria-label="Close" class="btn-close" type="button"></button>
   </span>
 </div>
 <div *ngIf="isAuthenticated" class="container-fluid" id="all-container">
-  <div class="d-block d-md-none">
-    <ul class="nav nav-tabs col-12 nav-fill my-4">
-      <li class="nav-item">
-        <a class="nav-link" [ngClass]="{'active': hideLists === false && hideComments === true}" (click)="goToDetails()">Details</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" [ngClass]="{'active': hideComments === false && hideLists === true}" (click)="goToComments()">Comments</a>
-      </li>
-    </ul>
-  </div>
-  <div class="row" id="main-row">
-    <div class="col-sm-8 col-12" id="lists-container" [hidden]="hideLists">
-      <app-lists [list]="list"></app-lists>
+    <div class="d-block d-md-none">
+        <ul class="nav nav-tabs col-12 nav-fill my-4">
+            <li class="nav-item">
+                <a (click)="goToDetails()" [ngClass]="{'active': hideLists === false && hideComments === true}"
+                   class="nav-link">Details</a>
+            </li>
+            <li class="nav-item">
+                <a (click)="goToComments()" [ngClass]="{'active': hideComments === false && hideLists === true}"
+                   class="nav-link">Comments</a>
+            </li>
+        </ul>
     </div>
-    <div class="col-sm-4 col-12" id="comments-container" [hidden]="hideComments">
-      <app-comments></app-comments>
+    <div class="row" id="main-row">
+        <div [hidden]="hideLists" class="col-sm-8 col-12" id="lists-container">
+            <app-lists [list]="list"></app-lists>
+        </div>
+        <div [hidden]="hideComments" class="col-sm-4 col-12" id="comments-container">
+            <app-comments></app-comments>
+        </div>
     </div>
-  </div>
 </div>
 <div *ngIf="!isAuthenticated" class="container-fluid">
-  <div class="row justify-content-center">
-    <div class="col-sm-4 col-10">
-      <app-login [endpoint]="list"></app-login>
+    <div class="row justify-content-center">
+        <div class="col-sm-4 col-10">
+            <app-login [endpoint]="list"></app-login>
+        </div>
     </div>
-  </div>
 </div>

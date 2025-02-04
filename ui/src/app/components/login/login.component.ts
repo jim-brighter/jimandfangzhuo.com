@@ -1,13 +1,13 @@
-import { Component, OnInit, Input } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core'
 import { AuthenticationService } from '../../services/authentication.service'
 import { Router } from '@angular/router'
 import { FormsModule } from '@angular/forms'
 
 @Component({
-    selector: 'app-login',
-    templateUrl: './login.component.html',
-    styleUrls: ['./login.component.css'],
-    imports: [FormsModule]
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css'],
+  imports: [FormsModule]
 })
 export class LoginComponent implements OnInit {
 
@@ -18,7 +18,8 @@ export class LoginComponent implements OnInit {
     password: ''
   }
 
-  constructor(private authenticator: AuthenticationService, private router: Router) { }
+  constructor(private authenticator: AuthenticationService, private router: Router) {
+  }
 
   ngOnInit() {
   }
@@ -27,8 +28,7 @@ export class LoginComponent implements OnInit {
     this.authenticator.authenticate(this.credentials, () => {
       if (this.endpoint === 'photos' || this.endpoint === 'admin') {
         this.router.navigateByUrl(`/${this.endpoint}`)
-      }
-      else {
+      } else {
         this.router.navigateByUrl(`/details/${this.endpoint.toLowerCase().replace('_', '-')}`)
       }
     })

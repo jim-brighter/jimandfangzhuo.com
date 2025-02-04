@@ -17,7 +17,8 @@ export class ImageService {
   private rootUrl = environment.plannerBackendRootUrl
   private apiContext = environment.plannerBackendImageContext
 
-  constructor(private http: HttpClient, private auth: AuthenticationService, private errors: ErrorService) { }
+  constructor(private http: HttpClient, private auth: AuthenticationService, private errors: ErrorService) {
+  }
 
   uploadImages(images: ImageUploadRequest): Observable<any> {
     return this.http.post<any>(this.rootUrl + this.apiContext, images, {

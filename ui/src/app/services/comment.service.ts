@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core'
-import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { HttpClient } from '@angular/common/http'
 import { Observable } from 'rxjs'
 import { catchError } from 'rxjs/operators'
 
@@ -16,7 +16,8 @@ export class CommentService {
   private rootUrl = environment.plannerBackendRootUrl
   private apiContext = environment.plannerBackendCommentsContext
 
-  constructor(private http: HttpClient, private auth: AuthenticationService, private errors: ErrorService) { }
+  constructor(private http: HttpClient, private auth: AuthenticationService, private errors: ErrorService) {
+  }
 
   getComments(): Observable<Comment[]> {
     return this.http.get<Comment[]>(this.rootUrl + this.apiContext, {

@@ -18,8 +18,9 @@ export class EventService {
   private apiContext = environment.plannerBackendEventsContext
 
   constructor(private http: HttpClient,
-    private auth: AuthenticationService,
-    private errors: ErrorService) { }
+              private auth: AuthenticationService,
+              private errors: ErrorService) {
+  }
 
   getEvents(): Observable<PlannerEvent[]> {
     return this.http.get<PlannerEvent[]>(`${this.rootUrl + this.apiContext}`, {
@@ -62,9 +63,9 @@ export class EventService {
       },
       body: eventIds
     })
-    .pipe(
-      catchError(this.errors.handleError('deleteEvent', new SuccessResponse()))
-    )
+      .pipe(
+        catchError(this.errors.handleError('deleteEvent', new SuccessResponse()))
+      )
   }
 
   updateEvents(events: PlannerEvent[]): Observable<SuccessResponse> {

@@ -1,51 +1,54 @@
-<div class="modal fade" id="descriptionModal" tabindex="-1" aria-labelledby="descriptionModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{{eventTitle}}</h5>
-      </div>
-      <div class="modal-body">
-        <p class="prewrapped">{{descriptionText}}</p>
-      </div>
+<div aria-hidden="true" aria-labelledby="descriptionModalLabel" class="modal fade" id="descriptionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ eventTitle }}</h5>
+            </div>
+            <div class="modal-body">
+                <p class="prewrapped">{{ descriptionText }}</p>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 <div *ngIf="isAuthenticated" class="table-responsive px-5 pt-2">
-  <div *ngIf="isLoading">
-    <div class="spinner"></div>
-  </div>
-  <table *ngIf="!isLoading" class="table table-sm table-hover">
-    <thead>
-      <tr>
-        <th>Event ID</th>
-        <th>Event Title</th>
-        <th>Event Status</th>
-        <th>Event Type</th>
-        <th>Restore?</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let event of events" [ngClass]="{'table-danger': event.eventStatus === 'DELETED'}" data-bs-toggle="modal" data-bs-target="#descriptionModal" (click)="updateDescriptionModal(event)">
-        <td>{{event.eventId}}</td>
-        <td>{{event.title}}</td>
-        <td>{{event.eventStatus}}</td>
-        <td>{{event.eventType}}</td>
-        <td>
-          <button *ngIf="event.eventStatus === 'DELETED'" type="button" title="Restore" class="btn btn-outline-success btn-sm" (click)="restoreItem(event)">
-            <fa-icon [icon]="faTrashRestore"></fa-icon>
-          </button>
-          <button *ngIf="event.eventStatus === 'DELETED'" type="button" title="Permanently Delete" class="btn btn-outline-danger btn-sm" (click)="permanentlyDeleteItem(event)">
-            <fa-icon [icon]="faTrash"></fa-icon>
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+    <div *ngIf="isLoading">
+        <div class="spinner"></div>
+    </div>
+    <table *ngIf="!isLoading" class="table table-sm table-hover">
+        <thead>
+        <tr>
+            <th>Event ID</th>
+            <th>Event Title</th>
+            <th>Event Status</th>
+            <th>Event Type</th>
+            <th>Restore?</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr (click)="updateDescriptionModal(event)" *ngFor="let event of events"
+            [ngClass]="{'table-danger': event.eventStatus === 'DELETED'}" data-bs-target="#descriptionModal" data-bs-toggle="modal">
+            <td>{{ event.eventId }}</td>
+            <td>{{ event.title }}</td>
+            <td>{{ event.eventStatus }}</td>
+            <td>{{ event.eventType }}</td>
+            <td>
+                <button (click)="restoreItem(event)" *ngIf="event.eventStatus === 'DELETED'" class="btn btn-outline-success btn-sm"
+                        title="Restore" type="button">
+                    <fa-icon [icon]="faTrashRestore"></fa-icon>
+                </button>
+                <button (click)="permanentlyDeleteItem(event)" *ngIf="event.eventStatus === 'DELETED'" class="btn btn-outline-danger btn-sm"
+                        title="Permanently Delete" type="button">
+                    <fa-icon [icon]="faTrash"></fa-icon>
+                </button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 <div *ngIf="!isAuthenticated" class="container-fluid">
-  <div class="row justify-content-center">
-    <div class="col-sm-4 col-10">
-      <app-login [endpoint]="'admin'"></app-login>
+    <div class="row justify-content-center">
+        <div class="col-sm-4 col-10">
+            <app-login [endpoint]="'admin'"></app-login>
+        </div>
     </div>
-  </div>
 </div>

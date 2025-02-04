@@ -4,16 +4,17 @@ import { ImageUploadRequest } from 'src/app/types/image-upload-request'
 import { FormsModule } from '@angular/forms'
 
 @Component({
-    selector: 'app-upload',
-    templateUrl: './upload.component.html',
-    styleUrls: ['./upload.component.css'],
-    imports: [FormsModule]
+  selector: 'app-upload',
+  templateUrl: './upload.component.html',
+  styleUrls: ['./upload.component.css'],
+  imports: [FormsModule]
 })
 export class UploadComponent {
 
   files: FileList[] = []
 
-  constructor(private imageService: ImageService) { }
+  constructor(private imageService: ImageService) {
+  }
 
   onFileChange(event: any) {
     this.files = []
@@ -29,13 +30,13 @@ export class UploadComponent {
         imageRequest.imageData = reader.result as string
         this.imageService.uploadImages(imageRequest).subscribe(data => {
           if (data.statusMessage === 'OK') {
-            alert("Upload Success!")
+            alert('Upload Success!')
           }
         })
       }
       reader.readAsDataURL(this.files[0][0])
     } else {
-      console.log("no images selected")
+      console.log('no images selected')
     }
   }
 

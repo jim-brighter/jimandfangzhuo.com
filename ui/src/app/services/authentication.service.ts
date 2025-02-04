@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core'
 import { ErrorService } from './error.service'
-import { signIn, signOut, fetchAuthSession } from 'aws-amplify/auth'
+import { fetchAuthSession, signIn, signOut } from 'aws-amplify/auth'
 
 @Injectable({
   providedIn: 'root'
@@ -20,22 +20,22 @@ export class AuthenticationService {
         this.idToken = idToken?.toString() || ''
         return true
       }
-    } catch(e) {
+    } catch (e) {
       console.error('failed to get auth info', e)
     }
     return false
   }
 
-  async authenticate(credentials: {username: string, password: string}, callback: () => void) {
+  async authenticate(credentials: { username: string, password: string }, callback: () => void) {
     try {
-      const { isSignedIn, nextStep } = await signIn({username: credentials.username, password: credentials.password})
+      const { isSignedIn, nextStep } = await signIn({ username: credentials.username, password: credentials.password })
       if (isSignedIn) {
         const { accessToken, idToken } = (await fetchAuthSession()).tokens ?? {}
         this.idToken = idToken?.toString() || ''
       }
       this.errors.clear()
       return callback && callback()
-    } catch(e) {
+    } catch (e) {
       this.errors.addError(400, 'Login failed, try again')
     }
   }
@@ -46,7 +46,7 @@ export class AuthenticationService {
         global: true
       })
       this.wipeSession()
-    } catch(e) {
+    } catch (e) {
       console.error(e)
     }
   }

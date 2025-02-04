@@ -8,11 +8,11 @@ import { AdminComponent } from '../components/admin/admin.component'
 import { ChristmasComponent } from '../components/christmas/christmas.component'
 
 const routes: Routes = [
-  {path: '', component: HomeComponent},
-  {path: 'details/:list', component: DetailsComponent, runGuardsAndResolvers: 'always'},
-  {path: 'photos', component: PhotosComponent, runGuardsAndResolvers: 'always'},
-  {path: 'admin', component: AdminComponent, runGuardsAndResolvers: 'always'},
-  {path: 'christmas', component: ChristmasComponent, runGuardsAndResolvers: 'always'}
+  { path: '', component: HomeComponent },
+  { path: 'details/:list', component: DetailsComponent, runGuardsAndResolvers: 'always' },
+  { path: 'photos', component: PhotosComponent, runGuardsAndResolvers: 'always' },
+  { path: 'admin', component: AdminComponent, runGuardsAndResolvers: 'always' },
+  { path: 'christmas', component: ChristmasComponent, runGuardsAndResolvers: 'always' }
 ]
 
 @NgModule({
@@ -25,4 +25,5 @@ const routes: Routes = [
   ],
   declarations: []
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {
+}
