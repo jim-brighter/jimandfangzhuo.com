@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
 
-import { ActivatedRoute, Router, NavigationEnd } from '@angular/router'
-import { Location, NgFor, NgIf, NgClass } from '@angular/common'
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router'
+import { Location, NgClass, NgFor, NgIf } from '@angular/common'
 import { AuthenticationService } from '../../services/authentication.service'
 import { ErrorService } from '../../services/error.service'
 import { faSignOutAlt, faTimes } from '@fortawesome/free-solid-svg-icons'
@@ -14,10 +14,10 @@ import { LoginComponent } from '../login/login.component'
 const MIN_WIDTH = 768
 
 @Component({
-    selector: 'app-details',
-    templateUrl: './details.component.html',
-    styleUrls: ['./details.component.css'],
-    imports: [NavbarComponent, NgFor, NgIf, NgClass, ListsComponent, CommentsComponent, LoginComponent]
+  selector: 'app-details',
+  templateUrl: './details.component.html',
+  styleUrls: ['./details.component.css'],
+  imports: [NavbarComponent, NgFor, NgIf, NgClass, ListsComponent, CommentsComponent, LoginComponent]
 })
 export class DetailsComponent implements OnInit, OnDestroy {
 
@@ -40,12 +40,12 @@ export class DetailsComponent implements OnInit, OnDestroy {
     private authenticator: AuthenticationService,
     public errors: ErrorService) {
 
-      this.navigationSubscription = this.router.events.subscribe(async (e: any) => {
-        if (e instanceof NavigationEnd && await this.authenticated()) {
-          this.getList()
-        }
-      })
-    }
+    this.navigationSubscription = this.router.events.subscribe(async (e: any) => {
+      if (e instanceof NavigationEnd && await this.authenticated()) {
+        this.getList()
+      }
+    })
+  }
 
   ngOnInit() {
     this.getList()
@@ -66,10 +66,6 @@ export class DetailsComponent implements OnInit, OnDestroy {
     this.list = list
   }
 
-  private enumify(listname: string): string {
-    return listname.replace('-', '_').toUpperCase()
-  }
-
   goToDetails(): void {
     this.hideComments = true
     this.hideLists = false
@@ -84,6 +80,10 @@ export class DetailsComponent implements OnInit, OnDestroy {
     if (this.navigationSubscription) {
       this.navigationSubscription.unsubscribe()
     }
+  }
+
+  private enumify(listname: string): string {
+    return listname.replace('-', '_').toUpperCase()
   }
 
 }

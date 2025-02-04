@@ -1,4 +1,4 @@
 export class PlannerError {
-    errorCode: number = 0
-    errorMessage: string = ''
+  errorCode: number = 0
+  errorMessage: string = ''
 }

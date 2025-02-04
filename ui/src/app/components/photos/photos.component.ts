@@ -3,18 +3,18 @@ import { PlannerImage } from '../../types/image'
 import { ImageService } from '../../services/image.service'
 import { ErrorService } from '../../services/error.service'
 import { AuthenticationService } from '../../services/authentication.service'
-import { Router, NavigationEnd } from '@angular/router'
-import { faSignOutAlt, faRotate } from '@fortawesome/free-solid-svg-icons'
+import { NavigationEnd, Router } from '@angular/router'
+import { faRotate, faSignOutAlt } from '@fortawesome/free-solid-svg-icons'
 import { NavbarComponent } from '../navbar/navbar.component'
-import { NgIf, NgFor } from '@angular/common'
+import { NgFor, NgIf } from '@angular/common'
 import { UploadComponent } from '../upload/upload.component'
 import { LoginComponent } from '../login/login.component'
 
 @Component({
-    selector: 'app-photos',
-    templateUrl: './photos.component.html',
-    styleUrls: ['./photos.component.css'],
-    imports: [NavbarComponent, NgIf, NgFor, UploadComponent, LoginComponent]
+  selector: 'app-photos',
+  templateUrl: './photos.component.html',
+  styleUrls: ['./photos.component.css'],
+  imports: [NavbarComponent, NgIf, NgFor, UploadComponent, LoginComponent]
 })
 export class PhotosComponent implements OnDestroy {
 
@@ -28,11 +28,12 @@ export class PhotosComponent implements OnDestroy {
 
   faSignOutAlt = faSignOutAlt
   faRotate = faRotate
+  images: PlannerImage[] = []
 
   constructor(private imageService: ImageService,
-    public errors: ErrorService,
-    private authenticator: AuthenticationService,
-    private router: Router) {
+              public errors: ErrorService,
+              private authenticator: AuthenticationService,
+              private router: Router) {
 
     this.navigationSubscription = this.router.events.subscribe(async (e: any) => {
       if (e instanceof NavigationEnd && await this.authenticated()) {
@@ -40,8 +41,6 @@ export class PhotosComponent implements OnDestroy {
       }
     })
   }
-
-  images: PlannerImage[] = []
 
   async authenticated(): Promise<boolean> {
     const authStatus = await this.authenticator.authenticated()

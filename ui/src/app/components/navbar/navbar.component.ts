@@ -1,22 +1,24 @@
-import { KeyValue, NgFor, NgClass, NgIf, KeyValuePipe } from '@angular/common'
-import { Component, OnInit, Input } from '@angular/core'
+import { KeyValue, KeyValuePipe, NgClass, NgFor, NgIf } from '@angular/common'
+import { Component, Input, OnInit } from '@angular/core'
 import { Router, RouterLink } from '@angular/router'
 import { AuthenticationService } from 'src/app/services/authentication.service'
-import { faSignOutAlt,
-  faPersonSkiing,
-  faUtensils,
+import {
+  faImage,
   faKitchenSet,
-  faPlaneDeparture,
-  faTv,
   faMoneyBillWave,
-  faImage } from '@fortawesome/free-solid-svg-icons'
+  faPersonSkiing,
+  faPlaneDeparture,
+  faSignOutAlt,
+  faTv,
+  faUtensils
+} from '@fortawesome/free-solid-svg-icons'
 import { FaIconComponent } from '@fortawesome/angular-fontawesome'
 
 @Component({
-    selector: 'app-navbar',
-    templateUrl: './navbar.component.html',
-    styleUrls: ['./navbar.component.css'],
-    imports: [NgFor, NgClass, RouterLink, FaIconComponent, NgIf, KeyValuePipe]
+  selector: 'app-navbar',
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.css'],
+  imports: [NgFor, NgClass, RouterLink, FaIconComponent, NgIf, KeyValuePipe]
 })
 export class NavbarComponent implements OnInit {
 
@@ -25,37 +27,38 @@ export class NavbarComponent implements OnInit {
   faSignOutAlt = faSignOutAlt
 
   routerMapping = {
-    "/details/to-do": {
-      text: "Doing!",
+    '/details/to-do': {
+      text: 'Doing!',
       icon: faPersonSkiing
     },
-    "/details/to-eat": {
-      text: "Eating!",
+    '/details/to-eat': {
+      text: 'Eating!',
       icon: faUtensils
     },
-    "/details/to-cook": {
-      text: "Cooking!",
+    '/details/to-cook': {
+      text: 'Cooking!',
       icon: faKitchenSet
     },
-    "/details/to-go": {
-      text: "Going!",
+    '/details/to-go': {
+      text: 'Going!',
       icon: faPlaneDeparture
     },
-    "/details/to-watch": {
-      text: "Watching!",
+    '/details/to-watch': {
+      text: 'Watching!',
       icon: faTv
     },
-    "/details/to-buy": {
-      text: "Buying!",
+    '/details/to-buy': {
+      text: 'Buying!',
       icon: faMoneyBillWave
     },
-    "/photos": {
-      text: "Photos!",
+    '/photos': {
+      text: 'Photos!',
       icon: faImage
     }
   }
 
-  constructor(private authenticator: AuthenticationService, private router: Router) { }
+  constructor(private authenticator: AuthenticationService, private router: Router) {
+  }
 
   ngOnInit() {
   }

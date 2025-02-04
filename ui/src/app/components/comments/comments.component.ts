@@ -2,15 +2,15 @@ import { Component, OnInit } from '@angular/core'
 
 import { CommentService } from '../../services/comment.service'
 import { Comment } from '../../types/comment'
-import { NgIf, NgFor } from '@angular/common'
+import { NgFor, NgIf } from '@angular/common'
 import { CommentItemComponent } from '../comment-item/comment-item.component'
 import { FormsModule } from '@angular/forms'
 
 @Component({
-    selector: 'app-comments',
-    templateUrl: './comments.component.html',
-    styleUrls: ['./comments.component.css'],
-    imports: [NgIf, NgFor, CommentItemComponent, FormsModule]
+  selector: 'app-comments',
+  templateUrl: './comments.component.html',
+  styleUrls: ['./comments.component.css'],
+  imports: [NgIf, NgFor, CommentItemComponent, FormsModule]
 })
 export class CommentsComponent implements OnInit {
 
@@ -20,7 +20,8 @@ export class CommentsComponent implements OnInit {
 
   isLoading = true
 
-  constructor(private commentService: CommentService) { }
+  constructor(private commentService: CommentService) {
+  }
 
   ngOnInit() {
     this.retrieveComments()

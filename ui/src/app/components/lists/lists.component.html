@@ -1,42 +1,49 @@
 <div *ngIf="!isLoading" class="container-fluid row align-items-start">
-  <a data-bs-toggle="collapse" (click)="toggleExpandToDo()" href="#toDoCollapse" aria-expanded="false" aria-controls="toDoCollapse">
-    <h5 class="col-12">
-      <fa-icon *ngIf="expandToDo" [icon]="faAngleDown"></fa-icon>
-      <fa-icon *ngIf="!expandToDo" [icon]="faAngleRight"></fa-icon>
-      {{listTitle}}
-    </h5>
-  </a>
-  <ul class="col-12 list-group list-group-flush collapse show border-top" id="toDoCollapse">
-    <li class="list-group-item" *ngFor="let plannerEvent of toDoEvents">
-      <app-list-item [plannerEvent]="plannerEvent" (itemToDelete)="onDelete($event)" (itemToUpdate)="onComplete($event)" (itemToEdit)="onEdit($event)"></app-list-item>
-    </li>
-    <li class="list-group-item">
-      <form>
-        <div class="input-group pt-3">
-          <input [(ngModel)]="newEvent.title" type="text" autocomplete="off" class="form-control form-control-sm" name="new-event-title" placeholder="New Event Title"/>
-        </div>
-        <div class="input-group pt-3" *ngIf="newEvent.title">
-          <textarea [(ngModel)]="newEvent.description" autocomplete="off" class="form-control form-control-sm" rows="2" name="new-event-desc" placeholder="New Event Description"></textarea>
-        </div>
-        <div class="input-group pt-3">
-          <button *ngIf="newEvent.title" (click)="saveNewEvent()" class="btn btn-outline-primary">Save</button>
-        </div>
-      </form>
-    </li>
-  </ul>
-  <a data-bs-toggle="collapse" (click)="toggleExpandDone()" href="#doneCollapse" aria-expanded="false" aria-controls="doneCollapse">
-    <h5 class="col-12">
-      <fa-icon *ngIf="expandDone" [icon]="faAngleDown"></fa-icon>
-      <fa-icon *ngIf="!expandDone" [icon]="faAngleRight"></fa-icon>
-      {{completedListTitle}}
-    </h5>
-  </a>
-  <ul class="col-12 collapse list-group list-group-flush border-top" id="doneCollapse">
-    <li class="list-group-item" *ngFor="let plannerEvent of completeEvents">
-      <app-list-item [plannerEvent]="plannerEvent" (itemToDelete)="onDelete($event)" (itemToUpdate)="onRedo($event)" (itemToEdit)="onEdit($event)"></app-list-item>
-    </li>
-  </ul>
+    <a (click)="toggleExpandToDo()" aria-controls="toDoCollapse" aria-expanded="false" data-bs-toggle="collapse"
+       href="#toDoCollapse">
+        <h5 class="col-12">
+            <fa-icon *ngIf="expandToDo" [icon]="faAngleDown"></fa-icon>
+            <fa-icon *ngIf="!expandToDo" [icon]="faAngleRight"></fa-icon>
+            {{ listTitle }}
+        </h5>
+    </a>
+    <ul class="col-12 list-group list-group-flush collapse show border-top" id="toDoCollapse">
+        <li *ngFor="let plannerEvent of toDoEvents" class="list-group-item">
+            <app-list-item (itemToDelete)="onDelete($event)" (itemToEdit)="onEdit($event)"
+                           (itemToUpdate)="onComplete($event)" [plannerEvent]="plannerEvent"></app-list-item>
+        </li>
+        <li class="list-group-item">
+            <form>
+                <div class="input-group pt-3">
+                    <input [(ngModel)]="newEvent.title" autocomplete="off" class="form-control form-control-sm"
+                           name="new-event-title" placeholder="New Event Title" type="text"/>
+                </div>
+                <div *ngIf="newEvent.title" class="input-group pt-3">
+                    <textarea [(ngModel)]="newEvent.description" autocomplete="off" class="form-control form-control-sm"
+                              name="new-event-desc" placeholder="New Event Description" rows="2"></textarea>
+                </div>
+                <div class="input-group pt-3">
+                    <button (click)="saveNewEvent()" *ngIf="newEvent.title" class="btn btn-outline-primary">Save
+                    </button>
+                </div>
+            </form>
+        </li>
+    </ul>
+    <a (click)="toggleExpandDone()" aria-controls="doneCollapse" aria-expanded="false" data-bs-toggle="collapse"
+       href="#doneCollapse">
+        <h5 class="col-12">
+            <fa-icon *ngIf="expandDone" [icon]="faAngleDown"></fa-icon>
+            <fa-icon *ngIf="!expandDone" [icon]="faAngleRight"></fa-icon>
+            {{ completedListTitle }}
+        </h5>
+    </a>
+    <ul class="col-12 collapse list-group list-group-flush border-top" id="doneCollapse">
+        <li *ngFor="let plannerEvent of completeEvents" class="list-group-item">
+            <app-list-item (itemToDelete)="onDelete($event)" (itemToEdit)="onEdit($event)"
+                           (itemToUpdate)="onRedo($event)" [plannerEvent]="plannerEvent"></app-list-item>
+        </li>
+    </ul>
 </div>
 <div *ngIf="isLoading">
-  <div class="spinner"></div>
+    <div class="spinner"></div>
 </div>

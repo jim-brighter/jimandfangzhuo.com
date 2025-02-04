@@ -10,8 +10,8 @@ import { ImageService } from './app/services/image.service'
 import { AuthenticationService } from './app/services/authentication.service'
 import { ErrorService } from './app/services/error.service'
 import { ChristmasService } from './app/services/christmas.service'
-import { HTTP_INTERCEPTORS, withInterceptorsFromDi, provideHttpClient } from '@angular/common/http'
-import { BrowserModule, bootstrapApplication } from '@angular/platform-browser'
+import { HTTP_INTERCEPTORS, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
+import { bootstrapApplication, BrowserModule } from '@angular/platform-browser'
 import { AppRoutingModule } from './app/modules/app-routing.module'
 import { FormsModule } from '@angular/forms'
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome'
@@ -32,16 +32,16 @@ if (environment.production) {
 }
 
 bootstrapApplication(AppComponent, {
-    providers: [
-        importProvidersFrom(BrowserModule, AppRoutingModule, FormsModule, FontAwesomeModule, AmplifyAuthenticatorModule),
-        EventService,
-        CommentService,
-        ImageService,
-        AuthenticationService,
-        ErrorService,
-        ChristmasService,
-        { provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true },
-        provideHttpClient(withInterceptorsFromDi())
-    ]
+  providers: [
+    importProvidersFrom(BrowserModule, AppRoutingModule, FormsModule, FontAwesomeModule, AmplifyAuthenticatorModule),
+    EventService,
+    CommentService,
+    ImageService,
+    AuthenticationService,
+    ErrorService,
+    ChristmasService,
+    { provide: HTTP_INTERCEPTORS, useClass: XhrInterceptor, multi: true },
+    provideHttpClient(withInterceptorsFromDi())
+  ]
 })
   .catch(err => console.error(err))

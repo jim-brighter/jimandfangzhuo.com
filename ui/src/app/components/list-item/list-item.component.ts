@@ -1,15 +1,15 @@
-import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core'
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
 import { PlannerEvent } from '../../types/event'
-import { faEdit, faCheck, faRedo, faTrash } from '@fortawesome/free-solid-svg-icons'
+import { faCheck, faEdit, faRedo, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { NgIf } from '@angular/common'
 import { FormsModule } from '@angular/forms'
 import { FaIconComponent } from '@fortawesome/angular-fontawesome'
 
 @Component({
-    selector: 'app-list-item',
-    templateUrl: './list-item.component.html',
-    styleUrls: ['./list-item.component.css'],
-    imports: [NgIf, FormsModule, FaIconComponent]
+  selector: 'app-list-item',
+  templateUrl: './list-item.component.html',
+  styleUrls: ['./list-item.component.css'],
+  imports: [NgIf, FormsModule, FaIconComponent]
 })
 export class ListItemComponent implements OnInit {
 
@@ -30,7 +30,8 @@ export class ListItemComponent implements OnInit {
 
   editing = false
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
     this.updateAction = this.plannerEvent.eventStatus === 'TO_DO' ? 'faCheck' : 'faRedo'
