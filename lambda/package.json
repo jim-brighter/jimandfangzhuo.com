@@ -8,15 +8,15 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.147",
-    "@types/node": "22.13.5",
+    "@types/node": "22.13.9",
     "esbuild": "^0.25.0",
     "ts-node": "^10.9.2",
-    "typescript": "~5.7.3"
+    "typescript": "~5.8.2"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.751.0",
-    "@aws-sdk/client-s3": "^3.750.0",
-    "@aws-sdk/lib-dynamodb": "^3.751.0",
+    "@aws-sdk/client-dynamodb": "^3.758.0",
+    "@aws-sdk/client-s3": "^3.758.0",
+    "@aws-sdk/lib-dynamodb": "^3.758.0",
     "heic-convert": "^2.1.0"
   }
 }
