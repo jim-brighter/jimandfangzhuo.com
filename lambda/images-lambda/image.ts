@@ -1,5 +1,6 @@
 interface IImage {
   imageId: string | null
+  s3Bucket: string | null
   s3ObjectKey: string | null
 
   validateNewImage(): boolean
@@ -9,10 +10,12 @@ export type Image = IImage
 
 export class PlannerImage implements Image {
   imageId: string | null
+  s3Bucket: string | null
   s3ObjectKey: string | null
 
   constructor(json: Image) {
     this.imageId = json.imageId || null
+    this.s3Bucket = process.env.BUCKET_NAME || 'jimandfangzhuo.com-images'
     this.s3ObjectKey = json.s3ObjectKey || null
 
   }

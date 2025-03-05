@@ -31,7 +31,11 @@ const getAllImages = async (): Promise<Array<Image>> => {
       TableName: imagesTable
     }))
 
-    return allImages.Items ? allImages.Items.map(i => i as Image) : []
+    return allImages.Items ? allImages.Items.map(i => {
+      const image = i as Image
+      image.s3Bucket = bucketName
+      return image
+    }) : []
   } catch (e) {
     console.error(`Failed to retrieve all images`, e)
     throw e

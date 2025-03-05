@@ -10,117 +10,26 @@ import * as targets from 'aws-cdk-lib/aws-route53-targets'
 import * as logs from 'aws-cdk-lib/aws-logs'
 import * as s3 from 'aws-cdk-lib/aws-s3'
 import * as cognito from 'aws-cdk-lib/aws-cognito'
-import * as backup from 'aws-cdk-lib/aws-backup'
 
 const EVENT_TYPE_INDEX = 'EventsTypeIndex'
 
-export class BackendStack extends Stack {
-
-  readonly eventsTable: ddb.Table
-  readonly commentsTable: ddb.Table
-  readonly imagesTable: ddb.Table
-  readonly christmasTable: ddb.Table
-  readonly userPool: cognito.UserPool
-  readonly cert: certmanager.Certificate
-
-  constructor(scope: Construct, id: string, props?: StackProps) {
+export class BackendStackWest extends Stack {
+  constructor(scope: Construct, id: string,
+              eventsTable: ddb.Table,
+              commentsTable: ddb.Table,
+              imagesTable: ddb.Table,
+              christmasTable: ddb.Table,
+              userPool: cognito.UserPool,
+              props?: StackProps) {
     super(scope, id, props)
 
     const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
       domainName: 'jimandfangzhuo.com'
     })
 
-    // DYNAMO TABLES
-    this.eventsTable = new ddb.Table(this, 'EventsTable', {
-      partitionKey: {
-        name: 'eventId',
-        type: ddb.AttributeType.STRING
-      },
-      encryption: ddb.TableEncryption.AWS_MANAGED,
-      tableName: 'PlannerEvents',
-      removalPolicy: RemovalPolicy.RETAIN,
-      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
-      deletionProtection: true,
-      pointInTimeRecoverySpecification: {
-        pointInTimeRecoveryEnabled: true,
-        recoveryPeriodInDays: 14
-      },
-      replicationRegions: ['us-west-2']
-    })
-
-    this.eventsTable.addGlobalSecondaryIndex({
-      indexName: EVENT_TYPE_INDEX,
-      partitionKey: {
-        name: 'eventType',
-        type: ddb.AttributeType.STRING
-      },
-      projectionType: ddb.ProjectionType.ALL
-    })
-
-    this.imagesTable = new ddb.Table(this, 'ImagesTable', {
-      partitionKey: {
-        name: 'imageId',
-        type: ddb.AttributeType.STRING
-      },
-      encryption: ddb.TableEncryption.AWS_MANAGED,
-      tableName: 'PlannerImages',
-      removalPolicy: RemovalPolicy.RETAIN,
-      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
-      deletionProtection: true,
-      pointInTimeRecoverySpecification: {
-        pointInTimeRecoveryEnabled: true,
-        recoveryPeriodInDays: 14
-      },
-      replicationRegions: ['us-west-2']
-    })
-
-    this.commentsTable = new ddb.Table(this, 'CommentsTable', {
-      partitionKey: {
-        name: 'commentId',
-        type: ddb.AttributeType.STRING
-      },
-      encryption: ddb.TableEncryption.AWS_MANAGED,
-      tableName: 'PlannerComments',
-      removalPolicy: RemovalPolicy.RETAIN,
-      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
-      deletionProtection: true,
-      pointInTimeRecoverySpecification: {
-        pointInTimeRecoveryEnabled: true,
-        recoveryPeriodInDays: 14
-      },
-      replicationRegions: ['us-west-2']
-    })
-
-    this.christmasTable = new ddb.Table(this, 'ChristmasTable', {
-      partitionKey: {
-        name: 'itemId',
-        type: ddb.AttributeType.STRING
-      },
-      encryption: ddb.TableEncryption.AWS_MANAGED,
-      tableName: 'PlannerChristmas',
-      removalPolicy: RemovalPolicy.RETAIN,
-      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
-      deletionProtection: true,
-      pointInTimeRecoverySpecification: {
-        pointInTimeRecoveryEnabled: true,
-        recoveryPeriodInDays: 14
-      },
-      replicationRegions: ['us-west-2']
-    })
-
-    const plan = backup.BackupPlan.daily35DayRetention(this, 'BackupPlan')
-    plan.addSelection('BackupSelection', {
-      resources: [
-        backup.BackupResource.fromDynamoDbTable(this.eventsTable),
-        backup.BackupResource.fromDynamoDbTable(this.imagesTable),
-        backup.BackupResource.fromDynamoDbTable(this.commentsTable),
-        backup.BackupResource.fromDynamoDbTable(this.christmasTable)
-      ]
-    })
-
     // IMAGE S3 BUCKET
     const imagesBucket = new s3.Bucket(this, 'PlannerImagesBucket', {
-      bucketName: 'jimandfangzhuo.com-images',
+      bucketName: 'jimandfangzhuo.com-images-west',
       encryption: s3.BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: true,
@@ -131,7 +40,7 @@ export class BackendStack extends Stack {
       }],
       replicationRules: [{
         deleteMarkerReplication: true,
-        destination: s3.Bucket.fromBucketName(this, 'WestBucket', 'jimandfangzhuo.com-images-west'),
+        destination: s3.Bucket.fromBucketName(this, 'EastBucket', 'jimandfangzhuo.com-images'),
         priority: 1
       }]
     })
@@ -160,7 +69,7 @@ export class BackendStack extends Stack {
         minify: true
       },
       environment: {
-        EVENTS_TABLE: this.eventsTable.tableName,
+        EVENTS_TABLE: eventsTable.tableName,
         EVENT_TYPE_INDEX
       },
       logRetention: logs.RetentionDays.THREE_DAYS
@@ -174,7 +83,7 @@ export class BackendStack extends Stack {
         minify: true
       },
       environment: {
-        COMMENTS_TABLE: this.commentsTable.tableName
+        COMMENTS_TABLE: commentsTable.tableName
       },
       logRetention: logs.RetentionDays.THREE_DAYS
     })
@@ -187,7 +96,7 @@ export class BackendStack extends Stack {
         minify: true
       },
       environment: {
-        IMAGES_TABLE: this.imagesTable.tableName,
+        IMAGES_TABLE: imagesTable.tableName,
         BUCKET_NAME: imagesBucket.bucketName
       },
       logRetention: logs.RetentionDays.THREE_DAYS
@@ -201,64 +110,29 @@ export class BackendStack extends Stack {
         minify: true
       },
       environment: {
-        CHRISTMAS_TABLE: this.christmasTable.tableName
+        CHRISTMAS_TABLE: christmasTable.tableName
       },
       logRetention: logs.RetentionDays.THREE_DAYS
     })
 
-    this.eventsTable.grantReadWriteData(eventsLambda)
-    this.commentsTable.grantReadWriteData(commentsLambda)
-    this.imagesTable.grantReadWriteData(imagesLambda)
-    this.christmasTable.grantReadWriteData(christmasLambda)
+    eventsTable.grantReadWriteData(eventsLambda)
+    commentsTable.grantReadWriteData(commentsLambda)
+    imagesTable.grantReadWriteData(imagesLambda)
+    christmasTable.grantReadWriteData(christmasLambda)
 
     imagesBucket.grantReadWrite(imagesLambda)
     imagesBucket.grantPutAcl(imagesLambda)
 
     // ACM
-    this.cert = new certmanager.Certificate(this, 'PlannerCert', {
+    const cert = new certmanager.Certificate(this, 'PlannerCert', {
       domainName: 'jimandfangzhuo.com',
       subjectAlternativeNames: ['*.jimandfangzhuo.com'],
       validation: certmanager.CertificateValidation.fromDns(hostedZone)
     })
 
-    // COGNITO
-    this.userPool = new cognito.UserPool(this, 'UserPool', {
-      userPoolName: 'PlannerUserPool',
-      passwordPolicy: {
-        requireDigits: false,
-        requireUppercase: false,
-        requireSymbols: false
-      }
-    })
-
-    const client = this.userPool.addClient('PlannerFrontend', {
-      userPoolClientName: 'planner-frontend',
-      accessTokenValidity: Duration.minutes(60 * 6),
-      authFlows: {
-        userPassword: true,
-        userSrp: true
-      },
-      supportedIdentityProviders: [cognito.UserPoolClientIdentityProvider.COGNITO],
-      oAuth: {
-        flows: {
-          authorizationCodeGrant: true
-        },
-        scopes: [cognito.OAuthScope.OPENID],
-        callbackUrls: ['https://jimandfangzhuo.com/details/to-do'],
-        logoutUrls: ['https://jimandfangzhuo.com']
-      }
-    })
-
-    const cognitoDomain = this.userPool.addDomain('PlannerCognitoDomain', {
-      customDomain: {
-        domainName: 'user.jimandfangzhuo.com',
-        certificate: this.cert
-      }
-    })
-
     // AUTHORIZER
     const authorizer = new apigw.CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
-      cognitoUserPools: [this.userPool],
+      cognitoUserPools: [userPool],
       authorizerName: 'PlannerCognitoAuthorizer'
     })
 
@@ -267,7 +141,7 @@ export class BackendStack extends Stack {
       handler: defaultErrorLambda,
       proxy: false,
       domainName: {
-        certificate: this.cert,
+        certificate: cert,
         domainName: 'api.jimandfangzhuo.com',
         securityPolicy: apigw.SecurityPolicy.TLS_1_2
       }
@@ -333,17 +207,11 @@ export class BackendStack extends Stack {
     christmasApi.addMethod('DELETE', christmasLambdaIntegration, { authorizer })
 
     // ROUTE53 MAPPING
-    const apiRecord = new route53.ARecord(this, 'ApiRecord', {
+    new route53.ARecord(this, 'ApiRecord', {
       zone: hostedZone,
       recordName: 'api',
       target: route53.RecordTarget.fromAlias(new targets.ApiGateway(restApi)),
-      region: 'us-east-1'
-    })
-
-    const userRecord = new route53.ARecord(this, 'CognitoRecord', {
-      zone: hostedZone,
-      recordName: 'user',
-      target: route53.RecordTarget.fromAlias(new targets.UserPoolDomainTarget(cognitoDomain))
+      region: 'us-west-2'
     })
   }
 }

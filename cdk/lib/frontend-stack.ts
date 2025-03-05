@@ -9,7 +9,7 @@ import * as origins from 'aws-cdk-lib/aws-cloudfront-origins'
 import * as certmanager from 'aws-cdk-lib/aws-certificatemanager'
 
 export class FrontendStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+  constructor(scope: Construct, id: string, cert: certmanager.Certificate, props?: StackProps) {
     super(scope, id, props)
 
     // S3 SITE
@@ -55,7 +55,7 @@ export class FrontendStack extends Stack {
           maxTtl: Duration.days(365)
         })
       },
-      certificate: certmanager.Certificate.fromCertificateArn(this, 'PlannerCert', 'arn:aws:acm:us-east-1:108929950724:certificate/f312d8ad-09ce-440a-807c-a4bc46cb0dd0'),
+      certificate: cert,
       sslSupportMethod: cloudfront.SSLMethod.SNI,
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
       domainNames: ['jimandfangzhuo.com'],

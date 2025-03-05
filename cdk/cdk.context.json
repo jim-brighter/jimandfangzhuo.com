@@ -2,5 +2,9 @@
   "hosted-zone:account=108929950724:domainName=jimandfangzhuo.com:region=us-east-1": {
     "Id": "/hostedzone/Z0988045ATJPY9PIKBJ4",
     "Name": "jimandfangzhuo.com."
+  },
+  "hosted-zone:account=108929950724:domainName=jimandfangzhuo.com:region=us-west-2": {
+    "Id": "/hostedzone/Z0988045ATJPY9PIKBJ4",
+    "Name": "jimandfangzhuo.com."
   }
 }
