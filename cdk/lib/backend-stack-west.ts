@@ -34,7 +34,12 @@ export class BackendStackWest extends Stack {
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: true,
       publicReadAccess: true,
-      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
+      blockPublicAccess: new s3.BlockPublicAccess({
+        blockPublicAcls: false,
+        ignorePublicAcls: false,
+        blockPublicPolicy: false,
+        restrictPublicBuckets: false
+      }),
       accessControl: s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
       lifecycleRules: [{
         enabled: true,
@@ -102,7 +107,9 @@ export class BackendStackWest extends Stack {
         IMAGES_TABLE: imagesTable.tableName,
         BUCKET_NAME: imagesBucket.bucketName
       },
-      logRetention: logs.RetentionDays.THREE_DAYS
+      logRetention: logs.RetentionDays.THREE_DAYS,
+      memorySize: 256,
+      timeout: Duration.seconds(30)
     })
 
     const christmasLambda = new nodejslambda.NodejsFunction(this, 'ChristmasHandler', {
