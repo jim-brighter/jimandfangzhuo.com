@@ -23,7 +23,7 @@ export class PhotosComponent implements OnDestroy {
   isLoading = true
   isAuthenticated = false
 
-  s3RootUrl = 'https://s3.amazonaws.com/jimandfangzhuo.com-images/'
+  s3RootUrl = 'https://s3.amazonaws.com'
   selectedImage: PlannerImage = new PlannerImage()
 
   faSignOutAlt = faSignOutAlt

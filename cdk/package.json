@@ -15,7 +15,7 @@
     "cdk:destroy:backend": "cdk destroy PlannerBackend -f",
     "cdk:deploy:frontend": "cdk deploy PlannerFrontend --require-approval never --outputs-file frontend-outputs.json",
     "cdk:destroy:frontend": "cdk destroy PlannerFrontend -f",
-    "cdk:deploy": "cdk deploy PlannerBackend PlannerFrontend --require-approval never --outputs-file frontend-backend-outputs.json",
+    "cdk:deploy": "cdk deploy --all --require-approval never --outputs-file frontend-backend-outputs.json",
     "cdk:angular:build": "cd ../ui && npm i && npm run angular:build:prod && cd ../cdk",
     "cdk:lambda:install": "cd ../lambda && npm i && cd ../cdk",
     "deploy": "npm run cdk:lambda:install && npm run cdk:angular:build && npm run cdk:deploy",
@@ -32,7 +32,7 @@
     "typescript": "~5.8.2"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.181.1",
+    "aws-cdk-lib": "2.182.0",
     "constructs": "^10.4.2",
     "source-map-support": "^0.5.21"
   }
