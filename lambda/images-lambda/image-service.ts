@@ -33,6 +33,7 @@ const getAllImages = async (): Promise<Array<Image>> => {
 
     return allImages.Items ? allImages.Items.map(i => {
       const image = i as Image
+      image.s3Region = process.env.AWS_REGION
       image.s3Bucket = bucketName
       return image
     }) : []
