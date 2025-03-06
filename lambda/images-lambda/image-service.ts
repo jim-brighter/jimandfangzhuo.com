@@ -60,7 +60,7 @@ const saveImages = async (body: any): Promise<void> => {
       data = await convert({
         buffer: data,
         format: 'JPEG',
-        quality: 1
+        quality: 0.8
       })
 
       contentType = JPEG_CONTENT_TYPE
