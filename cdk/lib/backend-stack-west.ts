@@ -33,6 +33,9 @@ export class BackendStackWest extends Stack {
       encryption: s3.BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.RETAIN,
       versioned: true,
+      publicReadAccess: true,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ACLS,
+      accessControl: s3.BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
       lifecycleRules: [{
         enabled: true,
         expiredObjectDeleteMarker: true,
