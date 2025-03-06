@@ -33,6 +33,7 @@ const getAllImages = async (): Promise<Array<Image>> => {
 
     return allImages.Items ? allImages.Items.map(i => {
       const image = i as Image
+      image.s3Region = process.env.AWS_REGION
       image.s3Bucket = bucketName
       return image
     }) : []
@@ -59,7 +60,7 @@ const saveImages = async (body: any): Promise<void> => {
       data = await convert({
         buffer: data,
         format: 'JPEG',
-        quality: 1
+        quality: 0.8
       })
 
       contentType = JPEG_CONTENT_TYPE
