@@ -154,6 +154,18 @@ export class BackendStackWest extends Stack {
         certificate: cert,
         domainName: 'api.jimandfangzhuo.com',
         securityPolicy: apigw.SecurityPolicy.TLS_1_2
+      },
+      defaultCorsPreflightOptions: {
+        allowOrigins: ['*'],
+        allowHeaders: ['*'],
+        allowCredentials: true
+      }
+    })
+
+    restApi.addUsagePlan('UsagePlan', {
+      throttle: {
+        rateLimit: 3,
+        burstLimit: 3
       }
     })
 
@@ -166,51 +178,26 @@ export class BackendStackWest extends Stack {
 
     // API: Events
     const eventsApi = api.addResource('events')
-    eventsApi.addCorsPreflight({
-      allowOrigins: ['*'],
-      allowHeaders: ['*'],
-      allowCredentials: true
-    })
     eventsApi.addMethod('GET', eventsLambdaIntegration, { authorizer })
     eventsApi.addMethod('POST', eventsLambdaIntegration, { authorizer })
     eventsApi.addMethod('PUT', eventsLambdaIntegration, { authorizer })
     eventsApi.addMethod('DELETE', eventsLambdaIntegration, { authorizer })
 
     const eventsTypeApi = eventsApi.addResource('{eventType}')
-    eventsTypeApi.addCorsPreflight({
-      allowOrigins: ['*'],
-      allowHeaders: ['*'],
-      allowCredentials: true
-    })
     eventsTypeApi.addMethod('GET', eventsLambdaIntegration, { authorizer })
 
     // API: Comments
     const commentsApi = api.addResource('comments')
-    commentsApi.addCorsPreflight({
-      allowOrigins: ['*'],
-      allowHeaders: ['*'],
-      allowCredentials: true
-    })
     commentsApi.addMethod('GET', commentsLambdaIntegration, { authorizer })
     commentsApi.addMethod('POST', commentsLambdaIntegration, { authorizer })
 
     // API: Images
     const imagesApi = api.addResource('images')
-    imagesApi.addCorsPreflight({
-      allowOrigins: ['*'],
-      allowHeaders: ['*'],
-      allowCredentials: true
-    })
     imagesApi.addMethod('GET', imagesLambdaIntegration, { authorizer })
     imagesApi.addMethod('POST', imagesLambdaIntegration, { authorizer })
 
     // API: Christmas
     const christmasApi = api.addResource('christmas')
-    christmasApi.addCorsPreflight({
-      allowOrigins: ['*'],
-      allowHeaders: ['*'],
-      allowCredentials: true
-    })
     christmasApi.addMethod('GET', christmasLambdaIntegration)
     christmasApi.addMethod('POST', christmasLambdaIntegration, { authorizer })
     christmasApi.addMethod('PUT', christmasLambdaIntegration, { authorizer })
