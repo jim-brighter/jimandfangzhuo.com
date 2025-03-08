@@ -162,13 +162,6 @@ export class BackendStackWest extends Stack {
       }
     })
 
-    restApi.addUsagePlan('UsagePlan', {
-      throttle: {
-        rateLimit: 3,
-        burstLimit: 3
-      }
-    })
-
     const eventsLambdaIntegration = new apigw.LambdaIntegration(eventsLambda)
     const commentsLambdaIntegration = new apigw.LambdaIntegration(commentsLambda)
     const imagesLambdaIntegration = new apigw.LambdaIntegration(imagesLambda)
