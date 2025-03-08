@@ -3,6 +3,12 @@
     position: relative;
 }
 
+@media screen and (max-width: 768px) {
+    .custom-image {
+        width: 150px;
+    }
+}
+
 .custom-image:hover {
     cursor: pointer;
 }
