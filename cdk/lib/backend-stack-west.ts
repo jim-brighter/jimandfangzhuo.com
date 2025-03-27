@@ -161,8 +161,8 @@ export class BackendStackWest extends Stack {
         allowCredentials: true
       },
       deployOptions: {
-        throttlingBurstLimit: 10,
-        throttlingRateLimit: 3
+        throttlingBurstLimit: 3,
+        throttlingRateLimit: 5
       }
     })
 
