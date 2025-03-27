@@ -285,6 +285,10 @@ export class BackendStack extends Stack {
         allowOrigins: ['*'],
         allowHeaders: ['*'],
         allowCredentials: true
+      },
+      deployOptions: {
+        throttlingBurstLimit: 3,
+        throttlingRateLimit: 5
       }
     })
 
