@@ -159,6 +159,10 @@ export class BackendStackWest extends Stack {
         allowOrigins: ['*'],
         allowHeaders: ['*'],
         allowCredentials: true
+      },
+      deployOptions: {
+        throttlingBurstLimit: 10,
+        throttlingRateLimit: 3
       }
     })
 
