@@ -27,7 +27,7 @@ export class ImageService {
       }
     })
       .pipe(
-        catchError(this.errors.handleError('uploadImages', ''))
+        catchError(this.errors.handleError('uploadImages', '', 'The photo you selected is too large. Files must be less than 3MB in size.'))
       )
   }
 

@@ -29,10 +29,10 @@ export class ErrorService {
     this.errorMessages = []
   }
 
-  handleError<T>(operation = 'operation', result ?: T) {
+  handleError<T>(operation: string = 'operation', result?: T, defaultMessage?: string) {
     return (error: any): Observable<T> => {
       console.error(error)
-      let message = `${operation} failed! Show Jim this error!`
+      let message = defaultMessage || `${operation} failed! Show Jim this error!`
       if (error.status === 403) {
         message = 'Your session is invalid. Please try logging in again.'
       } else if (error.status === 413) {
