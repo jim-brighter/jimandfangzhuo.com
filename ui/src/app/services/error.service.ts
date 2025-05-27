@@ -36,7 +36,7 @@ export class ErrorService {
       if (error.status === 403) {
         message = 'Your session is invalid. Please try logging in again.'
       } else if (error.status === 413) {
-        message = 'The photo you selected is too large. Files must be less than 10MB in size.'
+        message = 'The photo you selected is too large. Files must be less than 3MB in size.'
       }
       this.addError(error.status, message)
       return of(result as T)
