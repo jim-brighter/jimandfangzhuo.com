@@ -14,9 +14,9 @@
     "typescript": "~5.8.3"
   },
   "dependencies": {
-    "@aws-sdk/client-dynamodb": "^3.830.0",
-    "@aws-sdk/client-s3": "^3.830.0",
-    "@aws-sdk/lib-dynamodb": "^3.830.0",
+    "@aws-sdk/client-dynamodb": "^3.835.0",
+    "@aws-sdk/client-s3": "^3.835.0",
+    "@aws-sdk/lib-dynamodb": "^3.835.0",
     "heic-convert": "^2.1.0"
   }
 }
