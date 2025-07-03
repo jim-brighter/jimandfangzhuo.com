@@ -2,7 +2,7 @@ import { Stack, StackProps } from 'aws-cdk-lib'
 import * as route53 from 'aws-cdk-lib/aws-route53'
 import { Construct } from 'constructs'
 import { ApiGateway } from './backend/ApiGateway'
-import { CognitoUserPool } from './backend/Cognito'
+import { CognitoUserPool, setupAuthorizer } from './backend/Cognito'
 import { DynamoTable } from './backend/DynamoDB'
 import { ImageS3Bucket } from './backend/ImageS3Bucket'
 import { DefaultErrorLambda, NodeLambda } from './backend/Lambda'
@@ -57,7 +57,7 @@ export class BackendStackWest extends Stack {
     const cert = new Cert(this, hostedZone)
 
     // AUTHORIZER
-    const authorizer = userPool.setupAuthorizer()
+    const authorizer = setupAuthorizer(this, userPool)
 
     // REST API
     const restApi = new ApiGateway(this, defaultErrorLambda, cert, authorizer)

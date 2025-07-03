@@ -3,7 +3,7 @@ import { Certificate } from 'aws-cdk-lib/aws-certificatemanager'
 import { HostedZone } from 'aws-cdk-lib/aws-route53'
 import { Construct } from 'constructs'
 import { ApiGateway } from './backend/ApiGateway'
-import { CognitoUserPool } from './backend/Cognito'
+import { CognitoUserPool, setupAuthorizer } from './backend/Cognito'
 import { DynamoTable, setupBackupPlan } from './backend/DynamoDB'
 import { ImageS3Bucket } from './backend/ImageS3Bucket'
 import { DefaultErrorLambda, NodeLambda } from './backend/Lambda'
@@ -78,7 +78,7 @@ export class BackendStack extends Stack {
     this.userPool = new CognitoUserPool(this)
     this.userPool.setupUIClient()
     const cognitoDomain = this.userPool.setupDomain(this.cert)
-    const authorizer = this.userPool.setupAuthorizer()
+    const authorizer = setupAuthorizer(this, this.userPool)
 
     // REST API
     const restApi = new ApiGateway(this, defaultErrorLambda, this.cert, authorizer)

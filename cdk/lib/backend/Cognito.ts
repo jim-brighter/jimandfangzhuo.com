@@ -1,7 +1,7 @@
 import { Duration } from 'aws-cdk-lib'
 import { CognitoUserPoolsAuthorizer } from 'aws-cdk-lib/aws-apigateway'
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager'
-import { OAuthScope, UserPool, UserPoolClientIdentityProvider, UserPoolDomain } from 'aws-cdk-lib/aws-cognito'
+import { IUserPool, OAuthScope, UserPool, UserPoolClientIdentityProvider, UserPoolDomain } from 'aws-cdk-lib/aws-cognito'
 import { Construct } from 'constructs'
 
 export class CognitoUserPool extends UserPool {
@@ -45,10 +45,11 @@ export class CognitoUserPool extends UserPool {
     })
   }
 
-  setupAuthorizer(): CognitoUserPoolsAuthorizer {
-    return new CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
-      cognitoUserPools: [this],
-      identitySource: 'PlannerCognitoAuthorizer'
-    })
-  }
+}
+
+export function setupAuthorizer(scope: Construct, userPool: IUserPool): CognitoUserPoolsAuthorizer {
+  return new CognitoUserPoolsAuthorizer(scope, 'CognitoAuthorizer', {
+    cognitoUserPools: [userPool],
+    identitySource: 'PlannerCognitoAuthorizer'
+  })
 }
