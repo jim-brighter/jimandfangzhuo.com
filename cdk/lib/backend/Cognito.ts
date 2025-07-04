@@ -50,6 +50,6 @@ export class CognitoUserPool extends UserPool {
 export function setupAuthorizer(scope: Construct, userPool: IUserPool): CognitoUserPoolsAuthorizer {
   return new CognitoUserPoolsAuthorizer(scope, 'CognitoAuthorizer', {
     cognitoUserPools: [userPool],
-    identitySource: 'PlannerCognitoAuthorizer'
+    authorizerName: 'PlannerCognitoAuthorizer'
   })
 }
