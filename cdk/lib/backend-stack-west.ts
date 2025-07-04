@@ -1,5 +1,5 @@
 import { Stack, StackProps } from 'aws-cdk-lib'
-import * as route53 from 'aws-cdk-lib/aws-route53'
+import { HostedZone } from 'aws-cdk-lib/aws-route53'
 import { Construct } from 'constructs'
 import { ApiGateway } from './backend/ApiGateway'
 import { CognitoUserPool, setupAuthorizer } from './backend/Cognito'
@@ -12,23 +12,49 @@ import { ApiRecord } from './core/Route53'
 const EVENT_TYPE_INDEX = 'EventsTypeIndex'
 
 export class BackendStackWest extends Stack {
-  constructor(scope: Construct, id: string,
-              eventsTable: DynamoTable,
-              commentsTable: DynamoTable,
-              imagesTable: DynamoTable,
-              christmasTable: DynamoTable,
-              userPool: CognitoUserPool,
-              props?: StackProps) {
+  constructor(
+    scope: Construct,
+    id: string,
+    eventsTable: DynamoTable,
+    commentsTable: DynamoTable,
+    imagesTable: DynamoTable,
+    christmasTable: DynamoTable,
+    userPool: CognitoUserPool,
+    props?: StackProps
+  ) {
     super(scope, id, props)
 
-    const hostedZone = route53.HostedZone.fromLookup(this, 'HostedZone', {
-      domainName: 'jimandfangzhuo.com'
-    })
+    const hostedZone = this.setupHostedZone()
 
-    // IMAGE S3 BUCKET
     const imagesBucket = new ImageS3Bucket(this, 'west')
 
-    // LAMBDAS
+    const lambdas = this.setupLambdas(eventsTable, commentsTable, imagesTable, christmasTable, imagesBucket)
+
+    this.grantTableAndBucketPermissions(eventsTable, commentsTable, imagesTable, christmasTable, imagesBucket, lambdas)
+
+    const cert = new Cert(this, hostedZone)
+
+    const authorizer = setupAuthorizer(this, userPool)
+
+    const restApi = new ApiGateway(this, lambdas.defaultErrorLambda, cert, authorizer)
+    this.setupApiMethods(restApi, lambdas)
+
+    new ApiRecord(this, 'ApiRecord', hostedZone, restApi, 'us-west-2')
+  }
+
+  private setupHostedZone() {
+    return HostedZone.fromLookup(this, 'HostedZone', {
+      domainName: 'jimandfangzhuo.com'
+    })
+  }
+
+  private setupLambdas(
+    eventsTable: DynamoTable,
+    commentsTable: DynamoTable,
+    imagesTable: DynamoTable,
+    christmasTable: DynamoTable,
+    imagesBucket: ImageS3Bucket
+  ) {
     const defaultErrorLambda = new DefaultErrorLambda(this)
     const eventsLambda = new NodeLambda(this, 'EventsHandler', '../lambda/events-lambda/events.ts', {
       EVENTS_TABLE: eventsTable.tableName,
@@ -44,29 +70,30 @@ export class BackendStackWest extends Stack {
     const christmasLambda = new NodeLambda(this, 'ChristmasHandler', '../lambda/christmas-lambda/christmas.ts', {
       CHRISTMAS_TABLE: christmasTable.tableName
     })
+    return { defaultErrorLambda, eventsLambda, commentsLambda, imagesLambda, christmasLambda }
+  }
 
-    eventsTable.grantReadWriteData(eventsLambda)
-    commentsTable.grantReadWriteData(commentsLambda)
-    imagesTable.grantReadWriteData(imagesLambda)
-    christmasTable.grantReadWriteData(christmasLambda)
+  private grantTableAndBucketPermissions(
+    eventsTable: DynamoTable,
+    commentsTable: DynamoTable,
+    imagesTable: DynamoTable,
+    christmasTable: DynamoTable,
+    imagesBucket: ImageS3Bucket,
+    lambdas: any
+  ) {
+    eventsTable.grantReadWriteData(lambdas.eventsLambda)
+    commentsTable.grantReadWriteData(lambdas.commentsLambda)
+    imagesTable.grantReadWriteData(lambdas.imagesLambda)
+    christmasTable.grantReadWriteData(lambdas.christmasLambda)
 
-    imagesBucket.grantReadWrite(imagesLambda)
-    imagesBucket.grantPutAcl(imagesLambda)
+    imagesBucket.grantReadWrite(lambdas.imagesLambda)
+    imagesBucket.grantPutAcl(lambdas.imagesLambda)
+  }
 
-    // ACM
-    const cert = new Cert(this, hostedZone)
-
-    // AUTHORIZER
-    const authorizer = setupAuthorizer(this, userPool)
-
-    // REST API
-    const restApi = new ApiGateway(this, defaultErrorLambda, cert, authorizer)
-    restApi.setupEventsApi(eventsLambda)
-    restApi.setupCommentsApi(commentsLambda)
-    restApi.setupImagesApi(imagesLambda)
-    restApi.setupChristmasApi(christmasLambda)
-
-    // ROUTE53 MAPPING
-    new ApiRecord(this, 'ApiRecord', hostedZone, restApi, 'us-west-2')
+  private setupApiMethods(restApi: ApiGateway, lambdas: any) {
+    restApi.setupEventsApi(lambdas.eventsLambda)
+    restApi.setupCommentsApi(lambdas.commentsLambda)
+    restApi.setupImagesApi(lambdas.imagesLambda)
+    restApi.setupChristmasApi(lambdas.christmasLambda)
   }
 }
