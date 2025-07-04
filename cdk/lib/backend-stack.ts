@@ -14,12 +14,12 @@ const EVENT_TYPE_INDEX = 'EventsTypeIndex'
 
 export class BackendStack extends Stack {
 
-  readonly eventsTable: DynamoTable
-  readonly commentsTable: DynamoTable
-  readonly imagesTable: DynamoTable
-  readonly christmasTable: DynamoTable
-  readonly userPool: CognitoUserPool
-  readonly cert: Certificate
+  eventsTable: DynamoTable
+  commentsTable: DynamoTable
+  imagesTable: DynamoTable
+  christmasTable: DynamoTable
+  userPool: CognitoUserPool
+  cert: Certificate
 
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props)
@@ -28,14 +28,7 @@ export class BackendStack extends Stack {
       domainName: 'jimandfangzhuo.com'
     })
 
-    // DYNAMO TABLES
-    this.eventsTable = new DynamoTable(this, 'EventsTable', 'eventId', 'PlannerEvents')
-    this.imagesTable = new DynamoTable(this, 'ImagesTable', 'imageId', 'PlannerImages')
-    this.commentsTable = new DynamoTable(this, 'CommentsTable', 'commentId', 'PlannerComments')
-    this.christmasTable = new DynamoTable(this, 'ChristmasTable', 'itemId', 'PlannerChristmas')
-
-    this.eventsTable.setupGSI(EVENT_TYPE_INDEX, 'eventType')
-
+    this.setupDynamoTables()
     setupBackupPlan(this, [
       this.eventsTable,
       this.commentsTable,
@@ -43,10 +36,35 @@ export class BackendStack extends Stack {
       this.christmasTable
     ])
 
-    // IMAGE S3 BUCKET
     const imagesBucket = new ImageS3Bucket(this, 'east')
+    
+    const lambdas = this.setupLambdas(imagesBucket)
 
-    // LAMBDAS
+    this.grantTableAndBucketPermissions(imagesBucket, lambdas)
+
+    this.cert = new Cert(this, hostedZone)
+
+    this.userPool = new CognitoUserPool(this)
+    this.userPool.setupUIClient()
+    const cognitoDomain = this.userPool.setupDomain(this.cert)
+    const authorizer = setupAuthorizer(this, this.userPool)
+
+    const restApi = new ApiGateway(this, lambdas.defaultErrorLambda, this.cert, authorizer)
+    this.setupApiMethods(restApi, lambdas)
+
+    new ApiRecord(this, 'ApiRecord', hostedZone, restApi, 'us-east-1')
+    new UserRecord(this, hostedZone, cognitoDomain)
+  }
+
+  private setupDynamoTables() {
+    this.eventsTable = new DynamoTable(this, 'EventsTable', 'eventId', 'PlannerEvents')
+    this.imagesTable = new DynamoTable(this, 'ImagesTable', 'imageId', 'PlannerImages')
+    this.commentsTable = new DynamoTable(this, 'CommentsTable', 'commentId', 'PlannerComments')
+    this.christmasTable = new DynamoTable(this, 'ChristmasTable', 'itemId', 'PlannerChristmas')
+    this.eventsTable.setupGSI(EVENT_TYPE_INDEX, 'eventType')
+  }
+
+  private setupLambdas(imagesBucket: ImageS3Bucket) {
     const defaultErrorLambda = new DefaultErrorLambda(this)
     const eventsLambda = new NodeLambda(this, 'EventsHandler', '../lambda/events-lambda/events.ts', {
       EVENTS_TABLE: this.eventsTable.tableName,
@@ -62,33 +80,23 @@ export class BackendStack extends Stack {
     const christmasLambda = new NodeLambda(this, 'ChristmasHandler', '../lambda/christmas-lambda/christmas.ts', {
       CHRISTMAS_TABLE: this.christmasTable.tableName
     })
+    return { defaultErrorLambda, eventsLambda, commentsLambda, imagesLambda, christmasLambda }
+  }
 
-    this.eventsTable.grantReadWriteData(eventsLambda)
-    this.commentsTable.grantReadWriteData(commentsLambda)
-    this.imagesTable.grantReadWriteData(imagesLambda)
-    this.christmasTable.grantReadWriteData(christmasLambda)
+  private grantTableAndBucketPermissions(imagesBucket: ImageS3Bucket, lambdas: any) {
+    this.eventsTable.grantReadWriteData(lambdas.eventsLambda)
+    this.commentsTable.grantReadWriteData(lambdas.commentsLambda)
+    this.imagesTable.grantReadWriteData(lambdas.imagesLambda)
+    this.christmasTable.grantReadWriteData(lambdas.christmasLambda)
 
-    imagesBucket.grantReadWrite(imagesLambda)
-    imagesBucket.grantPutAcl(imagesLambda)
+    imagesBucket.grantReadWrite(lambdas.imagesLambda)
+    imagesBucket.grantPutAcl(lambdas.imagesLambda)
+  }
 
-    // ACM
-    this.cert = new Cert(this, hostedZone)
-
-    // COGNITO
-    this.userPool = new CognitoUserPool(this)
-    this.userPool.setupUIClient()
-    const cognitoDomain = this.userPool.setupDomain(this.cert)
-    const authorizer = setupAuthorizer(this, this.userPool)
-
-    // REST API
-    const restApi = new ApiGateway(this, defaultErrorLambda, this.cert, authorizer)
-    restApi.setupEventsApi(eventsLambda)
-    restApi.setupCommentsApi(commentsLambda)
-    restApi.setupImagesApi(imagesLambda)
-    restApi.setupChristmasApi(christmasLambda)
-
-    // ROUTE53 MAPPING
-    new ApiRecord(this, 'ApiRecord', hostedZone, restApi, 'us-east-1')
-    new UserRecord(this, hostedZone, cognitoDomain)
+  private setupApiMethods(restApi: ApiGateway, lambdas: any) {
+    restApi.setupEventsApi(lambdas.eventsLambda)
+    restApi.setupCommentsApi(lambdas.commentsLambda)
+    restApi.setupImagesApi(lambdas.imagesLambda)
+    restApi.setupChristmasApi(lambdas.christmasLambda)
   }
 }
