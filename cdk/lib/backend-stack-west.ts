@@ -1,5 +1,4 @@
 import { Stack, StackProps } from 'aws-cdk-lib'
-import * as route53 from 'aws-cdk-lib/aws-route53'
 import { Construct } from 'constructs'
 import { ApiGateway } from './backend/ApiGateway'
 import { CognitoUserPool, setupAuthorizer } from './backend/Cognito'
@@ -8,6 +7,7 @@ import { ImageS3Bucket } from './backend/ImageS3Bucket'
 import { DefaultErrorLambda, NodeLambda } from './backend/Lambda'
 import { Cert } from './core/Cert'
 import { ApiRecord } from './core/Route53'
+import { HostedZone } from 'aws-cdk-lib/aws-route53'
 
 const EVENT_TYPE_INDEX = 'EventsTypeIndex'
 
@@ -33,7 +33,7 @@ export class BackendStackWest extends Stack {
     this.grantTableAndBucketPermissions(eventsTable, commentsTable, imagesTable, christmasTable, imagesBucket, lambdas)
 
     const cert = new Cert(this, hostedZone)
-    
+
     const authorizer = setupAuthorizer(this, userPool)
 
     const restApi = new ApiGateway(this, lambdas.defaultErrorLambda, cert, authorizer)
@@ -43,7 +43,7 @@ export class BackendStackWest extends Stack {
   }
 
   private setupHostedZone() {
-    return route53.HostedZone.fromLookup(this, 'HostedZone', {
+    return HostedZone.fromLookup(this, 'HostedZone', {
       domainName: 'jimandfangzhuo.com'
     })
   }
