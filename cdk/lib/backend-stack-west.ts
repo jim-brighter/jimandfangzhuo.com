@@ -1,4 +1,5 @@
 import { Stack, StackProps } from 'aws-cdk-lib'
+import { HostedZone } from 'aws-cdk-lib/aws-route53'
 import { Construct } from 'constructs'
 import { ApiGateway } from './backend/ApiGateway'
 import { CognitoUserPool, setupAuthorizer } from './backend/Cognito'
@@ -7,7 +8,6 @@ import { ImageS3Bucket } from './backend/ImageS3Bucket'
 import { DefaultErrorLambda, NodeLambda } from './backend/Lambda'
 import { Cert } from './core/Cert'
 import { ApiRecord } from './core/Route53'
-import { HostedZone } from 'aws-cdk-lib/aws-route53'
 
 const EVENT_TYPE_INDEX = 'EventsTypeIndex'
 
