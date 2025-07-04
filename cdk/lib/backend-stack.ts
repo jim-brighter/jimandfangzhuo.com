@@ -7,10 +7,10 @@ import { CognitoUserPool, setupAuthorizer } from './backend/Cognito'
 import { DynamoTable, setupBackupPlan } from './backend/DynamoDB'
 import { ImageS3Bucket } from './backend/ImageS3Bucket'
 import { DefaultErrorLambda, NodeLambda } from './backend/Lambda'
+import { EVENT_TYPE_INDEX } from './constants'
 import { Cert } from './core/Cert'
 import { ApiRecord, UserRecord } from './core/Route53'
-
-const EVENT_TYPE_INDEX = 'EventsTypeIndex'
+import { LambdaFunctions } from './types'
 
 export class BackendStack extends Stack {
 
@@ -37,7 +37,7 @@ export class BackendStack extends Stack {
     ])
 
     const imagesBucket = new ImageS3Bucket(this, 'east')
-    
+
     const lambdas = this.setupLambdas(imagesBucket)
 
     this.grantTableAndBucketPermissions(imagesBucket, lambdas)
@@ -64,7 +64,7 @@ export class BackendStack extends Stack {
     this.eventsTable.setupGSI(EVENT_TYPE_INDEX, 'eventType')
   }
 
-  private setupLambdas(imagesBucket: ImageS3Bucket) {
+  private setupLambdas(imagesBucket: ImageS3Bucket): LambdaFunctions {
     const defaultErrorLambda = new DefaultErrorLambda(this)
     const eventsLambda = new NodeLambda(this, 'EventsHandler', '../lambda/events-lambda/events.ts', {
       EVENTS_TABLE: this.eventsTable.tableName,
@@ -83,7 +83,7 @@ export class BackendStack extends Stack {
     return { defaultErrorLambda, eventsLambda, commentsLambda, imagesLambda, christmasLambda }
   }
 
-  private grantTableAndBucketPermissions(imagesBucket: ImageS3Bucket, lambdas: any) {
+  private grantTableAndBucketPermissions(imagesBucket: ImageS3Bucket, lambdas: LambdaFunctions) {
     this.eventsTable.grantReadWriteData(lambdas.eventsLambda)
     this.commentsTable.grantReadWriteData(lambdas.commentsLambda)
     this.imagesTable.grantReadWriteData(lambdas.imagesLambda)
@@ -93,7 +93,7 @@ export class BackendStack extends Stack {
     imagesBucket.grantPutAcl(lambdas.imagesLambda)
   }
 
-  private setupApiMethods(restApi: ApiGateway, lambdas: any) {
+  private setupApiMethods(restApi: ApiGateway, lambdas: LambdaFunctions) {
     restApi.setupEventsApi(lambdas.eventsLambda)
     restApi.setupCommentsApi(lambdas.commentsLambda)
     restApi.setupImagesApi(lambdas.imagesLambda)

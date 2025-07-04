@@ -6,10 +6,10 @@ import { CognitoUserPool, setupAuthorizer } from './backend/Cognito'
 import { DynamoTable } from './backend/DynamoDB'
 import { ImageS3Bucket } from './backend/ImageS3Bucket'
 import { DefaultErrorLambda, NodeLambda } from './backend/Lambda'
+import { EVENT_TYPE_INDEX } from './constants'
 import { Cert } from './core/Cert'
 import { ApiRecord } from './core/Route53'
-
-const EVENT_TYPE_INDEX = 'EventsTypeIndex'
+import { LambdaFunctions } from './types'
 
 export class BackendStackWest extends Stack {
   constructor(
@@ -54,7 +54,7 @@ export class BackendStackWest extends Stack {
     imagesTable: DynamoTable,
     christmasTable: DynamoTable,
     imagesBucket: ImageS3Bucket
-  ) {
+  ): LambdaFunctions {
     const defaultErrorLambda = new DefaultErrorLambda(this)
     const eventsLambda = new NodeLambda(this, 'EventsHandler', '../lambda/events-lambda/events.ts', {
       EVENTS_TABLE: eventsTable.tableName,
@@ -79,7 +79,7 @@ export class BackendStackWest extends Stack {
     imagesTable: DynamoTable,
     christmasTable: DynamoTable,
     imagesBucket: ImageS3Bucket,
-    lambdas: any
+    lambdas: LambdaFunctions
   ) {
     eventsTable.grantReadWriteData(lambdas.eventsLambda)
     commentsTable.grantReadWriteData(lambdas.commentsLambda)
@@ -90,7 +90,7 @@ export class BackendStackWest extends Stack {
     imagesBucket.grantPutAcl(lambdas.imagesLambda)
   }
 
-  private setupApiMethods(restApi: ApiGateway, lambdas: any) {
+  private setupApiMethods(restApi: ApiGateway, lambdas: LambdaFunctions) {
     restApi.setupEventsApi(lambdas.eventsLambda)
     restApi.setupCommentsApi(lambdas.commentsLambda)
     restApi.setupImagesApi(lambdas.imagesLambda)
