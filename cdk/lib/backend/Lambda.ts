@@ -1,6 +1,6 @@
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
-import { RetentionDays } from 'aws-cdk-lib/aws-logs'
+import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs'
 import { Construct } from 'constructs'
 
 export class DefaultErrorLambda extends Function {
@@ -32,7 +32,9 @@ export class NodeLambda extends NodejsFunction {
         minify: true
       },
       environment,
-      logRetention: RetentionDays.THREE_DAYS
+      logGroup: new LogGroup(scope, 'PlannerLogGroup', {
+        retention: RetentionDays.THREE_DAYS
+      })
     })
   }
 }
