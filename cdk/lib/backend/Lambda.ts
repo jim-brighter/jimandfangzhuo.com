@@ -32,7 +32,7 @@ export class NodeLambda extends NodejsFunction {
         minify: true
       },
       environment,
-      logGroup: new LogGroup(scope, 'PlannerLogGroup', {
+      logGroup: new LogGroup(scope, `${id}LogGroup`, {
         retention: RetentionDays.THREE_DAYS
       })
     })
