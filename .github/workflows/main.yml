@@ -27,6 +27,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Deploy
+        run: |
+          cd cdk
+          npm i
+          npm run deploy
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ github.token }}
@@ -35,8 +40,3 @@ jobs:
           major-version: 1
           minor-version: 1
           num_releases_to_keep: 10
-      - name: Deploy
-        run: |
-          cd cdk
-          npm i
-          npm run deploy
