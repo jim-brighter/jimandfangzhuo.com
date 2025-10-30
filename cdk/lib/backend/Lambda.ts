@@ -8,6 +8,7 @@ export class DefaultErrorLambda extends Function {
     super(scope, 'DefaultErrorHandler', {
       runtime: Runtime.NODEJS_22_X,
       handler: 'index.handler',
+      reservedConcurrentExecutions: 2,
       code: Code.fromInline(`
         exports.handler = async (event) => {
           return {
@@ -34,7 +35,8 @@ export class NodeLambda extends NodejsFunction {
       environment,
       logGroup: new LogGroup(scope, `${id}LogGroup`, {
         retention: RetentionDays.THREE_DAYS
-      })
+      }),
+      reservedConcurrentExecutions: 2
     })
   }
 }
