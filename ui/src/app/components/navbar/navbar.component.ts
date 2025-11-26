@@ -1,4 +1,4 @@
-import { KeyValue, KeyValuePipe, NgClass, NgFor, NgIf } from '@angular/common'
+import { KeyValue, KeyValuePipe, NgClass } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core'
 import { Router, RouterLink } from '@angular/router'
 import { AuthenticationService } from 'src/app/services/authentication.service'
@@ -18,7 +18,7 @@ import { FaIconComponent } from '@fortawesome/angular-fontawesome'
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css'],
-  imports: [NgFor, NgClass, RouterLink, FaIconComponent, NgIf, KeyValuePipe]
+  imports: [NgClass, RouterLink, FaIconComponent, KeyValuePipe]
 })
 export class NavbarComponent implements OnInit {
 

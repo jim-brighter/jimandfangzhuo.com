@@ -4,7 +4,7 @@ import { faAngleDown, faAngleRight } from '@fortawesome/free-solid-svg-icons'
 
 import { EventService } from '../../services/event.service'
 import { PlannerEvent } from '../../types/event'
-import { NgFor, NgIf } from '@angular/common'
+
 import { FaIconComponent } from '@fortawesome/angular-fontawesome'
 import { ListItemComponent } from '../list-item/list-item.component'
 import { FormsModule } from '@angular/forms'
@@ -26,7 +26,7 @@ const DELETED = 'DELETED'
   selector: 'app-lists',
   templateUrl: './lists.component.html',
   styleUrls: ['./lists.component.css'],
-  imports: [NgIf, FaIconComponent, NgFor, ListItemComponent, FormsModule]
+  imports: [FaIconComponent, ListItemComponent, FormsModule]
 })
 export class ListsComponent implements OnChanges {
 

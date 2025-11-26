@@ -1,52 +1,74 @@
 <div class="p-3">
-    <h1>🎄 Christmas {{ year }} 🎄</h1>
-    <ul [ngClass]="{'w-50': screenWidth >= 800, 'w-100': screenWidth < 800}">
-        <li *ngFor="let item of data; index as i" class="w-100 pt-2">
-            <a *ngIf="editing != i && item.itemLink" class="d-inline-block w-75 align-top" href="{{item.itemLink || 'https://jimandfanghzuo.com/christmas'}}"
-               rel="noopener noreferrer" target="_blank">{{item.itemName}}</a>
-            <span *ngIf="editing != i && !item.itemLink" class="d-inline-block w-75 align-top">{{item.itemName}}</span>
-            <button (click)="deleteItem(item)" *ngIf="isAuthenticated" class="btn btn-outline-danger btn-sm float-end" class="d-inline-block w-25 align-top"
-                    title="Delete" type="button">
-                <fa-icon [icon]="faTrash"></fa-icon>
-            </button>
-            <button (click)="editItem(i)" *ngIf="isAuthenticated && editing != i" class="btn btn-outline-primary btn-sm float-end"
-                    class="d-inline-block w-25 align-top" title="Edit" type="button">
-                <fa-icon [icon]="faEdit"></fa-icon>
-            </button>
-            <form *ngIf="editing == i">
-                <div class="input-group">
-                    <input [(ngModel)]="item.itemName" autocomplete="off" class="form-control form-control-sm"
-                           name="edit-item-name" placeholder="Item Name" type="text"/>
-                </div>
-                <div class="input-group">
-                    <input [(ngModel)]="item.itemLink" autocomplete="off" class="form-control form-control-sm"
-                           name="edit-item-link" placeholder="Item Link" type="text"/>
-                </div>
-                <div class="input-group">
-                    <button (click)="saveEditItem(item)" *ngIf="item.itemName" class="btn btn-outline-primary">Save
-                    </button>
-                    <button (click)="cancelEdit()" class="btn btn-outline-primary">Cancel</button>
-                </div>
-            </form>
-        </li>
-        <li *ngIf="isAuthenticated">
-            <form>
-                <div class="input-group">
-                    <input [(ngModel)]="newItem.itemName" autocomplete="off" class="form-control form-control-sm"
-                           name="new-item-name" placeholder="New Item Name" type="text"/>
-                </div>
-                <div *ngIf="newItem.itemName" class="input-group">
-                    <input [(ngModel)]="newItem.itemLink" autocomplete="off" class="form-control form-control-sm"
-                           name="new-item-link" placeholder="Link" type="text"/>
-                </div>
-                <div class="input-group">
-                    <button (click)="saveNewItem()" *ngIf="newItem.itemName" class="btn btn-outline-primary">Save
-                    </button>
-                </div>
-            </form>
-        </li>
-    </ul>
+  <h1>🎄 Christmas {{ year }} 🎄</h1>
+  <ul [ngClass]="{'w-50': screenWidth >= 800, 'w-100': screenWidth < 800}">
+    @for (item of data; track item; let i = $index) {
+      <li class="w-100 pt-2">
+        @if (editing != i && item.itemLink) {
+          <a class="d-inline-block w-75 align-top" href="{{item.itemLink || 'https://jimandfanghzuo.com/christmas'}}"
+          rel="noopener noreferrer" target="_blank">{{item.itemName}}</a>
+        }
+        @if (editing != i && !item.itemLink) {
+          <span class="d-inline-block w-75 align-top">{{item.itemName}}</span>
+        }
+        @if (isAuthenticated) {
+          <button (click)="deleteItem(item)" class="btn btn-outline-danger btn-sm float-end" class="d-inline-block w-25 align-top"
+            title="Delete" type="button">
+            <fa-icon [icon]="faTrash"></fa-icon>
+          </button>
+        }
+        @if (isAuthenticated && editing != i) {
+          <button (click)="editItem(i)" class="btn btn-outline-primary btn-sm float-end"
+            class="d-inline-block w-25 align-top" title="Edit" type="button">
+            <fa-icon [icon]="faEdit"></fa-icon>
+          </button>
+        }
+        @if (editing == i) {
+          <form>
+            <div class="input-group">
+              <input [(ngModel)]="item.itemName" autocomplete="off" class="form-control form-control-sm"
+                name="edit-item-name" placeholder="Item Name" type="text"/>
+            </div>
+            <div class="input-group">
+              <input [(ngModel)]="item.itemLink" autocomplete="off" class="form-control form-control-sm"
+                name="edit-item-link" placeholder="Item Link" type="text"/>
+            </div>
+            <div class="input-group">
+              @if (item.itemName) {
+                <button (click)="saveEditItem(item)" class="btn btn-outline-primary">Save
+                </button>
+              }
+              <button (click)="cancelEdit()" class="btn btn-outline-primary">Cancel</button>
+            </div>
+          </form>
+        }
+      </li>
+    }
+    @if (isAuthenticated) {
+      <li>
+        <form>
+          <div class="input-group">
+            <input [(ngModel)]="newItem.itemName" autocomplete="off" class="form-control form-control-sm"
+              name="new-item-name" placeholder="New Item Name" type="text"/>
+          </div>
+          @if (newItem.itemName) {
+            <div class="input-group">
+              <input [(ngModel)]="newItem.itemLink" autocomplete="off" class="form-control form-control-sm"
+                name="new-item-link" placeholder="Link" type="text"/>
+            </div>
+          }
+          <div class="input-group">
+            @if (newItem.itemName) {
+              <button (click)="saveNewItem()" class="btn btn-outline-primary">Save
+              </button>
+            }
+          </div>
+        </form>
+      </li>
+    }
+  </ul>
 </div>
-<div *ngIf="isLoading">
+@if (isLoading) {
+  <div>
     <div class="spinner"></div>
-</div>
+  </div>
+}

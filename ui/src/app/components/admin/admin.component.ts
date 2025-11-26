@@ -5,7 +5,7 @@ import { PlannerEvent } from '../../types/event'
 import { faTrash, faTrashRestore } from '@fortawesome/free-solid-svg-icons'
 import { AuthenticationService } from '../../services/authentication.service'
 import { NavigationEnd, Router } from '@angular/router'
-import { NgClass, NgFor, NgIf } from '@angular/common'
+import { NgClass } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome'
 import { LoginComponent } from '../login/login.component'
 
@@ -15,7 +15,7 @@ const TO_DO = 'TO_DO'
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css'],
-  imports: [NgIf, NgFor, NgClass, FaIconComponent, LoginComponent]
+  imports: [NgClass, FaIconComponent, LoginComponent]
 })
 export class AdminComponent implements OnDestroy, OnInit {
 

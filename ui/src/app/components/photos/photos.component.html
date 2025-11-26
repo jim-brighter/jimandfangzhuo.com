@@ -1,43 +1,55 @@
 <div class="container-fluid">
-    <h1 class="container-fluid d-flex justify-content-center">Jim and Fangzhuo's Pics!</h1>
-    <app-navbar></app-navbar>
+  <h1 class="container-fluid d-flex justify-content-center">Jim and Fangzhuo's Pics!</h1>
+  <app-navbar></app-navbar>
 </div>
 <div aria-hidden="true" aria-labelledby="zoomModalLabel" class="modal fade bd-example-modal-xl" id="zoomModal" role="dialog"
-     tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <img *ngIf="!!selectedImage.s3ObjectKey" class="w-100" src="{{'https://s3.' + selectedImage.s3Region + '.amazonaws.com/' + selectedImage.s3Bucket + '/' + selectedImage.s3ObjectKey}}"/>
-            </div>
-        </div>
+  tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        @if (!!selectedImage.s3ObjectKey) {
+          <img class="w-100" src="{{'https://s3.' + selectedImage.s3Region + '.amazonaws.com/' + selectedImage.s3Bucket + '/' + selectedImage.s3ObjectKey}}"/>
+        }
+      </div>
     </div>
+  </div>
 </div>
-<div *ngIf="isAuthenticated && !isLoading" class="container-fluid">
+@if (isAuthenticated && !isLoading) {
+  <div class="container-fluid">
     <div class="container-fluid justify-content-center align-content-center text-center">
-        <span *ngFor="let errorMessage of errors.getErrors()"
-              class="d-block alert alert-danger">{{ errorMessage.errorMessage }}</span>
+      @for (errorMessage of errors.getErrors(); track errorMessage) {
+        <span
+        class="d-block alert alert-danger">{{ errorMessage.errorMessage }}</span>
+      }
     </div>
     <div class="container-fluid d-flex">
-        <div class="row d-flex">
-            <app-upload></app-upload>
-        </div>
+      <div class="row d-flex">
+        <app-upload></app-upload>
+      </div>
     </div>
     <div class="container-fluid d-flex">
-        <ul class="list-inline d-inline-block">
-            <li *ngFor="let image of images" class="list-inline-item custom-image p-1">
-                <img (click)="zoomImage(image)" data-bs-target="#zoomModal" data-bs-toggle="modal"
-                     src="{{'https://s3.' + image.s3Region + '.amazonaws.com/' + image.s3Bucket + '/' + image.s3ObjectKey}}"/>
-            </li>
-        </ul>
+      <ul class="list-inline d-inline-block">
+        @for (image of images; track image) {
+          <li class="list-inline-item custom-image p-1">
+            <img (click)="zoomImage(image)" data-bs-target="#zoomModal" data-bs-toggle="modal"
+              src="{{'https://s3.' + image.s3Region + '.amazonaws.com/' + image.s3Bucket + '/' + image.s3ObjectKey}}"/>
+          </li>
+        }
+      </ul>
     </div>
-</div>
-<div *ngIf="isAuthenticated && isLoading">
+  </div>
+}
+@if (isAuthenticated && isLoading) {
+  <div>
     <div class="spinner"></div>
-</div>
-<div *ngIf="!isAuthenticated" class="container-fluid">
+  </div>
+}
+@if (!isAuthenticated) {
+  <div class="container-fluid">
     <div class="row justify-content-center">
-        <div class="col-sm-4 col-10">
-            <app-login [endpoint]="'photos'"></app-login>
-        </div>
+      <div class="col-sm-4 col-10">
+        <app-login [endpoint]="'photos'"></app-login>
+      </div>
     </div>
-</div>
+  </div>
+}

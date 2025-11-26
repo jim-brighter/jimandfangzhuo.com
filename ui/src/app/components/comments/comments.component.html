@@ -1,24 +1,32 @@
-<div *ngIf="!isLoading" class="container-fluid row align-items-start">
+@if (!isLoading) {
+  <div class="container-fluid row align-items-start">
     <h5>Comments</h5>
     <ul class="col-12 list-group list-group-flush d-inline-block border-top">
-        <li *ngFor="let comment of comments" class="list-group-item">
-            <app-comment-item [comment]="comment"></app-comment-item>
-        </li>
+      @for (comment of comments; track comment) {
         <li class="list-group-item">
-            <form>
-                <div class="input-group pt-3">
-                    <input [(ngModel)]="newComment.commentText" autocomplete="off" class="form-control form-control-sm"
-                           name="new-comment-text" placeholder="New Comment" type="text"/>
-                </div>
-                <div class="input-group pt-3">
-                    <button (click)="saveNewComment()" *ngIf="newComment.commentText" class="btn btn-outline-primary">
-                        Save
-                    </button>
-                </div>
-            </form>
+          <app-comment-item [comment]="comment"></app-comment-item>
         </li>
+      }
+      <li class="list-group-item">
+        <form>
+          <div class="input-group pt-3">
+            <input [(ngModel)]="newComment.commentText" autocomplete="off" class="form-control form-control-sm"
+              name="new-comment-text" placeholder="New Comment" type="text"/>
+          </div>
+          <div class="input-group pt-3">
+            @if (newComment.commentText) {
+              <button (click)="saveNewComment()" class="btn btn-outline-primary">
+                Save
+              </button>
+            }
+          </div>
+        </form>
+      </li>
     </ul>
-</div>
-<div *ngIf="isLoading">
+  </div>
+}
+@if (isLoading) {
+  <div>
     <div class="spinner"></div>
-</div>
+  </div>
+}

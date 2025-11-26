@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 
 import { CommentService } from '../../services/comment.service'
 import { Comment } from '../../types/comment'
-import { NgFor, NgIf } from '@angular/common'
+
 import { CommentItemComponent } from '../comment-item/comment-item.component'
 import { FormsModule } from '@angular/forms'
 
@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms'
   selector: 'app-comments',
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.css'],
-  imports: [NgIf, NgFor, CommentItemComponent, FormsModule]
+  imports: [CommentItemComponent, FormsModule]
 })
 export class CommentsComponent implements OnInit {
 

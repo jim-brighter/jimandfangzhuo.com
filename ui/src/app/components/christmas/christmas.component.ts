@@ -4,7 +4,7 @@ import { AuthenticationService } from 'src/app/services/authentication.service'
 import { ChristmasService } from 'src/app/services/christmas.service'
 import { ChristmasItem } from 'src/app/types/christmas'
 import { faEdit, faTrash } from '@fortawesome/free-solid-svg-icons'
-import { NgClass, NgFor, NgIf } from '@angular/common'
+import { NgClass } from '@angular/common';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome'
 import { FormsModule } from '@angular/forms'
 
@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms'
   selector: 'app-christmas',
   templateUrl: './christmas.component.html',
   styleUrls: ['./christmas.component.css'],
-  imports: [NgClass, NgFor, NgIf, FaIconComponent, FormsModule]
+  imports: [NgClass, FaIconComponent, FormsModule]
 })
 export class ChristmasComponent implements OnDestroy, OnInit {
 

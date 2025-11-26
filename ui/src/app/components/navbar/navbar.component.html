@@ -1,39 +1,46 @@
 <ul class="container-fluid list-inline d-none d-md-inline-block d-md-flex justify-content-center text-center">
-    <li *ngFor="let route of routerMapping | keyvalue:onCompare" class="list-inline-item">
-        <h5 class="d-flex justify-content-center">
-            <a [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}"
-               class="btn"
-               routerLink="{{route.key}}">
-                <fa-icon [icon]="route.value.icon"></fa-icon>
-                {{ route.value.text }}</a>
-        </h5>
+  @for (route of routerMapping | keyvalue:onCompare; track route) {
+    <li class="list-inline-item">
+      <h5 class="d-flex justify-content-center">
+        <a [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}"
+          class="btn"
+          routerLink="{{route.key}}">
+          <fa-icon [icon]="route.value.icon"></fa-icon>
+        {{ route.value.text }}</a>
+      </h5>
     </li>
-    <li *ngIf="showLogout()" class="list-inline-item">
-        <h5 class="d-flex justify-content-center">
-            <a (click)="logout()"
-               [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}"
-               class="btn">
-                <fa-icon [icon]="faSignOutAlt"></fa-icon>
-                Logout</a>
-        </h5>
+  }
+  @if (showLogout()) {
+    <li class="list-inline-item">
+      <h5 class="d-flex justify-content-center">
+        <a (click)="logout()"
+          [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}"
+          class="btn">
+          <fa-icon [icon]="faSignOutAlt"></fa-icon>
+        Logout</a>
+      </h5>
     </li>
+  }
 </ul>
 <div class="dropdown show d-md-none w-100">
-    <button [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}"
-            aria-expanded="false"
-            aria-haspopup="true" class="btn dropdown-toggle w-100 mb-2" data-bs-toggle="dropdown" id="dropdownLink" type="button">Choose
-        A Page!
-    </button>
-    <div aria-labelledby="dropdownLink" class="dropdown-menu">
-        <a *ngFor="let route of routerMapping | keyvalue:onCompare"
-           [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}"
-           class="dropdown-item" routerLink="{{route.key}}">
-            <fa-icon [icon]="route.value.icon"></fa-icon>
-            {{ route.value.text }}</a>
-        <a (click)="logout()"
-           *ngIf="showLogout()"
-           [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" class="dropdown-item">
-            <fa-icon [icon]="faSignOutAlt"></fa-icon>
-            Logout</a>
-    </div>
+  <button [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}"
+    aria-expanded="false"
+    aria-haspopup="true" class="btn dropdown-toggle w-100 mb-2" data-bs-toggle="dropdown" id="dropdownLink" type="button">Choose
+    A Page!
+  </button>
+  <div aria-labelledby="dropdownLink" class="dropdown-menu">
+    @for (route of routerMapping | keyvalue:onCompare; track route) {
+      <a
+        [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}"
+        class="dropdown-item" routerLink="{{route.key}}">
+        <fa-icon [icon]="route.value.icon"></fa-icon>
+      {{ route.value.text }}</a>
+    }
+    @if (showLogout()) {
+      <a (click)="logout()"
+        [ngClass]="{'btn-outline-light': linkColor === 'light', 'btn-outline-secondary': linkColor !== 'light'}" class="dropdown-item">
+        <fa-icon [icon]="faSignOutAlt"></fa-icon>
+      Logout</a>
+    }
+  </div>
 </div>
