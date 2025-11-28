@@ -7,7 +7,9 @@ export class UIBucket extends Bucket {
     super(scope, 'PlannerFrontendRootBucket', {
       bucketName: 'jimandfangzhuo.com',
       encryption: BucketEncryption.S3_MANAGED,
-      removalPolicy: RemovalPolicy.RETAIN,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      
       versioned: true,
       publicReadAccess: true,
       blockPublicAccess: BlockPublicAccess.BLOCK_ACLS_ONLY,
@@ -28,7 +30,8 @@ export class UIRedirectBucket extends Bucket {
     super(scope, 'PlannerFrontendSubdomainBucket', {
       bucketName: 'www.jimandfangzhuo.com',
       encryption: BucketEncryption.S3_MANAGED,
-      removalPolicy: RemovalPolicy.RETAIN,
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
       versioned: true,
       websiteRedirect: {
         hostName: 'jimandfangzhuo.com',

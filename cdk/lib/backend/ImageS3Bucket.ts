@@ -13,7 +13,7 @@ export class ImageS3Bucket extends Bucket {
     super(scope, 'PlannerImagesBucket', {
       bucketName,
       encryption: BucketEncryption.S3_MANAGED,
-      removalPolicy: RemovalPolicy.RETAIN,
+      removalPolicy: RemovalPolicy.DESTROY,
       versioned: true,
       publicReadAccess: true,
       blockPublicAccess: new BlockPublicAccess({
