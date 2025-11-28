@@ -14,7 +14,7 @@ export class DynamoTable extends Table {
       tableName: tableName,
       removalPolicy: RemovalPolicy.DESTROY,
       billingMode: BillingMode.PAY_PER_REQUEST,
-      deletionProtection: true,
+      deletionProtection: false,
       pointInTimeRecoverySpecification: {
         pointInTimeRecoveryEnabled: true,
         recoveryPeriodInDays: 14
