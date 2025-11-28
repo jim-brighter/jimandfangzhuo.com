@@ -12,7 +12,7 @@ export class DynamoTable extends Table {
       },
       encryption: TableEncryption.AWS_MANAGED,
       tableName: tableName,
-      removalPolicy: RemovalPolicy.RETAIN,
+      removalPolicy: RemovalPolicy.DESTROY,
       billingMode: BillingMode.PAY_PER_REQUEST,
       deletionProtection: true,
       pointInTimeRecoverySpecification: {
