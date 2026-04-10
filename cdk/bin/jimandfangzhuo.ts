@@ -19,11 +19,26 @@ const hostedZone = new HostedZoneStack(app, 'JimAndFangzhuoHostedZone', {
   crossRegionReferences: true
 });
 
-// WEST
+// CERTIFICATES
 
 const westCert = new CertStack(app, 'JimAndFangzhuoCertWest', hostedZone.zone, {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.US_WEST_2 },
   crossRegionReferences: true
+});
+
+const eastCert = new CertStack(app, 'JimAndFangzhuoCertEast', hostedZone.zone, {
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.US_EAST_1 },
+  crossRegionReferences: true
+});
+
+const asiaCert = new CertStack(app, 'JimAndFangzhuoCertAsia', hostedZone.zone, {
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.AP_NORTHEAST_2 },
+  crossRegionReferences: true
+});
+
+// UI stack needs to be created early because it creates the top level domain
+const uiStack = new UIStack(app, 'JimAndFangzhuoFrontend', hostedZone.zone, eastCert.cert, {
+  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.US_EAST_1 }
 });
 
 const cognito = new CognitoStack(app, 'JimAndFangzhuoCognito', hostedZone.zone, westCert.cert, {
@@ -31,12 +46,9 @@ const cognito = new CognitoStack(app, 'JimAndFangzhuoCognito', hostedZone.zone, 
   crossRegionReferences: true
 });
 
-// EAST
+cognito.addDependency(uiStack); // requires the top level domain to be created first
 
-const eastCert = new CertStack(app, 'JimAndFangzhuoCertEast', hostedZone.zone, {
-  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.US_EAST_1 },
-  crossRegionReferences: true
-});
+// EAST BACKEND
 
 const tables = new DynamoDBStack(app, 'JimAndFangzhuoDynamoDB', {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.US_EAST_1 },
@@ -52,16 +64,7 @@ new APIStack(app, 'JimAndFangzhuoBackendEast', hostedZone.zone, eastCert.cert, t
   crossRegionReferences: true
 });
 
-new UIStack(app, 'JimAndFangzhuoFrontend', hostedZone.zone, eastCert.cert, {
-  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.US_EAST_1 }
-});
-
-// ASIA
-
-const asiaCert = new CertStack(app, 'JimAndFangzhuoCertAsia', hostedZone.zone, {
-  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.AP_NORTHEAST_2 },
-  crossRegionReferences: true
-});
+// ASIA BACKEND
 
 const asiaBuckets = new S3BucketStack(app, 'JimAndFangzhuoS3BucketsAsia', {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.AP_NORTHEAST_2 }
