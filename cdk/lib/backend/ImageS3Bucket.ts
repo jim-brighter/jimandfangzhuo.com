@@ -13,6 +13,7 @@ export class ImageS3Bucket extends Bucket {
       bucketName,
       encryption: BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
       versioned: true,
       accessControl: BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
       lifecycleRules: [{
@@ -20,11 +21,11 @@ export class ImageS3Bucket extends Bucket {
         expiredObjectDeleteMarker: true,
         noncurrentVersionExpiration: Duration.days(30)
       }],
-      replicationRules: [{
-        deleteMarkerReplication: true,
-        destination: Bucket.fromBucketName(scope, replicationId, replicationBucketName),
-        priority: 1
-      }]
+      // replicationRules: [{
+      //   deleteMarkerReplication: true,
+      //   destination: Bucket.fromBucketName(scope, replicationId, replicationBucketName),
+      //   priority: 1
+      // }]
     });
   }
 }
