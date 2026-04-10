@@ -1,4 +1,4 @@
-import { Duration } from 'aws-cdk-lib';
+import { Duration, RemovalPolicy } from 'aws-cdk-lib';
 import { CognitoUserPoolsAuthorizer } from 'aws-cdk-lib/aws-apigateway';
 import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { IUserPool, OAuthScope, UserPool, UserPoolClientIdentityProvider, UserPoolDomain } from 'aws-cdk-lib/aws-cognito';
@@ -7,6 +7,7 @@ import { Construct } from 'constructs';
 export class CognitoUserPool extends UserPool {
   constructor(scope: Construct) {
     super(scope, 'UserPool', {
+      removalPolicy: RemovalPolicy.DESTROY,
       userPoolName: 'JimAndFangzhuoUserPool',
       passwordPolicy: {
         requireDigits: false,
@@ -39,7 +40,7 @@ export class CognitoUserPool extends UserPool {
   setupDomain(cert: ICertificate): UserPoolDomain {
     return this.addDomain('JimAndFangzhuoCognitoDomain', {
       customDomain: {
-        domainName: 'user.jimandfangzhuo.com',
+        domainName: 'https://user.jimandfangzhuo.com',
         certificate: cert
       }
     });
