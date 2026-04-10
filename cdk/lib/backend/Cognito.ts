@@ -40,7 +40,7 @@ export class CognitoUserPool extends UserPool {
   setupDomain(cert: ICertificate): UserPoolDomain {
     return this.addDomain('JimAndFangzhuoCognitoDomain', {
       customDomain: {
-        domainName: 'https://user.jimandfangzhuo.com',
+        domainName: 'user.jimandfangzhuo.com',
         certificate: cert
       }
     });
