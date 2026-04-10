@@ -5,35 +5,35 @@
     "cdk": "bin/cdk.js"
   },
   "scripts": {
+    "lint": "eslint 'bin/**/*.ts' 'lib/**/*.ts' 'test/**/*.ts'",
+    "lint:fix": "eslint --fix 'bin/**/*.ts' 'lib/**/*.ts' 'test/**/*.ts'",
     "cdk:build": "tsc",
     "cdk:watch": "tsc -w",
     "cdk:test": "jest",
     "cdk": "cdk",
-    "cdk:deploy:hostedzone": "cdk deploy PlannerHostedZone --require-approval never --outputs-file hosted-zone-outputs.json",
-    "cdk:destroy:hostedzone": "cdk destroy PlannerHostedZone -f",
-    "cdk:deploy:backend": "cdk deploy PlannerBackend --require-approval never --outputs-file backend-outputs.json",
-    "cdk:destroy:backend": "cdk destroy PlannerBackend -f",
-    "cdk:deploy:frontend": "cdk deploy PlannerFrontend --require-approval never --outputs-file frontend-outputs.json",
-    "cdk:destroy:frontend": "cdk destroy PlannerFrontend -f",
-    "cdk:deploy": "cdk deploy --all --require-approval never --outputs-file frontend-backend-outputs.json",
-    "cdk:angular:build": "cd ../ui && npm i && npm run angular:build:prod && cd ../cdk",
+    "cdk:deploy": "cdk deploy --all --require-approval never --outputs-file outputs.json",
     "cdk:lambda:install": "cd ../lambda && npm i && cd ../cdk",
-    "deploy": "npm run cdk:lambda:install && npm run cdk:angular:build && npm run cdk:deploy",
-    "synth": "npm run cdk:lambda:install && npm run cdk:angular:build && cdk synth PlannerBackend PlannerFrontend"
+    "deploy": "npm run cdk:lambda:install && npm run cdk:deploy",
+    "synth": "npm run cdk:lambda:install && cdk synth --all"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
-    "@types/node": "24.10.1",
-    "aws-cdk": "2.1033.0",
-    "esbuild": "^0.27.0",
-    "jest": "^30.2.0",
-    "ts-jest": "^29.4.5",
+    "@types/node": "25.5.2",
+    "aws-cdk": "2.1118.0",
+    "esbuild": "^0.28.0",
+    "eslint": "^10.2.0",
+    "globals": "^17.4.0",
+    "jest": "^30.3.0",
+    "jiti": "^2.6.1",
+    "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
-    "typescript": "~5.9.3"
+    "typescript": "~6.0.2",
+    "typescript-eslint": "^8.58.1"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.229.0",
-    "constructs": "^10.4.3",
+    "aws-cdk-lib": "2.248.0",
+    "constructs": "^10.6.0",
     "source-map-support": "^0.5.21"
   }
 }

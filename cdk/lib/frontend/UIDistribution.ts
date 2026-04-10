@@ -1,13 +1,13 @@
-import { Duration } from 'aws-cdk-lib'
-import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager'
-import { AllowedMethods, CachePolicy, CachedMethods, Distribution, SSLMethod, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront'
-import { S3StaticWebsiteOrigin } from 'aws-cdk-lib/aws-cloudfront-origins'
-import { IBucket } from 'aws-cdk-lib/aws-s3'
-import { Construct } from 'constructs'
+import { Duration } from 'aws-cdk-lib';
+import { ICertificate } from 'aws-cdk-lib/aws-certificatemanager';
+import { AllowedMethods, CachePolicy, CachedMethods, Distribution, SSLMethod, SecurityPolicyProtocol, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
+import { S3StaticWebsiteOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { IBucket } from 'aws-cdk-lib/aws-s3';
+import { Construct } from 'constructs';
 
 export class UIDistribution extends Distribution {
   constructor(scope: Construct, uiBucket: IBucket, cert: ICertificate) {
-    super(scope, 'PlannerDistribution', {
+    super(scope, 'JimAndFangzhuoDistribution', {
       defaultBehavior: {
         compress: true,
         origin: new S3StaticWebsiteOrigin(uiBucket),
@@ -39,6 +39,6 @@ export class UIDistribution extends Distribution {
           ttl: Duration.days(30)
         }
       ]
-    })
+    });
   }
 }

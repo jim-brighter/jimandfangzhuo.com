@@ -15,28 +15,23 @@ updates:
       all:
         patterns:
           - "*"
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/lambda" # Location of package manifests
-    schedule:
-      interval: "weekly"
-    assignees:
-      - "jim-brighter"
-    groups:
-      all:
-        patterns:
-          - "*"
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/ui" # Location of package manifests
-    schedule:
-      interval: "weekly"
-    assignees:
-      - "jim-brighter"
-    groups:
-      all:
-        patterns:
-          - "*"
-    ignore:
-      - dependency-name: "typescript"
-        update-types: [ "version-update:semver-major", "version-update:semver-minor" ]
-      - dependency-name: "zone.js"
-        update-types: [ "version-update:semver-major", "version-update:semver-minor" ]
+  # - package-ecosystem: "npm" # See documentation for possible values
+  #   directory: "/lambda" # Location of package manifests
+  #   schedule:
+  #     interval: "weekly"
+  #   assignees:
+  #     - "jim-brighter"
+  #   groups:
+  #     all:
+  #       patterns:
+  #         - "*"
+  # - package-ecosystem: "npm" # See documentation for possible values
+  #   directory: "/ui" # Location of package manifests
+  #   schedule:
+  #     interval: "weekly"
+  #   assignees:
+  #     - "jim-brighter"
+  #   groups:
+  #     all:
+  #       patterns:
+  #         - "*"
