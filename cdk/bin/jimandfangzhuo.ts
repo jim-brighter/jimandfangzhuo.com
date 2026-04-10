@@ -21,11 +21,6 @@ const hostedZone = new HostedZoneStack(app, 'JimAndFangzhuoHostedZone', {
 
 // CERTIFICATES
 
-const westCert = new CertStack(app, 'JimAndFangzhuoCertWest', hostedZone.zone, {
-  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.US_WEST_2 },
-  crossRegionReferences: true
-});
-
 const eastCert = new CertStack(app, 'JimAndFangzhuoCertEast', hostedZone.zone, {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.US_EAST_1 },
   crossRegionReferences: true
@@ -41,7 +36,7 @@ const uiStack = new UIStack(app, 'JimAndFangzhuoFrontend', hostedZone.zone, east
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.US_EAST_1 }
 });
 
-const cognito = new CognitoStack(app, 'JimAndFangzhuoCognito', hostedZone.zone, westCert.cert, {
+const cognito = new CognitoStack(app, 'JimAndFangzhuoCognito', hostedZone.zone, eastCert.cert, {
   env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: Region.US_WEST_2 },
   crossRegionReferences: true
 });
