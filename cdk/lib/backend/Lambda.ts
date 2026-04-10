@@ -1,12 +1,12 @@
-import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda'
-import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
-import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs'
-import { Construct } from 'constructs'
+import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { Construct } from 'constructs';
 
 export class DefaultErrorLambda extends Function {
   constructor(scope: Construct) {
     super(scope, 'DefaultErrorHandler', {
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'index.handler',
       reservedConcurrentExecutions: 2,
       code: Code.fromInline(`
@@ -19,14 +19,14 @@ export class DefaultErrorLambda extends Function {
           }
         }
       `)
-    })
+    });
   }
 }
 
 export class NodeLambda extends NodejsFunction {
-  constructor(scope: Construct, id: string, entry: string, environment: any) {
+  constructor(scope: Construct, id: string, entry: string, environment: { [key: string]: string }) {
     super(scope, id, {
-      runtime: Runtime.NODEJS_22_X,
+      runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
       entry,
       bundling: {
@@ -37,6 +37,6 @@ export class NodeLambda extends NodejsFunction {
         retention: RetentionDays.THREE_DAYS
       }),
       reservedConcurrentExecutions: 2
-    })
+    });
   }
 }

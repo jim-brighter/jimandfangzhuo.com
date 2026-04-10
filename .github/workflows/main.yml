@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
       - name: Deploy
         run: |
           cd cdk
@@ -37,6 +37,5 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         uses: jim-brighter/github-release-action@v4
         with:
-          major-version: 1
-          minor-version: 1
-          num_releases_to_keep: 10
+          major-version: 2
+          minor-version: 0

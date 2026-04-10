@@ -1,7 +1,7 @@
-import { RemovalPolicy } from 'aws-cdk-lib'
-import { BackupPlan, BackupResource } from 'aws-cdk-lib/aws-backup'
-import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb'
-import { Construct } from 'constructs'
+import { RemovalPolicy } from 'aws-cdk-lib';
+import { BackupPlan, BackupResource } from 'aws-cdk-lib/aws-backup';
+import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
+import { Construct } from 'constructs';
 
 export class DynamoTable extends Table {
   constructor(scope: Construct, id: string, partitionKeyName: string, tableName: string) {
@@ -19,8 +19,8 @@ export class DynamoTable extends Table {
         pointInTimeRecoveryEnabled: true,
         recoveryPeriodInDays: 14
       },
-      replicationRegions: ['us-west-2']
-    })
+      replicationRegions: ['ap-northeast-2']
+    });
   }
 
   setupGSI(indexName: string, partitionKeyName: string)  {
@@ -31,13 +31,13 @@ export class DynamoTable extends Table {
         type: AttributeType.STRING
       },
       projectionType: ProjectionType.ALL
-    })
+    });
   }
 }
 
 export function setupBackupPlan(scope: Construct, tables: Table[]) {
-  const plan = BackupPlan.daily35DayRetention(scope, 'BackupPlan')
+  const plan = BackupPlan.daily35DayRetention(scope, 'BackupPlan');
   plan.addSelection('BackupSelection', {
     resources: tables.map(table => BackupResource.fromDynamoDbTable(table))
-  })
+  });
 }

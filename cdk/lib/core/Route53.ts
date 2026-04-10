@@ -1,31 +1,31 @@
-import { RestApiBase } from 'aws-cdk-lib/aws-apigateway'
-import { IDistribution } from 'aws-cdk-lib/aws-cloudfront'
-import { UserPoolDomain } from 'aws-cdk-lib/aws-cognito'
-import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53'
-import { ApiGateway, BucketWebsiteTarget, CloudFrontTarget, UserPoolDomainTarget } from 'aws-cdk-lib/aws-route53-targets'
-import { IBucket } from 'aws-cdk-lib/aws-s3'
-import { Construct } from 'constructs'
+import { RestApiBase } from 'aws-cdk-lib/aws-apigateway';
+import { IDistribution } from 'aws-cdk-lib/aws-cloudfront';
+import { UserPoolDomain } from 'aws-cdk-lib/aws-cognito';
+import { ARecord, IHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
+import { ApiGateway, BucketWebsiteTarget, CloudFrontTarget, UserPoolDomainTarget } from 'aws-cdk-lib/aws-route53-targets';
+import { IBucket } from 'aws-cdk-lib/aws-s3';
+import { Construct } from 'constructs';
 
 export class UIRootRecord extends ARecord {
   constructor(scope: Construct, zone: IHostedZone, distribution: IDistribution) {
-    super(scope, 'PlannerRootRecord', {
+    super(scope, 'JimAndFangzhuoRootRecord', {
       zone,
       target: {
         aliasTarget: new CloudFrontTarget(distribution)
       }
-    })
+    });
   }
 }
 
 export class UISubdomainRecord extends ARecord {
   constructor(scope: Construct, zone: IHostedZone, bucket: IBucket) {
-    super(scope, 'PlannerSubdomainRecord', {
+    super(scope, 'JimAndFangzhuoSubdomainRecord', {
       zone,
       recordName: 'www',
       target: {
         aliasTarget: new BucketWebsiteTarget(bucket)
       }
-    })
+    });
   }
 }
 
@@ -36,7 +36,7 @@ export class ApiRecord extends ARecord {
       recordName: 'api',
       target: RecordTarget.fromAlias(new ApiGateway(apiGateway)),
       region
-    })
+    });
   }
 }
 
@@ -46,6 +46,6 @@ export class UserRecord extends ARecord {
       zone,
       recordName: 'user',
       target: RecordTarget.fromAlias(new UserPoolDomainTarget(userPoolDomain))
-    })
+    });
   }
 }
