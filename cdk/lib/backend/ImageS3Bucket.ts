@@ -13,6 +13,7 @@ export class ImageS3Bucket extends Bucket {
       bucketName,
       encryption: BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
       versioned: true,
       accessControl: BucketAccessControl.BUCKET_OWNER_FULL_CONTROL,
       lifecycleRules: [{
