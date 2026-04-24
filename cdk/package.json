@@ -20,7 +20,7 @@
     "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
     "@types/node": "25.6.0",
-    "aws-cdk": "2.1118.4",
+    "aws-cdk": "2.1119.0",
     "esbuild": "^0.28.0",
     "eslint": "^10.2.1",
     "globals": "^17.5.0",
