@@ -26,7 +26,6 @@
     "types": ["node"]
   },
   "exclude": [
-    "node_modules",
-    "cdk.out"
+    "node_modules"
   ]
 }
