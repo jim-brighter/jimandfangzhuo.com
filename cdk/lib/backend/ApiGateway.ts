@@ -39,5 +39,8 @@ export class ApiGateway extends LambdaRestApi {
 
     const imagesApi = api?.addResource('images');
     imagesApi?.addMethod('GET', imagesLambdaIntegration, { authorizer: this.authorizer });
+
+    const imageById = imagesApi?.addResource('{albumId}');
+    imageById?.addMethod('GET', imagesLambdaIntegration, { authorizer: this.authorizer });
   }
 }

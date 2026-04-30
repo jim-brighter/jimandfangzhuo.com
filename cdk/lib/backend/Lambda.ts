@@ -28,6 +28,7 @@ export class NodeLambda extends NodejsFunction {
     super(scope, id, {
       runtime: Runtime.NODEJS_24_X,
       handler: 'handler',
+      depsLockFilePath: '../lambda/package-lock.json',
       entry,
       bundling: {
         minify: true
