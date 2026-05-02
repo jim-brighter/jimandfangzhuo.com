@@ -9,7 +9,17 @@
 </head>
 
 <body>
-  <div id="app"></div>
+  <div id="app">
+    <form id="login" hidden="true">
+      <input type="text" name="username" placeholder="Username" />
+      <input type="password" name="password" placeholder="Password" />
+      <button type="submit">Login</button>
+    </form>
+    <div id="welcome" hidden="true">
+      <h1>Welcome</h1>
+      <button id="logout">Logout</button>
+    </div>
+  </div>
   <script type="module" src="/src/main.ts"></script>
 </body>
 

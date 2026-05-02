@@ -1,60 +1,51 @@
-import './style.css'
-import typescriptLogo from './assets/typescript.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import { setupCounter } from './counter.ts'
+import { Amplify } from "aws-amplify";
+import { fetchAuthSession, signIn, signOut } from "aws-amplify/auth";
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-<section id="center">
-  <div class="hero">
-    <img src="${heroImg}" class="base" width="170" height="179">
-    <img src="${typescriptLogo}" class="framework" alt="TypeScript logo"/>
-    <img src="${viteLogo}" class="vite" alt="Vite logo" />
-  </div>
-  <div>
-    <h1>Get started</h1>
-    <p>Edit <code>src/main.ts</code> and save to test <code>HMR</code></p>
-  </div>
-  <button id="counter" type="button" class="counter"></button>
-</section>
+Amplify.configure({
+  Auth: {
+    Cognito: {
+      userPoolId: "us-west-2_TdfpNx8YV",
+      userPoolClientId: "65frmc7qe1ah5r3trjs0f682du"
+    }
+  }
+});
 
-<div class="ticks"></div>
+const doLogin = async (username: string, password: string) => {
+  await signIn({ username, password });
+};
 
-<section id="next-steps">
-  <div id="docs">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#documentation-icon"></use></svg>
-    <h2>Documentation</h2>
-    <p>Your questions, answered</p>
-    <ul>
-      <li>
-        <a href="https://vite.dev/" target="_blank">
-          <img class="logo" src="${viteLogo}" alt="" />
-          Explore Vite
-        </a>
-      </li>
-      <li>
-        <a href="https://www.typescriptlang.org" target="_blank">
-          <img class="button-icon" src="${typescriptLogo}" alt="">
-          Learn more
-        </a>
-      </li>
-    </ul>
-  </div>
-  <div id="social">
-    <svg class="icon" role="presentation" aria-hidden="true"><use href="/icons.svg#social-icon"></use></svg>
-    <h2>Connect with us</h2>
-    <p>Join the Vite community</p>
-    <ul>
-      <li><a href="https://github.com/vitejs/vite" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#github-icon"></use></svg>GitHub</a></li>
-      <li><a href="https://chat.vite.dev/" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#discord-icon"></use></svg>Discord</a></li>
-      <li><a href="https://x.com/vite_js" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#x-icon"></use></svg>X.com</a></li>
-      <li><a href="https://bsky.app/profile/vite.dev" target="_blank"><svg class="button-icon" role="presentation" aria-hidden="true"><use href="/icons.svg#bluesky-icon"></use></svg>Bluesky</a></li>
-    </ul>
-  </div>
-</section>
+const loginForm = document.getElementById("login") as HTMLFormElement;
+const welcomeHeader = document.getElementById("welcome") as HTMLDivElement;
 
-<div class="ticks"></div>
-<section id="spacer"></section>
-`
+const setContent = async () => {
+  const session = await fetchAuthSession();
 
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+  if (session.tokens) {
+    loginForm.hidden = true;
+    welcomeHeader.hidden = false;
+  } else {
+    loginForm.hidden = false;
+    welcomeHeader.hidden = true;
+  }
+}
+
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const data = new FormData(loginForm);
+  const username = data.get("username") as string;
+  const password = data.get("password") as string;
+  await doLogin(username, password);
+  setContent();
+});
+
+const logoutButton = document.getElementById("logout") as HTMLButtonElement;
+
+logoutButton.addEventListener("click", async () => {
+  await signOut({
+    global: true
+  });
+
+  setContent();
+});
+
+setContent();
