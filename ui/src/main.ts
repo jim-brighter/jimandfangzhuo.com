@@ -1,5 +1,6 @@
 import { Amplify } from "aws-amplify";
 import { checkAuthSession, doLogin, doLogout } from "./auth";
+import { getAllAlbums } from "./client";
 
 Amplify.configure({
   Auth: {
@@ -15,11 +16,13 @@ const logoutButton = document.getElementById("logout") as HTMLButtonElement;
 const welcomeHeader = document.getElementById("welcome") as HTMLDivElement;
 
 const setContent = async () => {
-  const session = await checkAuthSession();
+  const isLoggedIn = await checkAuthSession();
 
-  if (session.tokens) {
+  if (isLoggedIn) {
     loginForm.hidden = true;
     welcomeHeader.hidden = false;
+
+    getAllAlbums();
   } else {
     loginForm.hidden = false;
     welcomeHeader.hidden = true;
