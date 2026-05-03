@@ -13,8 +13,9 @@
     "cdk": "cdk",
     "cdk:deploy": "cdk deploy --all --require-approval never --outputs-file outputs.json",
     "cdk:lambda:install": "cd ../lambda && npm i && cd ../cdk",
-    "deploy": "npm run cdk:lambda:install && npm run cdk:deploy",
-    "synth": "npm run cdk:lambda:install && cdk synth --all"
+    "cdk:ui:build": "cd ../ui && npm i && npm run build && cd ../cdk",
+    "deploy": "npm run cdk:lambda:install && npm run cdk:ui:build && npm run cdk:deploy",
+    "synth": "npm run cdk:lambda:install && npm run cdk:ui:build && cdk synth --all"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
