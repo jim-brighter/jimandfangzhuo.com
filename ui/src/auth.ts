@@ -18,7 +18,7 @@ export const getIdToken = () => {
 export const doLogin = async (username: string, password: string) => {
   await signIn({ username, password });
   const session = await fetchAuthSession();
-  idToken = session.tokens?.idToken.toString();
+  idToken = session.tokens?.idToken?.toString() || null;
 };
 
 /**
@@ -37,7 +37,7 @@ export const doLogout = async () => {
  */
 export const checkAuthSession = async (): Promise<boolean> => {
   const session = await fetchAuthSession();
-  idToken = session.tokens?.idToken.toString();
+  idToken = session.tokens?.idToken?.toString() || null;
 
   return idToken !== null;
 };
