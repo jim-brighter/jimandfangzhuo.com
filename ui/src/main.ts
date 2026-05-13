@@ -1,6 +1,6 @@
 import { Amplify } from "aws-amplify";
 import { checkAuthSession, doLogin, doLogout } from "./auth";
-import { getAllAlbums } from "./client";
+import { getAllAlbums, getOneAlbum } from "./client";
 
 Amplify.configure({
   Auth: {
@@ -22,7 +22,25 @@ const setContent = async () => {
     loginForm.hidden = true;
     welcomeHeader.hidden = false;
 
-    getAllAlbums();
+    const albums = await getAllAlbums();
+
+    albums.items.forEach(album => {
+      const albumImage = document.createElement("img");
+      albumImage.src = album.presignedUrl;
+      albumImage.addEventListener("click", async (event) => {
+        event.preventDefault();
+
+        const presignedUrls = await getOneAlbum(album.albumId);
+        presignedUrls.forEach(url => {
+          const imageImg = document.createElement("img")
+          imageImg.src = url;
+
+          document.getElementById("images-container").appendChild(imageImg);
+        })
+      });
+
+      document.getElementById("album-container").appendChild(albumImage);
+    });
   } else {
     loginForm.hidden = false;
     welcomeHeader.hidden = true;
@@ -42,6 +60,9 @@ loginForm.addEventListener("submit", async (event) => {
 
 logoutButton.addEventListener("click", async () => {
   await doLogout();
+
+  document.getElementById("album-container").innerHTML = "";
+  document.getElementById("images-container").innerHTML = "";
 
   setContent();
 });
