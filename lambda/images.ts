@@ -1,6 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { DynamoDBDocumentClient, GetCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 type AlbumItem = {
@@ -20,6 +21,7 @@ const corsHeaders = {
 const tableName = process.env.ALBUM_METADATA_TABLE!;
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
+const bucketName = process.env.IMAGES_BUCKET;
 const s3 = new S3Client({});
 
 const response = (statusCode: number, body: unknown): APIGatewayProxyResult => ({
@@ -41,11 +43,24 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       const albumName = result.Item.albumName;
 
       const bucketContents = await s3.send(new ListObjectsV2Command({
-        Bucket: process.env.IMAGES_BUCKET,
+        Bucket: bucketName,
         Prefix: `${albumName}/`
       }));
 
-      return response(200, bucketContents.Contents);
+      if (!bucketContents.Contents) {
+        return response(500, { message: "Something went wrong, please try again" });
+      }
+
+      const presignedUrls = await Promise.all(bucketContents.Contents.map(object => {
+        return getSignedUrl(s3, new GetObjectCommand({
+          Bucket: bucketName,
+          Key: object.Key
+        }), {
+          expiresIn: 6 * 60 * 60 // 6 hours
+        });
+      }));
+
+      return response(200, presignedUrls);
     }
 
     const items: AlbumItem[] = [];
