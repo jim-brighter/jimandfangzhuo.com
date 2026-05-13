@@ -1,6 +1,7 @@
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { Duration } from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
 
 export class DefaultErrorLambda extends Function {
@@ -37,7 +38,9 @@ export class NodeLambda extends NodejsFunction {
       logGroup: new LogGroup(scope, `${id}LogGroup`, {
         retention: RetentionDays.THREE_DAYS
       }),
-      reservedConcurrentExecutions: 2
+      reservedConcurrentExecutions: 2,
+      memorySize: 512,
+      timeout: Duration.minutes(2)
     });
   }
 }
