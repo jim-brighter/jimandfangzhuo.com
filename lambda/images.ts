@@ -9,6 +9,7 @@ type AlbumItem = {
   albumName: string;
   coverImageObjectKey: string;
   createdAt: number;
+  presignedUrl: string | null;
 };
 
 const corsHeaders = {
@@ -68,7 +69,17 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     do {
       const result = await ddb.send(new ScanCommand({ TableName: tableName, ExclusiveStartKey: lastKey }));
-      items.push(...((result.Items ?? []) as AlbumItem[]));
+      for (const dynamoItem of result.Items!) {
+        const item = dynamoItem as AlbumItem;
+        item.presignedUrl = await getSignedUrl(s3, new GetObjectCommand({
+          Bucket: bucketName,
+          Key: `${item.albumName}/${item.coverImageObjectKey}`
+        }), {
+          expiresIn: 6 * 60 * 60 // 6 hours
+        });
+
+        items.push(item);
+      }
       lastKey = result.LastEvaluatedKey as Record<string, unknown> | undefined;
     } while (lastKey);
 
