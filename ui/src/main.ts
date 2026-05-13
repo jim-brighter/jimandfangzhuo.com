@@ -24,7 +24,7 @@ const setContent = async () => {
 
     const albums = await getAllAlbums();
 
-    albums.items.forEach(album => {
+    albums.forEach(album => {
       const albumImage = document.createElement("img");
       albumImage.src = album.presignedUrl;
       albumImage.addEventListener("click", async (event) => {
@@ -35,11 +35,11 @@ const setContent = async () => {
           const imageImg = document.createElement("img")
           imageImg.src = url;
 
-          document.getElementById("images-container").appendChild(imageImg);
+          document.getElementById("images-container")?.appendChild(imageImg);
         })
       });
 
-      document.getElementById("album-container").appendChild(albumImage);
+      document.getElementById("album-container")?.appendChild(albumImage);
     });
   } else {
     loginForm.hidden = false;
@@ -61,8 +61,8 @@ loginForm.addEventListener("submit", async (event) => {
 logoutButton.addEventListener("click", async () => {
   await doLogout();
 
-  document.getElementById("album-container").innerHTML = "";
-  document.getElementById("images-container").innerHTML = "";
+  document.getElementById("album-container")!.innerHTML = "";
+  document.getElementById("images-container")!.innerHTML = "";
 
   setContent();
 });
