@@ -1,6 +1,7 @@
+import type { Album } from "./album";
 import { getIdToken } from "./auth";
 
-export const getAllAlbums = async () => {
+export const getAllAlbums = async (): Promise<Album[]> => {
   const token = getIdToken();
 
   const response = await fetch("https://api.jimandfangzhuo.com/api/images", {
@@ -16,7 +17,24 @@ export const getAllAlbums = async () => {
 
   const payload = await response.json();
 
-  console.log(payload);
+  return payload.items as Album[];
+}
 
-  return payload;
+export const getOneAlbum = async (albumId: string): Promise<string[]> => {
+  const token = getIdToken();
+
+  const response = await fetch(`https://api.jimandfangzhuo.com/api/images/${albumId}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to get album ${albumId}`);
+  }
+
+  const payload = await response.json();
+
+  return payload as string[];
 }
