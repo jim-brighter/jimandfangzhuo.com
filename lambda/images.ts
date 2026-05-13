@@ -1,6 +1,7 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
+import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 import { DynamoDBDocumentClient, GetCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 type AlbumItem = {
   albumId: string;
@@ -19,6 +20,8 @@ const corsHeaders = {
 const tableName = process.env.ALBUM_METADATA_TABLE!;
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
+const s3 = new S3Client({});
+
 const response = (statusCode: number, body: unknown): APIGatewayProxyResult => ({
   statusCode,
   headers: { ...corsHeaders },
@@ -34,7 +37,15 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       if (!result.Item) {
         return response(404, { message: `Album ${albumId} not found` });
       }
-      return response(200, result.Item);
+
+      const albumName = result.Item.albumName;
+
+      const bucketContents = await s3.send(new ListObjectsV2Command({
+        Bucket: process.env.IMAGES_BUCKET,
+        Prefix: `${albumName}/`
+      }));
+
+      return response(200, bucketContents.Contents);
     }
 
     const items: AlbumItem[] = [];
