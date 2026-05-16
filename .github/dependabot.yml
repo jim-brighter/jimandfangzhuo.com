@@ -25,13 +25,13 @@ updates:
       all:
         patterns:
           - "*"
-  # - package-ecosystem: "npm" # See documentation for possible values
-  #   directory: "/ui" # Location of package manifests
-  #   schedule:
-  #     interval: "weekly"
-  #   assignees:
-  #     - "jim-brighter"
-  #   groups:
-  #     all:
-  #       patterns:
-  #         - "*"
+  - package-ecosystem: "npm" # See documentation for possible values
+    directory: "/ui" # Location of package manifests
+    schedule:
+      interval: "weekly"
+    assignees:
+      - "jim-brighter"
+    groups:
+      all:
+        patterns:
+          - "*"
