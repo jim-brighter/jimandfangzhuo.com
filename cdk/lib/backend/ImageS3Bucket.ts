@@ -21,11 +21,11 @@ export class ImageS3Bucket extends Bucket {
         expiredObjectDeleteMarker: true,
         noncurrentVersionExpiration: Duration.days(30)
       }],
-      replicationRules: [{
-        deleteMarkerReplication: true,
-        destination: Bucket.fromBucketName(scope, replicationId, replicationBucketName),
-        priority: 1
-      }]
+      // replicationRules: [{
+      //   deleteMarkerReplication: true,
+      //   destination: Bucket.fromBucketName(scope, replicationId, replicationBucketName),
+      //   priority: 1
+      // }]
     });
   }
 }
