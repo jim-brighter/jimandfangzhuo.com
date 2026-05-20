@@ -114,6 +114,8 @@ node_modules
 .cdk.staging
 cdk.out
 
+output.json
+outputs.json
 *-outputs.json
 
 build/
