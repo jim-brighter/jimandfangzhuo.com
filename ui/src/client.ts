@@ -36,5 +36,5 @@ export const getOneAlbum = async (albumId: string): Promise<string[]> => {
 
   const payload = await response.json();
 
-  return payload as string[];
+  return payload.images as string[];
 }

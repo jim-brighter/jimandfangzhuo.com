@@ -42,14 +42,20 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       }
 
       const albumName = result.Item.albumName;
+      const continuationToken = event.queryStringParameters?.nextPageToken;
 
       const bucketContents = await s3.send(new ListObjectsV2Command({
         Bucket: bucketName,
-        Prefix: `${albumName}/`
+        Prefix: `${albumName}/`,
+        MaxKeys: 100,
+        ContinuationToken: continuationToken
       }));
 
       if (!bucketContents.Contents) {
-        return response(500, { message: "Something went wrong, please try again" });
+        return response(200, {
+          images: [],
+          nextPageToken: undefined
+        });
       }
 
       const presignedUrls = await Promise.all(bucketContents.Contents.map(object => {
@@ -61,7 +67,10 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         });
       }));
 
-      return response(200, presignedUrls);
+      return response(200, {
+        images: presignedUrls,
+        nextPageToken: bucketContents.NextContinuationToken
+      });
     }
 
     const items: AlbumItem[] = [];
