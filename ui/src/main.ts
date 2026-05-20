@@ -24,11 +24,18 @@ let cachedAlbums: Album[] | null = null;
 let currentNextPageToken: string | undefined = undefined;
 let isLoadingMore = false;
 let intersectionObserver: IntersectionObserver | null = null;
+let imageObserver: IntersectionObserver | null = null;
+
+const PLACEHOLDER_GIF = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
 const cleanupPagination = () => {
   if (intersectionObserver) {
     intersectionObserver.disconnect();
     intersectionObserver = null;
+  }
+  if (imageObserver) {
+    imageObserver.disconnect();
+    imageObserver = null;
   }
   currentNextPageToken = undefined;
   isLoadingMore = false;
@@ -40,15 +47,37 @@ const cleanupPagination = () => {
 };
 
 const renderImages = (images: AlbumImage[], beforeElement?: HTMLElement) => {
+  if (!imageObserver) {
+    imageObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        const img = entry.target as HTMLImageElement;
+        if (entry.isIntersecting) {
+          const targetSrc = img.dataset.src;
+          if (targetSrc && img.src !== targetSrc) {
+            img.src = targetSrc;
+          }
+        } else {
+          if (img.src && img.src !== PLACEHOLDER_GIF) {
+            img.src = PLACEHOLDER_GIF;
+          }
+        }
+      });
+    }, {
+      rootMargin: "800px" // Preemptively load images 800px before they enter viewport
+    });
+  }
+
   images.forEach(image => {
     const imageImg = document.createElement("img");
-    imageImg.src = image.thumbnailUrl;
+    imageImg.dataset.src = image.thumbnailUrl;
+    imageImg.dataset.original = image.originalUrl;
+    imageImg.src = PLACEHOLDER_GIF;
     imageImg.loading = "lazy";
     imageImg.decoding = "async";
 
     imageImg.onerror = () => {
-      // Prevent infinite onerror loops if originalUrl also fails
       imageImg.onerror = null;
+      imageImg.dataset.src = image.originalUrl;
       imageImg.src = image.originalUrl;
     };
 
@@ -57,6 +86,8 @@ const renderImages = (images: AlbumImage[], beforeElement?: HTMLElement) => {
     } else {
       imagesContainer.appendChild(imageImg);
     }
+
+    imageObserver?.observe(imageImg);
   });
 };
 
@@ -143,7 +174,7 @@ const handleRoute = async (path: string) => {
       albumContainer.hidden = true;
       homeButton.hidden = false;
       imagesContainer.hidden = false;
-      imagesContainer.innerHTML = "<div>Loading images...</div>"; // Simple loading indicator
+      imagesContainer.innerHTML = '<div class="loader-sentinel"><div class="spinner"></div></div>';
 
       const response = await getOneAlbum(matchedAlbum.albumId);
       imagesContainer.innerHTML = ""; // Clear loader
