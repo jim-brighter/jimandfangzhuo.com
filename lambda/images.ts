@@ -47,7 +47,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       const bucketContents = await s3.send(new ListObjectsV2Command({
         Bucket: bucketName,
         Prefix: `${albumName}/`,
-        MaxKeys: 100,
+        MaxKeys: 20,
         ContinuationToken: continuationToken
       }));
 
