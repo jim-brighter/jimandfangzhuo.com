@@ -20,10 +20,25 @@ export const getAllAlbums = async (): Promise<Album[]> => {
   return payload.items as Album[];
 }
 
-export const getOneAlbum = async (albumId: string): Promise<string[]> => {
+export interface AlbumImage {
+  originalUrl: string;
+  thumbnailUrl: string;
+}
+
+export interface AlbumImagesResponse {
+  images: AlbumImage[];
+  nextPageToken?: string;
+}
+
+export const getOneAlbum = async (albumId: string, nextPageToken?: string): Promise<AlbumImagesResponse> => {
   const token = getIdToken();
 
-  const response = await fetch(`https://api.jimandfangzhuo.com/api/images/${albumId}`, {
+  const url = new URL(`https://api.jimandfangzhuo.com/api/images/${albumId}`);
+  if (nextPageToken) {
+    url.searchParams.append("nextPageToken", nextPageToken);
+  }
+
+  const response = await fetch(url.toString(), {
     method: "GET",
     headers: {
       "Authorization": `Bearer ${token}`
@@ -36,5 +51,9 @@ export const getOneAlbum = async (albumId: string): Promise<string[]> => {
 
   const payload = await response.json();
 
-  return payload.images as string[];
+  return {
+    images: payload.images as AlbumImage[],
+    nextPageToken: payload.nextPageToken as string | undefined
+  };
 }
+

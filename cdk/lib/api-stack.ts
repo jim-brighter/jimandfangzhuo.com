@@ -39,11 +39,13 @@ export class APIStack extends Stack {
   private createImagesLambda(tableStack: DynamoDBStack, bucketStack: S3BucketStack) {
     const imagesLambda = new NodeLambda(this, 'ImagesHandler', '../lambda/images.ts', {
       ALBUM_METADATA_TABLE: tableStack.albumMetadataTable.tableName,
-      IMAGES_BUCKET: bucketStack.bucket.bucketName
+      IMAGES_BUCKET: bucketStack.bucket.bucketName,
+      THUMBNAILS_BUCKET: bucketStack.thumbnailBucket.bucketName
     });
 
     tableStack.albumMetadataTable.grantReadData(imagesLambda);
     bucketStack.bucket.grantRead(imagesLambda);
+    bucketStack.thumbnailBucket.grantRead(imagesLambda);
 
     return imagesLambda;
   }

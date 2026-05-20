@@ -22,7 +22,8 @@ const corsHeaders = {
 const tableName = process.env.ALBUM_METADATA_TABLE!;
 const ddb = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
-const bucketName = process.env.IMAGES_BUCKET;
+const bucketName = process.env.IMAGES_BUCKET!;
+const thumbnailBucketName = process.env.THUMBNAILS_BUCKET!;
 const s3 = new S3Client({});
 
 const response = (statusCode: number, body: unknown): APIGatewayProxyResult => ({
@@ -58,17 +59,29 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
         });
       }
 
-      const presignedUrls = await Promise.all(bucketContents.Contents.map(object => {
-        return getSignedUrl(s3, new GetObjectCommand({
+      const albumImages = await Promise.all(bucketContents.Contents.map(async (object) => {
+        const originalUrl = await getSignedUrl(s3, new GetObjectCommand({
           Bucket: bucketName,
           Key: object.Key
         }), {
           expiresIn: 6 * 60 * 60 // 6 hours
         });
+
+        const thumbnailUrl = await getSignedUrl(s3, new GetObjectCommand({
+          Bucket: thumbnailBucketName,
+          Key: object.Key
+        }), {
+          expiresIn: 6 * 60 * 60 // 6 hours
+        });
+
+        return {
+          originalUrl,
+          thumbnailUrl
+        };
       }));
 
       return response(200, {
-        images: presignedUrls,
+        images: albumImages,
         nextPageToken: bucketContents.NextContinuationToken
       });
     }
@@ -81,7 +94,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       for (const dynamoItem of result.Items!) {
         const item = dynamoItem as AlbumItem;
         item.presignedUrl = await getSignedUrl(s3, new GetObjectCommand({
-          Bucket: bucketName,
+          Bucket: thumbnailBucketName,
           Key: `${item.albumName}/${item.coverImageObjectKey}`
         }), {
           expiresIn: 6 * 60 * 60 // 6 hours

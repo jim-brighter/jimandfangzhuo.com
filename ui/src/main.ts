@@ -1,6 +1,7 @@
 import { Amplify } from "aws-amplify";
 import { checkAuthSession, doLogin, doLogout } from "./auth";
 import { getAllAlbums, getOneAlbum } from "./client";
+import type { AlbumImage } from "./client";
 import type { Album } from "./album";
 
 Amplify.configure({
@@ -20,6 +21,44 @@ const imagesContainer = document.getElementById("images-container") as HTMLDivEl
 const homeButton = document.getElementById("home-btn") as HTMLButtonElement;
 
 let cachedAlbums: Album[] | null = null;
+let currentNextPageToken: string | undefined = undefined;
+let isLoadingMore = false;
+let intersectionObserver: IntersectionObserver | null = null;
+
+const cleanupPagination = () => {
+  if (intersectionObserver) {
+    intersectionObserver.disconnect();
+    intersectionObserver = null;
+  }
+  currentNextPageToken = undefined;
+  isLoadingMore = false;
+
+  const sentinel = document.getElementById("scroll-sentinel");
+  if (sentinel) {
+    sentinel.remove();
+  }
+};
+
+const renderImages = (images: AlbumImage[], beforeElement?: HTMLElement) => {
+  images.forEach(image => {
+    const imageImg = document.createElement("img");
+    imageImg.src = image.thumbnailUrl;
+    imageImg.loading = "lazy";
+    imageImg.decoding = "async";
+
+    imageImg.onerror = () => {
+      // Prevent infinite onerror loops if originalUrl also fails
+      imageImg.onerror = null;
+      imageImg.src = image.originalUrl;
+    };
+
+    if (beforeElement) {
+      imagesContainer.insertBefore(imageImg, beforeElement);
+    } else {
+      imagesContainer.appendChild(imageImg);
+    }
+  });
+};
 
 const getAlbums = async (): Promise<Album[]> => {
   if (!cachedAlbums) {
@@ -29,6 +68,7 @@ const getAlbums = async (): Promise<Album[]> => {
 };
 
 const handleRoute = async (path: string) => {
+  cleanupPagination();
   const isLoggedIn = await checkAuthSession();
 
   if (!isLoggedIn) {
@@ -105,14 +145,52 @@ const handleRoute = async (path: string) => {
       imagesContainer.hidden = false;
       imagesContainer.innerHTML = "<div>Loading images...</div>"; // Simple loading indicator
 
-      const presignedUrls = await getOneAlbum(matchedAlbum.albumId);
+      const response = await getOneAlbum(matchedAlbum.albumId);
       imagesContainer.innerHTML = ""; // Clear loader
 
-      presignedUrls.forEach(url => {
-        const imageImg = document.createElement("img");
-        imageImg.src = url;
-        imagesContainer.appendChild(imageImg);
-      });
+      renderImages(response.images);
+
+      currentNextPageToken = response.nextPageToken;
+
+      if (currentNextPageToken) {
+        const sentinel = document.createElement("div");
+        sentinel.id = "scroll-sentinel";
+        sentinel.className = "loader-sentinel";
+
+        const spinner = document.createElement("div");
+        spinner.className = "spinner";
+        sentinel.appendChild(spinner);
+
+        imagesContainer.appendChild(sentinel);
+
+        intersectionObserver = new IntersectionObserver(async (entries) => {
+          const entry = entries[0];
+          if (entry.isIntersecting && currentNextPageToken && !isLoadingMore) {
+            isLoadingMore = true;
+            try {
+              const nextResponse = await getOneAlbum(matchedAlbum.albumId, currentNextPageToken);
+
+              renderImages(nextResponse.images, sentinel);
+
+              currentNextPageToken = nextResponse.nextPageToken;
+
+              if (!currentNextPageToken) {
+                sentinel.remove();
+                intersectionObserver?.disconnect();
+                intersectionObserver = null;
+              }
+            } catch (error) {
+              console.error("Error loading more images:", error);
+            } finally {
+              isLoadingMore = false;
+            }
+          }
+        }, {
+          rootMargin: "200px"
+        });
+
+        intersectionObserver.observe(sentinel);
+      }
     } catch (error) {
       console.error(`Error loading album "${albumNameFromPath}":`, error);
       // Fallback on failure

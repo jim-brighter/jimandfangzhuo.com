@@ -3,13 +3,13 @@ import { Bucket, BucketAccessControl, BucketEncryption } from 'aws-cdk-lib/aws-s
 import { Construct } from 'constructs';
 
 export class ImageS3Bucket extends Bucket {
-  constructor(scope: Construct, bucketRegion: string, replicationRegion: string) {
+  constructor(scope: Construct, id: string, baseName: string, bucketRegion: string, replicationRegion: string) {
 
-    const bucketName = `jimandfangzhuo.com-images-${bucketRegion}`;
-    const replicationId = `${replicationRegion}-replication`;
-    const replicationBucketName = `jimandfangzhuo.com-images-${replicationRegion}`;
+    const bucketName = `${baseName}-${bucketRegion}`;
+    const replicationId = `${id}-${replicationRegion}-replication`;
+    const replicationBucketName = `${baseName}-${replicationRegion}`;
 
-    super(scope, 'JimAndFangzhuoImagesBucket', {
+    super(scope, id, {
       bucketName,
       encryption: BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.DESTROY,
