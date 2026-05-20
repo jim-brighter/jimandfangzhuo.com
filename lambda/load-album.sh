@@ -87,7 +87,7 @@ function doSync() {
     if [ "$isImage" = true ]; then
       sips -s format jpeg -Z 600 "$filePath" --out "$tempThumbnail" &>/dev/null || echo "Warning: Failed to generate image thumbnail for $relativePath"
     elif [ "$isVideo" = true ]; then
-      ffmpeg -y -i "$filePath" -ss 00:00:01 -vframes 1 -vf "scale=600:-1" "$tempThumbnail" &>/dev/null || echo "Warning: Failed to extract video thumbnail for $relativePath"
+      ffmpeg -y -nostdin -i "$filePath" -ss 00:00:01 -vframes 1 -vf "scale=600:-1" "$tempThumbnail" &>/dev/null || echo "Warning: Failed to extract video thumbnail for $relativePath"
     fi
 
     echo "($currentFile/$totalFiles) Uploading $relativePath as $destinationKey..."
