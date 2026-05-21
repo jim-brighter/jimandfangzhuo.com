@@ -1,4 +1,4 @@
-import type { Album } from "./album";
+import type { Album, AlbumImage, AlbumImagesResponse } from "./album";
 import { getIdToken } from "./auth";
 
 export const getAllAlbums = async (): Promise<Album[]> => {
@@ -18,16 +18,6 @@ export const getAllAlbums = async (): Promise<Album[]> => {
   const payload = await response.json();
 
   return payload.items as Album[];
-}
-
-export interface AlbumImage {
-  originalUrl: string;
-  thumbnailUrl: string;
-}
-
-export interface AlbumImagesResponse {
-  images: AlbumImage[];
-  nextPageToken?: string;
 }
 
 export const getOneAlbum = async (albumId: string, nextPageToken?: string): Promise<AlbumImagesResponse> => {
@@ -56,4 +46,3 @@ export const getOneAlbum = async (albumId: string, nextPageToken?: string): Prom
     nextPageToken: payload.nextPageToken as string | undefined
   };
 }
-

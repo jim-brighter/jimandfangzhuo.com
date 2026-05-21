@@ -52,6 +52,9 @@
 
 body {
   margin: 0;
+}
+
+#main {
   padding: 1rem;
 }
 
@@ -315,7 +318,7 @@ code {
 
 /* Login Container and Form Layout */
 #login {
-  min-height: calc(100vh - 2rem);
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -538,7 +541,3 @@ code {
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
-
-
-
-

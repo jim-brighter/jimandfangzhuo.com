@@ -1,6 +1,18 @@
+import { Amplify } from "aws-amplify";
 import { fetchAuthSession, signIn, signOut } from "aws-amplify/auth";
 
 let idToken: string | null = null;
+
+export const initAuth = () => {
+  Amplify.configure({
+    Auth: {
+      Cognito: {
+        userPoolId: "us-west-2_TdfpNx8YV",
+        userPoolClientId: "65frmc7qe1ah5r3trjs0f682du"
+      }
+    }
+  });
+}
 
 /**
  * Gets the current authentication id token.

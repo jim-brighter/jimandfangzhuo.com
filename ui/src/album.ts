@@ -5,3 +5,13 @@ export type Album = {
   createdAt: number;
   presignedUrl: string;
 };
+
+export interface AlbumImage {
+  originalUrl: string;
+  thumbnailUrl: string;
+}
+
+export interface AlbumImagesResponse {
+  images: AlbumImage[];
+  nextPageToken?: string;
+}
