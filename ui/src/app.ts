@@ -60,8 +60,9 @@ export class App {
       }
     });
 
-    this.imageGridView.addEventListener("modal-select", (event: CustomEvent) => {
-      const { imageUrl, imageAlt } = event.detail;
+    this.imageGridView.addEventListener("modal-select", (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { imageUrl, imageAlt } = customEvent.detail;
       this.modalView.show(imageUrl, imageAlt);
     });
   }
