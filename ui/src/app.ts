@@ -1,16 +1,18 @@
-import { checkAuthSession, doLogin, doLogout } from "./auth";
-import { getAllAlbums, getOneAlbum } from "./client";
 import type { Album } from "./album";
-import { LoginView } from "./views/login-view";
-import { NavbarView } from "./views/navbar-view";
+import { checkAuthSession, doLogin, doLogout, initAuth } from "./auth";
+import { getAllAlbums, getOneAlbum } from "./client";
 import { AlbumListView } from "./views/album-list-view";
 import { ImageGridView } from "./views/image-grid-view";
+import { LoginView } from "./views/login-view";
+import { ModalView } from "./views/modal-view";
+import { NavbarView } from "./views/navbar-view";
 
-export class AppController {
+export class App {
   private loginView: LoginView;
   private navbarView: NavbarView;
   private albumListView: AlbumListView;
   private imageGridView: ImageGridView;
+  private modalView: ModalView;
   private mainContainer: HTMLDivElement;
 
   private cachedAlbums: Album[] | null = null;
@@ -24,6 +26,7 @@ export class AppController {
     this.navbarView = new NavbarView();
     this.albumListView = new AlbumListView("album-container");
     this.imageGridView = new ImageGridView("images-container");
+    this.modalView = new ModalView("modal");
 
     this.initViewEvents();
   }
@@ -56,9 +59,17 @@ export class AppController {
         this.imageGridView.setLoadingMore(false);
       }
     });
+
+    this.imageGridView.addEventListener("modal-select", (event: CustomEvent) => {
+      const { imageUrl, imageAlt } = event.detail;
+      this.modalView.show(imageUrl, imageAlt);
+    });
   }
 
   public async init() {
+    // Start auth flow
+    initAuth();
+
     // Listen to navigation events (Back/Forward)
     window.addEventListener("popstate", () => {
       this.handleRoute(window.location.pathname);

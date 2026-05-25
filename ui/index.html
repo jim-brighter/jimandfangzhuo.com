@@ -15,7 +15,8 @@
       <div class="login-card">
         <div class="login-header">
           <div class="login-logo">
-            <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" width="40" height="40" stroke="currentColor" stroke-width="1.8" fill="none"
+              stroke-linecap="round" stroke-linejoin="round">
               <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
               <circle cx="12" cy="13" r="4"></circle>
             </svg>
@@ -24,12 +25,14 @@
 
         <div class="input-group">
           <label for="username">Username</label>
-          <input type="text" id="username" name="username" placeholder="Enter username" required autocomplete="username" />
+          <input type="text" id="username" name="username" placeholder="Enter username" required
+            autocomplete="username" />
         </div>
 
         <div class="input-group">
           <label for="password">Password</label>
-          <input type="password" id="password" name="password" placeholder="Enter password" required autocomplete="current-password" />
+          <input type="password" id="password" name="password" placeholder="Enter password" required
+            autocomplete="current-password" />
         </div>
 
         <div id="login-error" class="login-error-msg" hidden></div>
@@ -41,6 +44,12 @@
       </div>
     </form>
 
+    <div id="modal" hidden="true">
+      <div id="modal-content">
+        <img id="modal-image" src="" alt="">
+      </div>
+    </div>
+
     <div id="main" hidden="true">
       <header class="nav-bar">
         <button id="home-btn" hidden="true">Home</button>
@@ -49,7 +58,6 @@
       <div id="album-container"></div>
       <div id="images-container"></div>
     </div>
-    
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>
