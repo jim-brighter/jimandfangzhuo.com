@@ -30,6 +30,17 @@ export class ImageGridView extends EventTarget {
     this.isLoadingMore = false;
   }
 
+  private emitModalSelection(img: HTMLImageElement) {
+    this.dispatchEvent(new CustomEvent("modal-select",
+      {
+        detail: {
+          imageUrl: img.dataset.original,
+          imageAlt: img.alt
+        }
+      }
+    ));
+  }
+
   private getImageObserver() {
     if (!this.imageObserver) {
       this.imageObserver = new IntersectionObserver(
@@ -84,6 +95,10 @@ export class ImageGridView extends EventTarget {
         imageImg.dataset.src = image.originalUrl;
         imageImg.src = image.originalUrl;
       };
+
+      imageImg.onclick = () => {
+        this.emitModalSelection(imageImg);
+      }
 
       if (beforeElement) {
         this.container.insertBefore(imageImg, beforeElement);

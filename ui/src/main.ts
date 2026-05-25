@@ -1,8 +1,3 @@
-import { initAuth } from "./auth";
-import { AppController } from "./app-controller";
+import { App } from "./app";
 
-initAuth();
-
-const app = new AppController();
-app.init();
-
+new App().init();
