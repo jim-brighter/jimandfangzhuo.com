@@ -1,4 +1,4 @@
-import type { Album } from "./album";
+import type { Album, AlbumImage } from "./album";
 import { checkAuthSession, doLogin, doLogout, initAuth } from "./auth";
 import { getAllAlbums, getOneAlbum } from "./client";
 import { AlbumListView } from "./views/album-list-view";
@@ -18,6 +18,8 @@ export class App {
   private cachedAlbums: Album[] | null = null;
   private currentNextPageToken: string | undefined = undefined;
   private currentAlbum: Album | null = null;
+  private loadedImages: AlbumImage[] = [];
+  private currentImageIndex: number = -1;
 
   constructor() {
     this.mainContainer = document.getElementById("main") as HTMLDivElement;
@@ -62,8 +64,15 @@ export class App {
 
     this.imageGridView.addEventListener("modal-select", (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { imageUrl, imageAlt } = customEvent.detail;
-      this.modalView.show(imageUrl, imageAlt);
+      const { imageUrl, imageAlt, videoUrl } = customEvent.detail;
+      this.currentImageIndex = this.loadedImages.findIndex((img) => img.originalUrl === imageUrl);
+      this.modalView.show(imageUrl, imageAlt, videoUrl);
+    });
+
+    this.modalView.addEventListener("navigate", async (event: Event) => {
+      const customEvent = event as CustomEvent;
+      const { direction } = customEvent.detail;
+      await this.navigateModal(direction);
     });
   }
 
@@ -128,6 +137,8 @@ export class App {
     this.albumListView.clear();
     this.currentNextPageToken = undefined;
     this.currentAlbum = null;
+    this.loadedImages = [];
+    this.currentImageIndex = -1;
 
     // 2. Check auth status
     const isLoggedIn = await checkAuthSession();
@@ -189,6 +200,7 @@ export class App {
 
     try {
       const response = await getOneAlbum(matchedAlbum.albumId);
+      this.loadedImages = response.images;
       this.imageGridView.renderInitialImages(response.images);
       this.currentNextPageToken = response.nextPageToken;
 
@@ -204,6 +216,8 @@ export class App {
 
     const response = await getOneAlbum(this.currentAlbum.albumId, this.currentNextPageToken);
 
+    this.loadedImages.push(...response.images);
+
     // Append images before the sentinel element if it exists in the DOM
     const sentinel = document.getElementById("scroll-sentinel");
     if (sentinel) {
@@ -216,6 +230,50 @@ export class App {
 
     if (!this.currentNextPageToken) {
       this.imageGridView.removeSentinel();
+    }
+  }
+
+  private async navigateModal(direction: "next" | "prev") {
+    if (this.currentImageIndex === -1 || this.loadedImages.length === 0) return;
+
+    if (direction === "next") {
+      if (this.currentImageIndex < this.loadedImages.length - 1) {
+        this.currentImageIndex++;
+        const nextImg = this.loadedImages[this.currentImageIndex];
+        this.modalView.updateImage(nextImg.originalUrl, "Album photo", nextImg.videoUrl);
+      } else {
+        // We are on the last image. Can we load more?
+        if (this.currentNextPageToken) {
+          try {
+            await this.loadMoreImages();
+            // After loading more, if we got more images, navigate to the next one
+            if (this.currentImageIndex < this.loadedImages.length - 1) {
+              this.currentImageIndex++;
+              const nextImg = this.loadedImages[this.currentImageIndex];
+              this.modalView.updateImage(nextImg.originalUrl, "Album photo", nextImg.videoUrl);
+            }
+          } catch (e) {
+            console.error("Failed to load more images for modal navigation:", e);
+          }
+        } else {
+          // Wrap around to start
+          this.currentImageIndex = 0;
+          const nextImg = this.loadedImages[this.currentImageIndex];
+          this.modalView.updateImage(nextImg.originalUrl, "Album photo", nextImg.videoUrl);
+        }
+      }
+    } else {
+      // direction === "prev"
+      if (this.currentImageIndex > 0) {
+        this.currentImageIndex--;
+        const prevImg = this.loadedImages[this.currentImageIndex];
+        this.modalView.updateImage(prevImg.originalUrl, "Album photo", prevImg.videoUrl);
+      } else {
+        // Wrap around to the end of currently loaded images
+        this.currentImageIndex = this.loadedImages.length - 1;
+        const prevImg = this.loadedImages[this.currentImageIndex];
+        this.modalView.updateImage(prevImg.originalUrl, "Album photo", prevImg.videoUrl);
+      }
     }
   }
 }

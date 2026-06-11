@@ -30,12 +30,13 @@ export class ImageGridView extends EventTarget {
     this.isLoadingMore = false;
   }
 
-  private emitModalSelection(img: HTMLImageElement) {
+  private emitModalSelection(img: HTMLImageElement, videoUrl?: string) {
     this.dispatchEvent(new CustomEvent("modal-select",
       {
         detail: {
           imageUrl: img.dataset.original,
-          imageAlt: img.alt
+          imageAlt: img.alt,
+          videoUrl: videoUrl
         }
       }
     ));
@@ -83,6 +84,9 @@ export class ImageGridView extends EventTarget {
     const observer = this.getImageObserver();
 
     images.forEach((image) => {
+      const wrapper = document.createElement("div");
+      wrapper.className = "media-item";
+
       const imageImg = document.createElement("img");
       imageImg.dataset.src = image.thumbnailUrl;
       imageImg.dataset.original = image.originalUrl;
@@ -96,18 +100,65 @@ export class ImageGridView extends EventTarget {
         imageImg.src = image.originalUrl;
       };
 
-      imageImg.onclick = () => {
-        this.emitModalSelection(imageImg);
+      wrapper.appendChild(imageImg);
+
+      // Check if originalUrl is a video or if it has a backing Live Photo videoUrl
+      if (image.videoUrl) {
+        // Live Photo badge
+        const liveBadge = document.createElement("div");
+        liveBadge.className = "live-badge";
+        liveBadge.innerHTML = `
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="live-icon">
+            <circle cx="12" cy="12" r="10" stroke-dasharray="3 3"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+            <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
+          </svg>
+          <span>LIVE</span>
+        `;
+        wrapper.appendChild(liveBadge);
+        wrapper.classList.add("is-live-photo");
+      } else if (this.isVideo(image.originalUrl)) {
+        // Standalone Video
+        const overlay = document.createElement("div");
+        overlay.className = "video-overlay";
+        overlay.innerHTML = `
+          <svg class="play-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="5 3 19 12 5 21 5 3" fill="currentColor"></polygon>
+          </svg>
+        `;
+        wrapper.appendChild(overlay);
+        wrapper.classList.add("is-video");
       }
 
+      wrapper.onclick = () => {
+        this.emitModalSelection(imageImg, image.videoUrl);
+      };
+
       if (beforeElement) {
-        this.container.insertBefore(imageImg, beforeElement);
+        this.container.insertBefore(wrapper, beforeElement);
       } else {
-        this.container.appendChild(imageImg);
+        this.container.appendChild(wrapper);
       }
 
       observer.observe(imageImg);
     });
+  }
+
+  private isVideo(url: string): boolean {
+    try {
+      const parsed = new URL(url);
+      const pathname = parsed.pathname.toLowerCase();
+      return pathname.endsWith(".mp4") || 
+             pathname.endsWith(".mov") || 
+             pathname.endsWith(".m4v") || 
+             pathname.endsWith(".avi");
+    } catch (e) {
+      const lowerUrl = url.toLowerCase();
+      return lowerUrl.includes(".mp4") || 
+             lowerUrl.includes(".mov") || 
+             lowerUrl.includes(".m4v") || 
+             lowerUrl.includes(".avi");
+    }
   }
 
   public showInitialLoader() {
