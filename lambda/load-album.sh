@@ -67,7 +67,27 @@ function doSync() {
     local ext="${filePath##*.}"
     local ext_lower=$(echo "$ext" | tr '[:upper:]' '[:lower:]')
 
-    local takenAt=$(getCreateDate "$filePath")
+    local takenAt=""
+    if [[ "$ext_lower" =~ ^(mp4|mov|m4v|avi)$ ]]; then
+      # Check for matching image in the same directory to align Live Photo timestamps
+      local dirPath=$(dirname "$filePath")
+      local baseName=$(basename "$filePath" | sed 's/\.[^.]*$//')
+      local matchingImage=""
+      for imgExt in HEIC heic JPG jpg JPEG jpeg PNG png WEBP webp; do
+        if [[ -f "$dirPath/$baseName.$imgExt" ]]; then
+          matchingImage="$dirPath/$baseName.$imgExt"
+          break
+        fi
+      done
+      if [[ -n "$matchingImage" ]]; then
+        takenAt=$(getCreateDate "$matchingImage")
+      fi
+    fi
+
+    if [[ -z "$takenAt" ]]; then
+      takenAt=$(getCreateDate "$filePath")
+    fi
+
     local destinationKey="$takenAt-$relativePath"
 
     # Define temp thumbnail destination

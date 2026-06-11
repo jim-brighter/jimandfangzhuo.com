@@ -4,6 +4,9 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
   <link rel="stylesheet" type="text/css" href="src/style.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jim and Fangzhuo</title>
@@ -46,7 +49,16 @@
 
     <div id="modal" hidden="true">
       <div id="modal-content">
-        <img id="modal-image" src="" alt="">
+        <button id="modal-live-btn" class="modal-live-btn" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="live-icon">
+            <circle cx="12" cy="12" r="10" stroke-dasharray="3 3"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+            <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
+          </svg>
+          <span>LIVE</span>
+        </button>
+        <img id="modal-image" src="" alt="" hidden>
+        <video id="modal-video" src="" controls autoplay playsinline loop hidden></video>
       </div>
     </div>
 

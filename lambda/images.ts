@@ -1,5 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { GetObjectCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, ListObjectsV2Command, S3Client, _Object, ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
 import { DynamoDBDocumentClient, GetCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
@@ -43,46 +43,98 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       }
 
       const albumName = result.Item.albumName;
-      const continuationToken = event.queryStringParameters?.nextPageToken;
+      const offsetToken = event.queryStringParameters?.nextPageToken;
 
-      const bucketContents = await s3.send(new ListObjectsV2Command({
-        Bucket: bucketName,
-        Prefix: `${albumName}/`,
-        MaxKeys: 20,
-        ContinuationToken: continuationToken
-      }));
+      // 1. Fetch all S3 objects in the album prefix
+      const allObjects: _Object[] = [];
+      let s3ContinuationToken: string | undefined = undefined;
+      do {
+        const bucketContents: ListObjectsV2CommandOutput = await s3.send(new ListObjectsV2Command({
+          Bucket: bucketName,
+          Prefix: `${albumName}/`,
+          ContinuationToken: s3ContinuationToken
+        }));
+        if (bucketContents.Contents) {
+          allObjects.push(...bucketContents.Contents);
+        }
+        s3ContinuationToken = bucketContents.NextContinuationToken;
+      } while (s3ContinuationToken);
 
-      if (!bucketContents.Contents) {
+      if (allObjects.length === 0) {
         return response(200, {
           images: [],
           nextPageToken: undefined
         });
       }
 
-      const albumImages = await Promise.all(bucketContents.Contents.map(async (object) => {
-        const originalUrl = await getSignedUrl(s3, new GetObjectCommand({
-          Bucket: bucketName,
-          Key: object.Key
-        }), {
-          expiresIn: 6 * 60 * 60 // 6 hours
-        });
+      // 2. Group keys by base path to associate Live Photo images and videos
+      const groups: Record<string, { imageKey?: string; videoKey?: string }> = {};
+      for (const object of allObjects) {
+        if (!object.Key) continue;
+        const extIndex = object.Key.lastIndexOf('.');
+        const baseKey = extIndex !== -1 ? object.Key.slice(0, extIndex) : object.Key;
+        const ext = extIndex !== -1 ? object.Key.slice(extIndex + 1).toLowerCase() : '';
 
-        const thumbnailUrl = await getSignedUrl(s3, new GetObjectCommand({
-          Bucket: thumbnailBucketName,
-          Key: object.Key
-        }), {
-          expiresIn: 6 * 60 * 60 // 6 hours
-        });
+        if (!groups[baseKey]) {
+          groups[baseKey] = {};
+        }
 
-        return {
-          originalUrl,
-          thumbnailUrl
-        };
-      }));
+        if (['mp4', 'mov', 'm4v', 'avi'].includes(ext)) {
+          groups[baseKey].videoKey = object.Key;
+        } else {
+          groups[baseKey].imageKey = object.Key;
+        }
+      }
+
+      // 3. Sort groups lexicographically (preserves S3 timestamp prefix sort)
+      const sortedGroups = Object.entries(groups).sort((a, b) => a[0].localeCompare(b[0]));
+
+      // 4. Paginate the grouped array using offset token
+      const pageSize = 20;
+      const offset = parseInt(offsetToken || '0', 10);
+      const pageGroups = sortedGroups.slice(offset, offset + pageSize);
+      const hasMore = offset + pageSize < sortedGroups.length;
+      const nextPageToken = hasMore ? (offset + pageSize).toString() : undefined;
+
+      // 5. Generate signed URLs for page assets
+      const albumImages = await Promise.all(
+        pageGroups.map(async ([, group]) => {
+          const mainKey = group.imageKey || group.videoKey!;
+          const originalUrl = await getSignedUrl(s3, new GetObjectCommand({
+            Bucket: bucketName,
+            Key: mainKey
+          }), {
+            expiresIn: 6 * 60 * 60 // 6 hours
+          });
+
+          const thumbnailUrl = await getSignedUrl(s3, new GetObjectCommand({
+            Bucket: thumbnailBucketName,
+            Key: mainKey
+          }), {
+            expiresIn: 6 * 60 * 60 // 6 hours
+          });
+
+          let videoUrl: string | null = null;
+          if (group.imageKey && group.videoKey) {
+            videoUrl = await getSignedUrl(s3, new GetObjectCommand({
+              Bucket: bucketName,
+              Key: group.videoKey
+            }), {
+              expiresIn: 6 * 60 * 60 // 6 hours
+            });
+          }
+
+          return {
+            originalUrl,
+            thumbnailUrl,
+            videoUrl
+          };
+        })
+      );
 
       return response(200, {
         images: albumImages,
-        nextPageToken: bucketContents.NextContinuationToken
+        nextPageToken
       });
     }
 

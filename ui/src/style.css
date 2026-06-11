@@ -1,16 +1,17 @@
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: rgb(227, 83, 54);
-  --accent-bg: rgba(227, 83, 54, 0.1);
-  --accent-border: rgba(227, 83, 54, 0.5);
+  --text: #4a4d4b;
+  --text-h: #181a19;
+  --bg: #faf9f6;
+  --border: #e6e5df;
+  --code-bg: #f2f1eb;
+  --accent: #3d5a45;
+  --accent-bg: rgba(61, 90, 69, 0.08);
+  --accent-border: rgba(61, 90, 69, 0.4);
   --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+    rgba(0, 0, 0, 0.06) 0 8px 24px -4px, rgba(0, 0, 0, 0.04) 0 4px 12px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --sans: 'Outfit', system-ui, 'Segoe UI', Roboto, sans-serif;
+  --serif: 'Lora', Georgia, serif;
 
   font: 18px/145% var(--sans);
   letter-spacing: 0.18px;
@@ -29,16 +30,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: rgb(227, 83, 54);
-    --accent-bg: rgba(227, 83, 54, 0.15);
-    --accent-border: rgba(227, 83, 54, 0.5);
+    --text: #c5c9c6;
+    --text-h: #f1f3f0;
+    --bg: #111412;
+    --border: #272c29;
+    --code-bg: #1a1e1b;
+    --accent: #87a38e;
+    --accent-bg: rgba(135, 163, 142, 0.12);
+    --accent-border: rgba(135, 163, 142, 0.4);
     --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+      rgba(0, 0, 0, 0.3) 0 10px 25px -3px, rgba(0, 0, 0, 0.2) 0 4px 12px -2px;
   }
 }
 
@@ -88,10 +89,28 @@ p {
     height: 100%;
   }
 
-  #modal-image {
+  #modal-image,
+  #modal-video {
     max-width: 100%;
     max-height: 100%;
     object-fit: contain;
+    transition: opacity 0.2s ease;
+  }
+
+  #modal-image.fade-in,
+  #modal-video.fade-in {
+    animation: modalImageFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@keyframes modalImageFadeIn {
+  from {
+    opacity: 0.3;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -101,23 +120,76 @@ p {
 }
 
 /* Image grid in opened album view */
-#images-container img {
+#images-container .media-item {
+  position: relative;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
   aspect-ratio: 4 / 3;
   border-radius: 12px;
   box-shadow: var(--shadow);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
   cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
   @media (max-width: 1024px) {
     border-radius: 8px;
   }
 }
 
-#images-container img:hover {
-  transform: scale(1.01);
+#images-container .media-item:hover {
+  transform: scale(1.02);
+}
+
+#images-container .media-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+#images-container .media-item:hover img {
+  transform: scale(1.05);
+}
+
+/* Video Play Overlay */
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.15);
+  transition: background-color 0.3s ease;
+}
+
+.media-item:hover .video-overlay {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.play-icon {
+  width: 44px;
+  height: 44px;
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  padding: 10px;
+  box-sizing: border-box;
+  backdrop-filter: blur(4px);
+  border: 1.5px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s, color 0.3s, border-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.media-item:hover .play-icon {
+  transform: scale(1.12);
+  background: rgba(255, 255, 255, 0.95);
+  color: black;
+  border-color: transparent;
 }
 
 /* Album Card representation on Home view */
@@ -155,8 +227,8 @@ p {
 }
 
 .album-label {
-  font-family: var(--sans);
-  font-size: 15px;
+  font-family: var(--serif);
+  font-size: 17px;
   font-weight: 500;
   color: var(--text-h);
   text-align: center;
@@ -164,7 +236,7 @@ p {
   word-break: break-word;
 
   @media (max-width: 1024px) {
-    font-size: 13px;
+    font-size: 14px;
   }
 }
 
@@ -459,4 +531,89 @@ p {
   border-top-color: #fff;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+/* Live Photo Grid Badge */
+.live-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(8px);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.3s;
+}
+
+.live-icon {
+  width: 12px;
+  height: 12px;
+}
+
+@media (max-width: 1024px) {
+  .live-badge {
+    top: 8px;
+    left: 8px;
+    padding: 5px;
+    border-radius: 50%;
+  }
+  .live-badge span {
+    display: none;
+  }
+}
+
+/* Modal Live Photo Button */
+.modal-live-btn {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 8px 14px;
+  border-radius: 30px;
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 1010;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.modal-live-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+  border-color: transparent;
+  transform: scale(1.05);
+}
+
+.modal-live-btn.active {
+  background: #007aff;
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 0 15px rgba(0, 122, 255, 0.5);
+  animation: livePulse 1.5s infinite ease-in-out;
+}
+
+@keyframes livePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
