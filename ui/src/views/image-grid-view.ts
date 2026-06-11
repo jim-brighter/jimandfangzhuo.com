@@ -1,4 +1,4 @@
-import type { AlbumImage } from "../album";
+import { isVideo, type AlbumImage } from "../album";
 
 const PLACEHOLDER_GIF = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
 
@@ -96,8 +96,12 @@ export class ImageGridView extends EventTarget {
 
       imageImg.onerror = () => {
         imageImg.onerror = null;
-        imageImg.dataset.src = image.originalUrl;
-        imageImg.src = image.originalUrl;
+        if (isVideo(image.originalUrl)) {
+          imageImg.src = PLACEHOLDER_GIF;
+        } else {
+          imageImg.dataset.src = image.originalUrl;
+          imageImg.src = image.originalUrl;
+        }
       };
 
       wrapper.appendChild(imageImg);
@@ -117,7 +121,7 @@ export class ImageGridView extends EventTarget {
         `;
         wrapper.appendChild(liveBadge);
         wrapper.classList.add("is-live-photo");
-      } else if (this.isVideo(image.originalUrl)) {
+      } else if (isVideo(image.originalUrl)) {
         // Standalone Video
         const overlay = document.createElement("div");
         overlay.className = "video-overlay";
@@ -144,22 +148,7 @@ export class ImageGridView extends EventTarget {
     });
   }
 
-  private isVideo(url: string): boolean {
-    try {
-      const parsed = new URL(url);
-      const pathname = parsed.pathname.toLowerCase();
-      return pathname.endsWith(".mp4") || 
-             pathname.endsWith(".mov") || 
-             pathname.endsWith(".m4v") || 
-             pathname.endsWith(".avi");
-    } catch (e) {
-      const lowerUrl = url.toLowerCase();
-      return lowerUrl.includes(".mp4") || 
-             lowerUrl.includes(".mov") || 
-             lowerUrl.includes(".m4v") || 
-             lowerUrl.includes(".avi");
-    }
-  }
+
 
   public showInitialLoader() {
     this.cleanup();

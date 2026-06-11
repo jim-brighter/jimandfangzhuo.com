@@ -1,3 +1,5 @@
+import { isVideo } from "../album";
+
 export class ModalView extends EventTarget {
   private container: HTMLDivElement;
   private image: HTMLImageElement;
@@ -85,22 +87,7 @@ export class ModalView extends EventTarget {
     };
   }
 
-  private isVideo(url: string): boolean {
-    try {
-      const parsed = new URL(url);
-      const pathname = parsed.pathname.toLowerCase();
-      return pathname.endsWith(".mp4") || 
-             pathname.endsWith(".mov") || 
-             pathname.endsWith(".m4v") || 
-             pathname.endsWith(".avi");
-    } catch (e) {
-      const lowerUrl = url.toLowerCase();
-      return lowerUrl.includes(".mp4") || 
-             lowerUrl.includes(".mov") || 
-             lowerUrl.includes(".m4v") || 
-             lowerUrl.includes(".avi");
-    }
-  }
+
 
   private handleSwipe() {
     const diffX = this.touchEndX - this.touchStartX;
@@ -134,7 +121,7 @@ export class ModalView extends EventTarget {
     if (!this.currentVideoUrl) return;
 
     if (this.isPlayingVideo) {
-      this.stopLivePhotoPlayback();
+      this.stopVideoPlayback();
     } else {
       this.startLivePhotoPlayback();
     }
@@ -157,22 +144,24 @@ export class ModalView extends EventTarget {
     this.video.classList.remove("fade-in");
 
     const onCanPlay = () => {
-      this.video.removeEventListener("canplay", onCanPlay);
+      this.cleanupPendingLoad();
       this.video.style.opacity = "";
       void this.video.offsetWidth; // Force reflow
       this.video.classList.add("fade-in");
       this.video.play().catch(e => console.error("Live Photo video playback failed", e));
     };
 
+    this.activeElement = this.video;
+    this.activeLoadListener = onCanPlay;
     this.video.addEventListener("canplay", onCanPlay);
 
     // Auto return to image when finished playing
     this.video.onended = () => {
-      this.stopLivePhotoPlayback();
+      this.stopVideoPlayback();
     };
   }
 
-  private stopLivePhotoPlayback() {
+  private stopVideoPlayback() {
     this.isPlayingVideo = false;
     this.liveBtn.classList.remove("active");
 
@@ -188,9 +177,9 @@ export class ModalView extends EventTarget {
 
   private loadMedia(mediaSrc: string, mediaAlt: string, videoUrl?: string) {
     this.cleanupPendingLoad();
-    this.stopLivePhotoPlayback();
+    this.stopVideoPlayback();
 
-    const isVid = this.isVideo(mediaSrc);
+    const isVid = isVideo(mediaSrc);
     this.currentVideoUrl = videoUrl;
 
     if (isVid) {
@@ -218,10 +207,6 @@ export class ModalView extends EventTarget {
 
     } else {
       // Image file (possibly with backing Live Photo videoUrl)
-      this.video.hidden = true;
-      this.video.pause();
-      this.video.src = "";
-
       this.image.hidden = false;
       this.image.classList.remove("fade-in");
       this.image.style.opacity = "0";
@@ -275,7 +260,7 @@ export class ModalView extends EventTarget {
 
   private cleanup() {
     this.cleanupPendingLoad();
-    this.stopLivePhotoPlayback();
+    this.stopVideoPlayback();
     this.currentVideoUrl = undefined;
     this.liveBtn.hidden = true;
     this.image.src = "";

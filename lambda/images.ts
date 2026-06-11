@@ -1,5 +1,5 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { GetObjectCommand, ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
+import { GetObjectCommand, ListObjectsV2Command, S3Client, _Object, ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
 import { DynamoDBDocumentClient, GetCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
@@ -46,10 +46,10 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       const offsetToken = event.queryStringParameters?.nextPageToken;
 
       // 1. Fetch all S3 objects in the album prefix
-      let allObjects: any[] = [];
+      const allObjects: _Object[] = [];
       let s3ContinuationToken: string | undefined = undefined;
       do {
-        const bucketContents: any = await s3.send(new ListObjectsV2Command({
+        const bucketContents: ListObjectsV2CommandOutput = await s3.send(new ListObjectsV2Command({
           Bucket: bucketName,
           Prefix: `${albumName}/`,
           ContinuationToken: s3ContinuationToken
@@ -98,7 +98,7 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
       // 5. Generate signed URLs for page assets
       const albumImages = await Promise.all(
-        pageGroups.map(async ([baseKey, group]) => {
+        pageGroups.map(async ([, group]) => {
           const mainKey = group.imageKey || group.videoKey!;
           const originalUrl = await getSignedUrl(s3, new GetObjectCommand({
             Bucket: bucketName,

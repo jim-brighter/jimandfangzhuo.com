@@ -1,4 +1,4 @@
-import { S3Client, ListObjectsV2Command, CopyObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, ListObjectsV2Command, CopyObjectCommand, DeleteObjectCommand, _Object, ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
 
 const s3 = new S3Client({
   region: 'us-east-1'
@@ -6,12 +6,20 @@ const s3 = new S3Client({
 const IMAGES_BUCKET = 'jimandfangzhuo.com-images-us-east-1';
 const THUMBNAILS_BUCKET = 'jimandfangzhuo.com-thumbnails-us-east-1';
 
+function encodeS3CopySource(bucket: string, key: string): string {
+  const encodedKey = key
+    .split('/')
+    .map(segment => encodeURIComponent(segment))
+    .join('/');
+  return `${bucket}/${encodedKey}`;
+}
+
 async function migrate() {
-  console.log("Listing S3 objects from IMAGES bucket...");
+  console.log('Listing S3 objects from IMAGES bucket...');
   let continuationToken: string | undefined = undefined;
-  const objects: any[] = [];
+  const objects: _Object[] = [];
   do {
-    const listRes: any = await s3.send(new ListObjectsV2Command({
+    const listRes: ListObjectsV2CommandOutput = await s3.send(new ListObjectsV2Command({
       Bucket: IMAGES_BUCKET,
       ContinuationToken: continuationToken
     }));
@@ -65,7 +73,7 @@ async function migrate() {
   // Find mismatched pairs
   const migrations: { oldVideoKey: string; newVideoKey: string }[] = [];
 
-  for (const [groupKey, group] of Object.entries(groups)) {
+  for (const [, group] of Object.entries(groups)) {
     if (group.image && group.video) {
       if (group.image.timestamp !== group.video.timestamp) {
         // We have a mismatch!
@@ -89,7 +97,7 @@ async function migrate() {
   }
 
   if (migrations.length === 0) {
-    console.log("No mismatched timestamps found. All S3 objects are already aligned!");
+    console.log('No mismatched timestamps found. All S3 objects are already aligned!');
     return;
   }
 
@@ -98,14 +106,14 @@ async function migrate() {
     console.log(`- ${m.oldVideoKey} -> ${m.newVideoKey}`);
   }
 
-  console.log("\nStarting migration in S3...");
+  console.log('\nStarting migration in S3...');
   for (const m of migrations) {
     console.log(`Migrating video asset: ${m.oldVideoKey}`);
 
     // Copy video in IMAGES_BUCKET
     await s3.send(new CopyObjectCommand({
       Bucket: IMAGES_BUCKET,
-      CopySource: encodeURI(`${IMAGES_BUCKET}/${m.oldVideoKey}`),
+      CopySource: encodeS3CopySource(IMAGES_BUCKET, m.oldVideoKey),
       Key: m.newVideoKey
     }));
 
@@ -119,7 +127,7 @@ async function migrate() {
     try {
       await s3.send(new CopyObjectCommand({
         Bucket: THUMBNAILS_BUCKET,
-        CopySource: encodeURI(`${THUMBNAILS_BUCKET}/${m.oldVideoKey}`),
+        CopySource: encodeS3CopySource(THUMBNAILS_BUCKET, m.oldVideoKey),
         Key: m.newVideoKey
       }));
       await s3.send(new DeleteObjectCommand({
@@ -127,15 +135,15 @@ async function migrate() {
         Key: m.oldVideoKey
       }));
       console.log(`  Successfully migrated video thumbnail: ${m.oldVideoKey}`);
-    } catch (e) {
+    } catch {
       // Thumbnail might not exist, that's fine
       console.log(`  No video thumbnail found or failed to migrate thumbnail for ${m.oldVideoKey}`);
     }
   }
 
-  console.log("S3 Migration complete!");
+  console.log('S3 Migration complete!');
 }
 
 migrate().catch(err => {
-  console.error("Migration failed:", err);
+  console.error('Migration failed:', err);
 });
