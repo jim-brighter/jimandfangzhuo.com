@@ -278,23 +278,36 @@ async function main() {
 
     const destinationKey = `${takenAt}-${relativePath}`;
     const tempThumbnail = path.join(tempDir, `${destinationKey}.jpg`);
+    const tempOptimized = path.join(tempDir, `optimized-${destinationKey}.jpg`);
 
-    // 1. Generate thumbnail (CPU bound)
+    // 1. Generate thumbnail and optimized view (CPU bound)
     let hasThumbnail = false;
+    let hasOptimized = false;
     if (isImage || isVideo) {
       await cpuSemaphore.acquire();
       try {
         fs.mkdirSync(path.dirname(tempThumbnail), { recursive: true });
         if (isImage) {
-          await runCommand(`sips -s format jpeg -Z 600 "${filePath}" --out "${tempThumbnail}" >/dev/null 2>&1`);
+          // Generate thumbnail and optimized view in parallel
+          await Promise.all([
+            runCommand(`sips -s format jpeg -Z 600 "${filePath}" --out "${tempThumbnail}" >/dev/null 2>&1`),
+            runCommand(`sips -s format jpeg -Z 2048 "${filePath}" --out "${tempOptimized}" >/dev/null 2>&1`)
+          ]);
           hasThumbnail = true;
+          hasOptimized = true;
+
+          // Copy original EXIF/XMP metadata to both files in parallel
+          await Promise.all([
+            runCommand(`exiftool -tagsFromFile "${filePath}" -all:all "${tempThumbnail}" -overwrite_original >/dev/null 2>&1`),
+            runCommand(`exiftool -tagsFromFile "${filePath}" -all:all "${tempOptimized}" -overwrite_original >/dev/null 2>&1`)
+          ]);
         } else if (isVideo) {
           await runCommand(`ffmpeg -y -nostdin -i "${filePath}" -ss 00:00:01 -vframes 1 -vf "scale=600:-1" "${tempThumbnail}" >/dev/null 2>&1`);
           hasThumbnail = true;
         }
       } catch (e: unknown) {
         const err = e as Error;
-        console.warn(`Warning: Failed to generate thumbnail for ${relativePath}: ${err.message}`);
+        console.warn(`Warning: Failed to generate thumbnail/optimized view for ${relativePath}: ${err.message}`);
       } finally {
         cpuSemaphore.release();
       }
@@ -303,25 +316,40 @@ async function main() {
     // 2. Upload to S3 (Network bound)
     await networkSemaphore.acquire();
     try {
+      const uploadPromises: Promise<unknown>[] = [];
+
       // Upload original
       const originalStream = fs.createReadStream(filePath);
-      await s3.send(new PutObjectCommand({
+      uploadPromises.push(s3.send(new PutObjectCommand({
         Bucket: IMAGES_BUCKET,
         Key: `${albumName}/${destinationKey}`,
         Body: originalStream,
         ContentType: getContentType(filePath)
-      }));
+      })));
 
       // Upload thumbnail
       if (hasThumbnail && fs.existsSync(tempThumbnail)) {
         const thumbStream = fs.createReadStream(tempThumbnail);
-        await s3.send(new PutObjectCommand({
+        uploadPromises.push(s3.send(new PutObjectCommand({
           Bucket: THUMBNAILS_BUCKET,
           Key: `${albumName}/${destinationKey}`,
           Body: thumbStream,
           ContentType: 'image/jpeg'
-        }));
+        })));
       }
+
+      // Upload optimized
+      if (hasOptimized && fs.existsSync(tempOptimized)) {
+        const optimizedStream = fs.createReadStream(tempOptimized);
+        uploadPromises.push(s3.send(new PutObjectCommand({
+          Bucket: THUMBNAILS_BUCKET,
+          Key: `${albumName}/optimized/${destinationKey}`,
+          Body: optimizedStream,
+          ContentType: 'image/jpeg'
+        })));
+      }
+
+      await Promise.all(uploadPromises);
 
       completedCount++;
       console.log(`(${completedCount}/${totalFiles}) Uploaded ${relativePath} as ${destinationKey}`);
@@ -331,10 +359,13 @@ async function main() {
       throw err;
     } finally {
       networkSemaphore.release();
-      // Clean up temp thumbnail file immediately to save disk space
+      // Clean up temp files immediately to save disk space
       try {
         if (fs.existsSync(tempThumbnail)) {
           fs.unlinkSync(tempThumbnail);
+        }
+        if (fs.existsSync(tempOptimized)) {
+          fs.unlinkSync(tempOptimized);
         }
       } catch {
         // Ignore unlink error

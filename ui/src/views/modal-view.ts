@@ -5,6 +5,7 @@ export class ModalView extends EventTarget {
   private image: HTMLImageElement;
   private video: HTMLVideoElement;
   private liveBtn: HTMLButtonElement;
+  private downloadBtn: HTMLAnchorElement;
 
   private touchStartX = 0;
   private touchStartY = 0;
@@ -25,10 +26,17 @@ export class ModalView extends EventTarget {
     this.image = document.getElementById("modal-image") as HTMLImageElement;
     this.video = document.getElementById("modal-video") as HTMLVideoElement;
     this.liveBtn = document.getElementById("modal-live-btn") as HTMLButtonElement;
+    this.downloadBtn = document.getElementById("modal-download-btn") as HTMLAnchorElement;
 
     this.container.onclick = (e) => {
-      // If the user clicks on the video controls or Live button, don't close the modal
-      if (e.target === this.video || e.target === this.liveBtn || this.liveBtn.contains(e.target as Node)) {
+      // If the user clicks on the video controls, Live button, or Download button, don't close the modal
+      if (
+        e.target === this.video ||
+        e.target === this.liveBtn ||
+        this.liveBtn.contains(e.target as Node) ||
+        e.target === this.downloadBtn ||
+        this.downloadBtn.contains(e.target as Node)
+      ) {
         return;
       }
       if (this.isSwiping) {
@@ -175,12 +183,15 @@ export class ModalView extends EventTarget {
     this.image.hidden = false;
   }
 
-  private loadMedia(mediaSrc: string, mediaAlt: string, videoUrl?: string) {
+  private loadMedia(mediaSrc: string, optimizedUrl: string | undefined, mediaAlt: string, videoUrl?: string) {
     this.cleanupPendingLoad();
     this.stopVideoPlayback();
 
     const isVid = isVideo(mediaSrc);
     this.currentVideoUrl = videoUrl;
+
+    // Set download link to original file URL
+    this.downloadBtn.href = mediaSrc;
 
     if (isVid) {
       // Standalone Video: Autoplay with controls, hide Live button
@@ -237,19 +248,34 @@ export class ModalView extends EventTarget {
       this.image.addEventListener("load", onLoad);
       this.image.addEventListener("error", onError);
 
-      this.image.src = mediaSrc;
+      // Determine correct URL to load (original HEIC on Safari, optimized JPEG everywhere else)
+      let displaySrc = mediaSrc;
+      if (optimizedUrl) {
+        const isHeic = mediaSrc.toLowerCase().includes(".heic") || mediaSrc.toLowerCase().includes(".heif");
+        const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        if (isHeic) {
+          if (!isSafari) {
+            displaySrc = optimizedUrl;
+          }
+        } else {
+          // For non-HEIC, use optimizedUrl to speed up modal load times
+          displaySrc = optimizedUrl;
+        }
+      }
+
+      this.image.src = displaySrc;
       this.image.alt = mediaAlt;
     }
   }
 
-  public show(mediaSrc: string, mediaAlt: string, videoUrl?: string) {
+  public show(mediaSrc: string, optimizedUrl: string | undefined, mediaAlt: string, videoUrl?: string) {
     this.container.hidden = false;
     document.body.classList.add("no-scroll-fixed");
-    this.loadMedia(mediaSrc, mediaAlt, videoUrl);
+    this.loadMedia(mediaSrc, optimizedUrl, mediaAlt, videoUrl);
   }
 
-  public updateImage(mediaSrc: string, mediaAlt: string, videoUrl?: string) {
-    this.loadMedia(mediaSrc, mediaAlt, videoUrl);
+  public updateImage(mediaSrc: string, optimizedUrl: string | undefined, mediaAlt: string, videoUrl?: string) {
+    this.loadMedia(mediaSrc, optimizedUrl, mediaAlt, videoUrl);
   }
 
   public hide() {
@@ -263,6 +289,7 @@ export class ModalView extends EventTarget {
     this.stopVideoPlayback();
     this.currentVideoUrl = undefined;
     this.liveBtn.hidden = true;
+    this.downloadBtn.href = "";
     this.image.src = "";
     this.image.alt = "";
     this.image.classList.remove("fade-in");

@@ -30,11 +30,12 @@ export class ImageGridView extends EventTarget {
     this.isLoadingMore = false;
   }
 
-  private emitModalSelection(img: HTMLImageElement, videoUrl?: string) {
+  private emitModalSelection(img: HTMLImageElement, optimizedUrl?: string, videoUrl?: string) {
     this.dispatchEvent(new CustomEvent("modal-select",
       {
         detail: {
           imageUrl: img.dataset.original,
+          optimizedUrl: optimizedUrl,
           imageAlt: img.alt,
           videoUrl: videoUrl
         }
@@ -135,7 +136,7 @@ export class ImageGridView extends EventTarget {
       }
 
       wrapper.onclick = () => {
-        this.emitModalSelection(imageImg, image.videoUrl);
+        this.emitModalSelection(imageImg, image.optimizedUrl, image.videoUrl);
       };
 
       if (beforeElement) {

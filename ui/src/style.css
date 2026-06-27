@@ -617,3 +617,35 @@ p {
   50% { transform: scale(1.03); }
   100% { transform: scale(1); }
 }
+
+/* Modal Download Button */
+.modal-download-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  padding: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 1010;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.2s;
+}
+
+.modal-download-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  color: black;
+  border-color: transparent;
+  transform: scale(1.05);
+}
+
+.download-icon {
+  width: 20px;
+  height: 20px;
+}

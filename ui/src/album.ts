@@ -9,6 +9,7 @@ export type Album = {
 export interface AlbumImage {
   originalUrl: string;
   thumbnailUrl: string;
+  optimizedUrl?: string;
   videoUrl?: string;
 }
 

@@ -100,33 +100,50 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
       const albumImages = await Promise.all(
         pageGroups.map(async ([, group]) => {
           const mainKey = group.imageKey || group.videoKey!;
-          const originalUrl = await getSignedUrl(s3, new GetObjectCommand({
+
+          const originalPromise = getSignedUrl(s3, new GetObjectCommand({
             Bucket: bucketName,
             Key: mainKey
           }), {
             expiresIn: 6 * 60 * 60 // 6 hours
           });
 
-          const thumbnailUrl = await getSignedUrl(s3, new GetObjectCommand({
+          const thumbnailPromise = getSignedUrl(s3, new GetObjectCommand({
             Bucket: thumbnailBucketName,
             Key: mainKey
           }), {
             expiresIn: 6 * 60 * 60 // 6 hours
           });
 
-          let videoUrl: string | null = null;
-          if (group.imageKey && group.videoKey) {
-            videoUrl = await getSignedUrl(s3, new GetObjectCommand({
-              Bucket: bucketName,
-              Key: group.videoKey
-            }), {
-              expiresIn: 6 * 60 * 60 // 6 hours
-            });
-          }
+          const videoPromise = (group.imageKey && group.videoKey)
+            ? getSignedUrl(s3, new GetObjectCommand({
+                Bucket: bucketName,
+                Key: group.videoKey
+              }), {
+                expiresIn: 6 * 60 * 60 // 6 hours
+              })
+            : Promise.resolve(null);
+
+          const optimizedPromise = group.imageKey
+            ? getSignedUrl(s3, new GetObjectCommand({
+                Bucket: thumbnailBucketName,
+                Key: `${albumName}/optimized/${group.imageKey.substring(albumName.length + 1)}`
+              }), {
+                expiresIn: 6 * 60 * 60 // 6 hours
+              })
+            : Promise.resolve(null);
+
+          const [originalUrl, thumbnailUrl, videoUrl, optimizedUrl] = await Promise.all([
+            originalPromise,
+            thumbnailPromise,
+            videoPromise,
+            optimizedPromise
+          ]);
 
           return {
             originalUrl,
             thumbnailUrl,
+            optimizedUrl,
             videoUrl
           };
         })
@@ -143,16 +160,20 @@ export const handler = async (event: APIGatewayProxyEvent): Promise<APIGatewayPr
 
     do {
       const result = await ddb.send(new ScanCommand({ TableName: tableName, ExclusiveStartKey: lastKey }));
-      for (const dynamoItem of result.Items!) {
-        const item = dynamoItem as AlbumItem;
-        item.presignedUrl = await getSignedUrl(s3, new GetObjectCommand({
-          Bucket: thumbnailBucketName,
-          Key: `${item.albumName}/${item.coverImageObjectKey}`
-        }), {
-          expiresIn: 6 * 60 * 60 // 6 hours
-        });
-
-        items.push(item);
+      if (result.Items) {
+        const batchItems = await Promise.all(
+          result.Items.map(async (dynamoItem) => {
+            const item = dynamoItem as AlbumItem;
+            item.presignedUrl = await getSignedUrl(s3, new GetObjectCommand({
+              Bucket: thumbnailBucketName,
+              Key: `${item.albumName}/${item.coverImageObjectKey}`
+            }), {
+              expiresIn: 6 * 60 * 60 // 6 hours
+            });
+            return item;
+          })
+        );
+        items.push(...batchItems);
       }
       lastKey = result.LastEvaluatedKey as Record<string, unknown> | undefined;
     } while (lastKey);
