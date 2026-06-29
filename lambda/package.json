@@ -5,6 +5,7 @@
   "license": "ISC",
   "author": "",
   "main": "images.ts",
+  "type": "module",
   "scripts": {
     "lint": "eslint '**/*.ts'",
     "lint:fix": "eslint --fix '**/*.ts'",
@@ -12,6 +13,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@jim-brighter/lambda-local-runner": "^0.0.2",
     "@types/aws-lambda": "^8.10.161",
     "@types/node": "^26.0.0",
     "esbuild": "^0.28.0",
