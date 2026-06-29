@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@jim-brighter/lambda-local-runner": "^0.0.2",
+    "@jim-brighter/lambda-local-runner": "^0.1.0",
     "@types/aws-lambda": "^8.10.161",
     "@types/node": "^26.0.0",
     "esbuild": "^0.28.0",

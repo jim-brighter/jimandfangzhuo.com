@@ -1,8 +1,8 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { GetObjectCommand, ListObjectsV2Command, S3Client, type _Object, type ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
+import { GetObjectCommand, ListObjectsV2Command, S3Client, _Object, ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
 import { DynamoDBDocumentClient, GetCommand, ScanCommand } from '@aws-sdk/lib-dynamodb';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
+import { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 
 type AlbumItem = {
   albumId: string;
