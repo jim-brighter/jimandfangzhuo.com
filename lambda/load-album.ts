@@ -1,4 +1,5 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, ListObjectsV2Command, ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import fs from 'fs';
 import path from 'path';
@@ -90,7 +91,7 @@ function fetchAllMetadata(albumPath: string): Promise<Map<string, ExifMetadata>>
   return new Promise((resolve) => {
     const absolutePath = path.resolve(albumPath);
     const cmd = `exiftool -json -CreateDate -DateTimeOriginal -d %s -r "${absolutePath}"`;
-    
+
     console.log('Extracting image/video metadata in batch...');
     exec(cmd, { maxBuffer: 100 * 1024 * 1024 }, (err, stdout) => {
       const metadataMap = new Map<string, ExifMetadata>();
@@ -223,9 +224,35 @@ async function main() {
   const totalFiles = filesToUpload.length;
   console.log(`Uploading ${totalFiles} files from ${cleanPath}...`);
 
+  // Fetch existing S3 objects to skip already-uploaded files
+  console.log('Checking S3 bucket for existing files to enable resume capability...');
+  const existingKeys = new Set<string>();
+  let continuationToken: string | undefined = undefined;
+  try {
+    do {
+      const listRes: ListObjectsV2CommandOutput = await s3.send(new ListObjectsV2Command({
+        Bucket: IMAGES_BUCKET,
+        Prefix: `${albumName}/`,
+        ContinuationToken: continuationToken
+      }));
+      if (listRes.Contents) {
+        for (const obj of listRes.Contents) {
+          if (obj.Key) {
+            existingKeys.add(obj.Key);
+          }
+        }
+      }
+      continuationToken = listRes.NextContinuationToken;
+    } while (continuationToken);
+    console.log(`Found ${existingKeys.size} files already uploaded to S3.`);
+  } catch (e: unknown) {
+    const err = e as Error;
+    console.warn(`Warning: Failed to fetch existing S3 objects: ${err.message}. Proceeding with clean upload.`);
+  }
+
   // Setup temp directory for local thumbnail processing
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'load-album-'));
-  
+
   // Register cleanup on exit
   const cleanup = () => {
     try {
@@ -278,17 +305,33 @@ async function main() {
   const processFile = async (filePath: string) => {
     const relativePath = path.relative(cleanPath, filePath);
     let ext = path.extname(filePath).toLowerCase();
-    
+
     const takenAt = getCreateDate(filePath);
+    const isHeic = ['.heic', '.heif'].includes(ext);
+
+    // Compute destination key early to check if already uploaded
+    let uploadRelativePath = relativePath;
+    if (isHeic) {
+      const baseNameWithoutExt = path.basename(relativePath, path.extname(relativePath));
+      const dirName = path.dirname(relativePath);
+      uploadRelativePath = dirName === '.' ? `${baseNameWithoutExt}.jpg` : path.join(dirName, `${baseNameWithoutExt}.jpg`);
+    }
+
+    const destinationKey = `${takenAt}-${uploadRelativePath}`;
+    const s3Key = `${albumName}/${destinationKey}`;
+
+    if (existingKeys.has(s3Key)) {
+      completedCount++;
+      console.log(`(${completedCount}/${totalFiles}) Skipping (already uploaded): ${relativePath}`);
+      return;
+    }
 
     let uploadFilePath = filePath;
-    let uploadRelativePath = relativePath;
-    const isHeic = ['.heic', '.heif'].includes(ext);
 
     if (isHeic) {
       const tempConvertedName = `${crypto.randomUUID()}.jpg`;
       const tempConvertedPath = path.join(tempDir, tempConvertedName);
-      
+
       await cpuSemaphore.acquire();
       try {
         console.log(`Converting HEIC ${relativePath} to JPG...`);
@@ -300,18 +343,14 @@ async function main() {
       } finally {
         cpuSemaphore.release();
       }
-      
+
       uploadFilePath = tempConvertedPath;
-      const baseNameWithoutExt = path.basename(relativePath, path.extname(relativePath));
-      const dirName = path.dirname(relativePath);
-      uploadRelativePath = dirName === '.' ? `${baseNameWithoutExt}.jpg` : path.join(dirName, `${baseNameWithoutExt}.jpg`);
       ext = '.jpg';
     }
 
     const isVideo = ['.mp4', '.mov', '.m4v', '.avi'].includes(ext);
     const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
 
-    const destinationKey = `${takenAt}-${uploadRelativePath}`;
     const tempThumbnail = path.join(tempDir, `${destinationKey}.jpg`);
 
     // 1. Generate thumbnail (CPU bound)
@@ -338,24 +377,30 @@ async function main() {
     // 2. Upload to S3 (Network bound)
     await networkSemaphore.acquire();
     try {
-      // Upload original (or converted JPG)
-      const originalStream = fs.createReadStream(uploadFilePath);
-      await s3.send(new PutObjectCommand({
-        Bucket: IMAGES_BUCKET,
-        Key: `${albumName}/${destinationKey}`,
-        Body: originalStream,
-        ContentType: getContentType(uploadFilePath)
-      }));
+      // Upload original (or converted JPG) using lib-storage Upload for robust retries & chunked streaming
+      const originalUpload = new Upload({
+        client: s3,
+        params: {
+          Bucket: IMAGES_BUCKET,
+          Key: `${albumName}/${destinationKey}`,
+          Body: fs.createReadStream(uploadFilePath),
+          ContentType: getContentType(uploadFilePath)
+        }
+      });
+      await originalUpload.done();
 
       // Upload thumbnail
       if (hasThumbnail && fs.existsSync(tempThumbnail)) {
-        const thumbStream = fs.createReadStream(tempThumbnail);
-        await s3.send(new PutObjectCommand({
-          Bucket: THUMBNAILS_BUCKET,
-          Key: `${albumName}/${destinationKey}`,
-          Body: thumbStream,
-          ContentType: 'image/jpeg'
-        }));
+        const thumbnailUpload = new Upload({
+          client: s3,
+          params: {
+            Bucket: THUMBNAILS_BUCKET,
+            Key: `${albumName}/${destinationKey}`,
+            Body: fs.createReadStream(tempThumbnail),
+            ContentType: 'image/jpeg'
+          }
+        });
+        await thumbnailUpload.done();
       }
 
       completedCount++;
