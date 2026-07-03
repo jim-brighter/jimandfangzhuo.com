@@ -6,6 +6,7 @@ import { ImageGridView } from "./views/image-grid-view";
 import { LoginView } from "./views/login-view";
 import { ModalView } from "./views/modal-view";
 import { NavbarView } from "./views/navbar-view";
+import { t, translateError, translateStaticDOM } from "./i18n";
 
 export class App {
   private loginView: LoginView;
@@ -22,6 +23,7 @@ export class App {
   private currentImageIndex: number = -1;
 
   constructor() {
+    translateStaticDOM();
     this.mainContainer = document.getElementById("main") as HTMLDivElement;
 
     this.loginView = new LoginView("login");
@@ -96,9 +98,7 @@ export class App {
       this.triggerRouteUpdate();
     } catch (error) {
       this.loginView.setLoading(false);
-      this.loginView.showError(
-        error instanceof Error ? error.message : "Login failed. Please check credentials."
-      );
+      this.loginView.showError(translateError(error));
     }
   }
 
@@ -180,7 +180,7 @@ export class App {
       this.albumListView.render(albums);
     } catch (error) {
       console.error("Error displaying albums:", error);
-      this.albumListView.renderError("Failed to load albums.");
+      this.albumListView.renderError(t("failedToLoadAlbums"));
     }
   }
 
@@ -240,7 +240,7 @@ export class App {
       if (this.currentImageIndex < this.loadedImages.length - 1) {
         this.currentImageIndex++;
         const nextImg = this.loadedImages[this.currentImageIndex];
-        this.modalView.updateImage(nextImg.originalUrl, "Album photo");
+        this.modalView.updateImage(nextImg.originalUrl, t("albumPhoto"));
       } else {
         // We are on the last image. Can we load more?
         if (this.currentNextPageToken) {
@@ -250,7 +250,7 @@ export class App {
             if (this.currentImageIndex < this.loadedImages.length - 1) {
               this.currentImageIndex++;
               const nextImg = this.loadedImages[this.currentImageIndex];
-              this.modalView.updateImage(nextImg.originalUrl, "Album photo");
+              this.modalView.updateImage(nextImg.originalUrl, t("albumPhoto"));
             }
           } catch (e) {
             console.error("Failed to load more images for modal navigation:", e);
@@ -259,7 +259,7 @@ export class App {
           // Wrap around to start
           this.currentImageIndex = 0;
           const nextImg = this.loadedImages[this.currentImageIndex];
-          this.modalView.updateImage(nextImg.originalUrl, "Album photo");
+          this.modalView.updateImage(nextImg.originalUrl, t("albumPhoto"));
         }
       }
     } else {
@@ -267,12 +267,12 @@ export class App {
       if (this.currentImageIndex > 0) {
         this.currentImageIndex--;
         const prevImg = this.loadedImages[this.currentImageIndex];
-        this.modalView.updateImage(prevImg.originalUrl, "Album photo");
+        this.modalView.updateImage(prevImg.originalUrl, t("albumPhoto"));
       } else {
         // Wrap around to the end of currently loaded images
         this.currentImageIndex = this.loadedImages.length - 1;
         const prevImg = this.loadedImages[this.currentImageIndex];
-        this.modalView.updateImage(prevImg.originalUrl, "Album photo");
+        this.modalView.updateImage(prevImg.originalUrl, t("albumPhoto"));
       }
     }
   }
