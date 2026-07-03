@@ -314,6 +314,7 @@ p {
 /* Login Container and Form Layout */
 #login {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -321,6 +322,11 @@ p {
   position: relative;
   overflow: hidden;
   box-sizing: border-box;
+  padding: 24px;
+
+  @media (max-width: 768px) {
+    padding: 24px 24px 10dvh 24px;
+  }
 }
 
 #login::before,
@@ -376,6 +382,11 @@ p {
   gap: 24px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   box-sizing: border-box;
+
+  @media (max-width: 480px) {
+    padding: 32px 24px;
+    gap: 20px;
+  }
 }
 
 @media (prefers-color-scheme: dark) {
