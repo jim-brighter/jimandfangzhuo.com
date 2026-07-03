@@ -4,7 +4,6 @@ export class ModalView extends EventTarget {
   private container: HTMLDivElement;
   private image: HTMLImageElement;
   private video: HTMLVideoElement;
-  private liveBtn: HTMLButtonElement;
 
   private touchStartX = 0;
   private touchStartY = 0;
@@ -16,19 +15,15 @@ export class ModalView extends EventTarget {
   private activeLoadListener: (() => void) | null = null;
   private activeErrorListener: (() => void) | null = null;
 
-  private currentVideoUrl: string | undefined = undefined;
-  private isPlayingVideo = false;
-
   constructor(containerId: string) {
     super();
     this.container = document.getElementById(containerId) as HTMLDivElement;
     this.image = document.getElementById("modal-image") as HTMLImageElement;
     this.video = document.getElementById("modal-video") as HTMLVideoElement;
-    this.liveBtn = document.getElementById("modal-live-btn") as HTMLButtonElement;
 
     this.container.onclick = (e) => {
-      // If the user clicks on the video controls or Live button, don't close the modal
-      if (e.target === this.video || e.target === this.liveBtn || this.liveBtn.contains(e.target as Node)) {
+      // If the user clicks on the video controls, don't close the modal
+      if (e.target === this.video) {
         return;
       }
       if (this.isSwiping) {
@@ -79,15 +74,7 @@ export class ModalView extends EventTarget {
         }, 100);
       }
     }, { passive: true });
-
-    // Live Photo button click
-    this.liveBtn.onclick = (e) => {
-      e.stopPropagation();
-      this.toggleLivePhoto();
-    };
   }
-
-
 
   private handleSwipe() {
     const diffX = this.touchEndX - this.touchStartX;
@@ -117,74 +104,22 @@ export class ModalView extends EventTarget {
     this.activeElement = null;
   }
 
-  private toggleLivePhoto() {
-    if (!this.currentVideoUrl) return;
-
-    if (this.isPlayingVideo) {
-      this.stopVideoPlayback();
-    } else {
-      this.startLivePhotoPlayback();
-    }
-  }
-
-  private startLivePhotoPlayback() {
-    if (!this.currentVideoUrl) return;
-    this.isPlayingVideo = true;
-    this.liveBtn.classList.add("active");
-
-    // Setup video details for Live Photo
-    this.video.controls = false;
-    this.video.loop = false;
-    this.video.src = this.currentVideoUrl;
-
-    // Swap view elements
-    this.image.hidden = true;
-    this.video.hidden = false;
-    this.video.style.opacity = "0";
-    this.video.classList.remove("fade-in");
-
-    const onCanPlay = () => {
-      this.cleanupPendingLoad();
-      this.video.style.opacity = "";
-      void this.video.offsetWidth; // Force reflow
-      this.video.classList.add("fade-in");
-      this.video.play().catch(e => console.error("Live Photo video playback failed", e));
-    };
-
-    this.activeElement = this.video;
-    this.activeLoadListener = onCanPlay;
-    this.video.addEventListener("canplay", onCanPlay);
-
-    // Auto return to image when finished playing
-    this.video.onended = () => {
-      this.stopVideoPlayback();
-    };
-  }
-
   private stopVideoPlayback() {
-    this.isPlayingVideo = false;
-    this.liveBtn.classList.remove("active");
-
     this.video.pause();
     this.video.src = "";
     this.video.onended = null;
-
-    // Swap back
     this.video.hidden = true;
     this.video.classList.remove("fade-in");
-    this.image.hidden = false;
   }
 
-  private loadMedia(mediaSrc: string, mediaAlt: string, videoUrl?: string) {
+  private loadMedia(mediaSrc: string, mediaAlt: string) {
     this.cleanupPendingLoad();
     this.stopVideoPlayback();
 
     const isVid = isVideo(mediaSrc);
-    this.currentVideoUrl = videoUrl;
 
     if (isVid) {
-      // Standalone Video: Autoplay with controls, hide Live button
-      this.liveBtn.hidden = true;
+      // Standalone Video: Autoplay with controls
       this.image.hidden = true;
       this.video.hidden = false;
       this.video.controls = true;
@@ -206,17 +141,10 @@ export class ModalView extends EventTarget {
       this.video.src = mediaSrc;
 
     } else {
-      // Image file (possibly with backing Live Photo videoUrl)
+      // Image file
       this.image.hidden = false;
       this.image.classList.remove("fade-in");
       this.image.style.opacity = "0";
-
-      if (videoUrl) {
-        this.liveBtn.hidden = false;
-        this.liveBtn.classList.remove("active");
-      } else {
-        this.liveBtn.hidden = true;
-      }
 
       const onLoad = () => {
         this.cleanupPendingLoad();
@@ -242,14 +170,14 @@ export class ModalView extends EventTarget {
     }
   }
 
-  public show(mediaSrc: string, mediaAlt: string, videoUrl?: string) {
+  public show(mediaSrc: string, mediaAlt: string) {
     this.container.hidden = false;
     document.body.classList.add("no-scroll-fixed");
-    this.loadMedia(mediaSrc, mediaAlt, videoUrl);
+    this.loadMedia(mediaSrc, mediaAlt);
   }
 
-  public updateImage(mediaSrc: string, mediaAlt: string, videoUrl?: string) {
-    this.loadMedia(mediaSrc, mediaAlt, videoUrl);
+  public updateImage(mediaSrc: string, mediaAlt: string) {
+    this.loadMedia(mediaSrc, mediaAlt);
   }
 
   public hide() {
@@ -261,8 +189,6 @@ export class ModalView extends EventTarget {
   private cleanup() {
     this.cleanupPendingLoad();
     this.stopVideoPlayback();
-    this.currentVideoUrl = undefined;
-    this.liveBtn.hidden = true;
     this.image.src = "";
     this.image.alt = "";
     this.image.classList.remove("fade-in");

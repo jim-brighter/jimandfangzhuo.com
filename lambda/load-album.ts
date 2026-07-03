@@ -1,4 +1,5 @@
-import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { S3Client, ListObjectsV2Command, ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
 import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import fs from 'fs';
 import path from 'path';
@@ -90,7 +91,7 @@ function fetchAllMetadata(albumPath: string): Promise<Map<string, ExifMetadata>>
   return new Promise((resolve) => {
     const absolutePath = path.resolve(albumPath);
     const cmd = `exiftool -json -CreateDate -DateTimeOriginal -d %s -r "${absolutePath}"`;
-    
+
     console.log('Extracting image/video metadata in batch...');
     exec(cmd, { maxBuffer: 100 * 1024 * 1024 }, (err, stdout) => {
       const metadataMap = new Map<string, ExifMetadata>();
@@ -191,12 +192,67 @@ async function main() {
   }
 
   const allFiles = getFilesRecursively(cleanPath);
-  const totalFiles = allFiles.length;
+
+  // Filter out the video portion of Live Photos
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.heic', '.heif', '.webp', '.gif'];
+  const videoExtensions = ['.mp4', '.mov', '.m4v', '.avi'];
+
+  const imageBaseNames = new Set<string>();
+  for (const file of allFiles) {
+    const ext = path.extname(file).toLowerCase();
+    if (imageExtensions.includes(ext)) {
+      const dir = path.dirname(file);
+      const base = path.basename(file, path.extname(file));
+      imageBaseNames.add(path.join(dir, base).toLowerCase());
+    }
+  }
+
+  const filesToUpload = allFiles.filter(file => {
+    const ext = path.extname(file).toLowerCase();
+    if (videoExtensions.includes(ext)) {
+      const dir = path.dirname(file);
+      const base = path.basename(file, path.extname(file));
+      const baseKey = path.join(dir, base).toLowerCase();
+      if (imageBaseNames.has(baseKey)) {
+        console.log(`Skipping video portion of Live Photo: ${path.relative(cleanPath, file)}`);
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const totalFiles = filesToUpload.length;
   console.log(`Uploading ${totalFiles} files from ${cleanPath}...`);
+
+  // Fetch existing S3 objects to skip already-uploaded files
+  console.log('Checking S3 bucket for existing files to enable resume capability...');
+  const existingKeys = new Set<string>();
+  let continuationToken: string | undefined = undefined;
+  try {
+    do {
+      const listRes: ListObjectsV2CommandOutput = await s3.send(new ListObjectsV2Command({
+        Bucket: IMAGES_BUCKET,
+        Prefix: `${albumName}/`,
+        ContinuationToken: continuationToken
+      }));
+      if (listRes.Contents) {
+        for (const obj of listRes.Contents) {
+          if (obj.Key) {
+            existingKeys.add(obj.Key);
+          }
+        }
+      }
+      continuationToken = listRes.NextContinuationToken;
+    } while (continuationToken);
+    console.log(`Found ${existingKeys.size} files already uploaded to S3.`);
+  } catch (e: unknown) {
+    const err = e as Error;
+    console.warn(`Warning: Failed to fetch existing S3 objects: ${err.message}. Proceeding with clean upload.`);
+  }
 
   // Setup temp directory for local thumbnail processing
   const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'load-album-'));
-  
+
   // Register cleanup on exit
   const cleanup = () => {
     try {
@@ -248,35 +304,53 @@ async function main() {
   // Process a single file
   const processFile = async (filePath: string) => {
     const relativePath = path.relative(cleanPath, filePath);
-    const ext = path.extname(filePath).toLowerCase();
-    
-    // Live photo timestamp alignment for videos
-    let takenAt = '';
+    let ext = path.extname(filePath).toLowerCase();
+
+    const takenAt = getCreateDate(filePath);
+    const isHeic = ['.heic', '.heif'].includes(ext);
+
+    // Compute destination key early to check if already uploaded
+    let uploadRelativePath = relativePath;
+    if (isHeic) {
+      const baseNameWithoutExt = path.basename(relativePath, path.extname(relativePath));
+      const dirName = path.dirname(relativePath);
+      uploadRelativePath = dirName === '.' ? `${baseNameWithoutExt}.jpg` : path.join(dirName, `${baseNameWithoutExt}.jpg`);
+    }
+
+    const destinationKey = `${takenAt}-${uploadRelativePath}`;
+    const s3Key = `${albumName}/${destinationKey}`;
+
+    if (existingKeys.has(s3Key)) {
+      completedCount++;
+      console.log(`(${completedCount}/${totalFiles}) Skipping (already uploaded): ${relativePath}`);
+      return;
+    }
+
+    let uploadFilePath = filePath;
+
+    if (isHeic) {
+      const tempConvertedName = `${crypto.randomUUID()}.jpg`;
+      const tempConvertedPath = path.join(tempDir, tempConvertedName);
+
+      await cpuSemaphore.acquire();
+      try {
+        console.log(`Converting HEIC ${relativePath} to JPG...`);
+        await runCommand(`sips -s format jpeg "${filePath}" --out "${tempConvertedPath}" >/dev/null 2>&1`);
+      } catch (e: unknown) {
+        const err = e as Error;
+        console.error(`Failed to convert ${relativePath} to JPG:`, err.message);
+        throw err;
+      } finally {
+        cpuSemaphore.release();
+      }
+
+      uploadFilePath = tempConvertedPath;
+      ext = '.jpg';
+    }
+
     const isVideo = ['.mp4', '.mov', '.m4v', '.avi'].includes(ext);
-    const isImage = ['.jpg', '.jpeg', '.png', '.heic', '.heif', '.webp', '.gif'].includes(ext);
+    const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
 
-    if (isVideo) {
-      const dir = path.dirname(filePath);
-      const baseName = path.basename(filePath, path.extname(filePath));
-      const imageExtensions = ['.heic', '.jpg', '.jpeg', '.png', '.webp'];
-      let matchingImage = '';
-      for (const imgExt of imageExtensions) {
-        const candidate = path.join(dir, baseName + imgExt);
-        if (fs.existsSync(candidate)) {
-          matchingImage = candidate;
-          break;
-        }
-      }
-      if (matchingImage) {
-        takenAt = getCreateDate(matchingImage);
-      }
-    }
-
-    if (!takenAt) {
-      takenAt = getCreateDate(filePath);
-    }
-
-    const destinationKey = `${takenAt}-${relativePath}`;
     const tempThumbnail = path.join(tempDir, `${destinationKey}.jpg`);
 
     // 1. Generate thumbnail (CPU bound)
@@ -286,10 +360,10 @@ async function main() {
       try {
         fs.mkdirSync(path.dirname(tempThumbnail), { recursive: true });
         if (isImage) {
-          await runCommand(`sips -s format jpeg -Z 600 "${filePath}" --out "${tempThumbnail}" >/dev/null 2>&1`);
+          await runCommand(`sips -s format jpeg -Z 600 "${uploadFilePath}" --out "${tempThumbnail}" >/dev/null 2>&1`);
           hasThumbnail = true;
         } else if (isVideo) {
-          await runCommand(`ffmpeg -y -nostdin -i "${filePath}" -ss 00:00:01 -vframes 1 -vf "scale=600:-1" "${tempThumbnail}" >/dev/null 2>&1`);
+          await runCommand(`ffmpeg -y -nostdin -i "${uploadFilePath}" -ss 00:00:01 -vframes 1 -vf "scale=600:-1" "${tempThumbnail}" >/dev/null 2>&1`);
           hasThumbnail = true;
         }
       } catch (e: unknown) {
@@ -303,24 +377,30 @@ async function main() {
     // 2. Upload to S3 (Network bound)
     await networkSemaphore.acquire();
     try {
-      // Upload original
-      const originalStream = fs.createReadStream(filePath);
-      await s3.send(new PutObjectCommand({
-        Bucket: IMAGES_BUCKET,
-        Key: `${albumName}/${destinationKey}`,
-        Body: originalStream,
-        ContentType: getContentType(filePath)
-      }));
+      // Upload original (or converted JPG) using lib-storage Upload for robust retries & chunked streaming
+      const originalUpload = new Upload({
+        client: s3,
+        params: {
+          Bucket: IMAGES_BUCKET,
+          Key: `${albumName}/${destinationKey}`,
+          Body: fs.createReadStream(uploadFilePath),
+          ContentType: getContentType(uploadFilePath)
+        }
+      });
+      await originalUpload.done();
 
       // Upload thumbnail
       if (hasThumbnail && fs.existsSync(tempThumbnail)) {
-        const thumbStream = fs.createReadStream(tempThumbnail);
-        await s3.send(new PutObjectCommand({
-          Bucket: THUMBNAILS_BUCKET,
-          Key: `${albumName}/${destinationKey}`,
-          Body: thumbStream,
-          ContentType: 'image/jpeg'
-        }));
+        const thumbnailUpload = new Upload({
+          client: s3,
+          params: {
+            Bucket: THUMBNAILS_BUCKET,
+            Key: `${albumName}/${destinationKey}`,
+            Body: fs.createReadStream(tempThumbnail),
+            ContentType: 'image/jpeg'
+          }
+        });
+        await thumbnailUpload.done();
       }
 
       completedCount++;
@@ -337,14 +417,24 @@ async function main() {
           fs.unlinkSync(tempThumbnail);
         }
       } catch {
-        // Ignore unlink error
+        // Ignore
+      }
+      // Clean up converted HEIC temp file
+      if (isHeic) {
+        try {
+          if (fs.existsSync(uploadFilePath)) {
+            fs.unlinkSync(uploadFilePath);
+          }
+        } catch {
+          // Ignore
+        }
       }
     }
   };
 
   // Run all processes concurrently
   try {
-    await Promise.all(allFiles.map(file => processFile(file)));
+    await Promise.all(filesToUpload.map(file => processFile(file)));
   } catch (e: unknown) {
     const err = e as Error;
     console.error('Sync failed due to errors:', err.message);
@@ -358,7 +448,13 @@ async function main() {
 
   if (fs.existsSync(coverImagePath)) {
     const coverImageTimestamp = getCreateDate(coverImagePath);
-    coverImageObjectKey = `${coverImageTimestamp}-${coverImage}`;
+    let coverName = coverImage;
+    const coverExt = path.extname(coverImage).toLowerCase();
+    if (['.heic', '.heif'].includes(coverExt)) {
+      const coverBase = path.basename(coverImage, path.extname(coverImage));
+      coverName = `${coverBase}.jpg`;
+    }
+    coverImageObjectKey = `${coverImageTimestamp}-${coverName}`;
   }
 
   // Write metadata to DynamoDB
