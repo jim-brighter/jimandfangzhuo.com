@@ -191,7 +191,36 @@ async function main() {
   }
 
   const allFiles = getFilesRecursively(cleanPath);
-  const totalFiles = allFiles.length;
+
+  // Filter out the video portion of Live Photos
+  const imageExtensions = ['.jpg', '.jpeg', '.png', '.heic', '.heif', '.webp', '.gif'];
+  const videoExtensions = ['.mp4', '.mov', '.m4v', '.avi'];
+
+  const imageBaseNames = new Set<string>();
+  for (const file of allFiles) {
+    const ext = path.extname(file).toLowerCase();
+    if (imageExtensions.includes(ext)) {
+      const dir = path.dirname(file);
+      const base = path.basename(file, path.extname(file));
+      imageBaseNames.add(path.join(dir, base).toLowerCase());
+    }
+  }
+
+  const filesToUpload = allFiles.filter(file => {
+    const ext = path.extname(file).toLowerCase();
+    if (videoExtensions.includes(ext)) {
+      const dir = path.dirname(file);
+      const base = path.basename(file, path.extname(file));
+      const baseKey = path.join(dir, base).toLowerCase();
+      if (imageBaseNames.has(baseKey)) {
+        console.log(`Skipping video portion of Live Photo: ${path.relative(cleanPath, file)}`);
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const totalFiles = filesToUpload.length;
   console.log(`Uploading ${totalFiles} files from ${cleanPath}...`);
 
   // Setup temp directory for local thumbnail processing
@@ -248,35 +277,41 @@ async function main() {
   // Process a single file
   const processFile = async (filePath: string) => {
     const relativePath = path.relative(cleanPath, filePath);
-    const ext = path.extname(filePath).toLowerCase();
+    let ext = path.extname(filePath).toLowerCase();
     
-    // Live photo timestamp alignment for videos
-    let takenAt = '';
+    const takenAt = getCreateDate(filePath);
+
+    let uploadFilePath = filePath;
+    let uploadRelativePath = relativePath;
+    const isHeic = ['.heic', '.heif'].includes(ext);
+
+    if (isHeic) {
+      const tempConvertedName = `${crypto.randomUUID()}.jpg`;
+      const tempConvertedPath = path.join(tempDir, tempConvertedName);
+      
+      await cpuSemaphore.acquire();
+      try {
+        console.log(`Converting HEIC ${relativePath} to JPG...`);
+        await runCommand(`sips -s format jpeg "${filePath}" --out "${tempConvertedPath}" >/dev/null 2>&1`);
+      } catch (e: unknown) {
+        const err = e as Error;
+        console.error(`Failed to convert ${relativePath} to JPG:`, err.message);
+        throw err;
+      } finally {
+        cpuSemaphore.release();
+      }
+      
+      uploadFilePath = tempConvertedPath;
+      const baseNameWithoutExt = path.basename(relativePath, path.extname(relativePath));
+      const dirName = path.dirname(relativePath);
+      uploadRelativePath = dirName === '.' ? `${baseNameWithoutExt}.jpg` : path.join(dirName, `${baseNameWithoutExt}.jpg`);
+      ext = '.jpg';
+    }
+
     const isVideo = ['.mp4', '.mov', '.m4v', '.avi'].includes(ext);
-    const isImage = ['.jpg', '.jpeg', '.png', '.heic', '.heif', '.webp', '.gif'].includes(ext);
+    const isImage = ['.jpg', '.jpeg', '.png', '.webp', '.gif'].includes(ext);
 
-    if (isVideo) {
-      const dir = path.dirname(filePath);
-      const baseName = path.basename(filePath, path.extname(filePath));
-      const imageExtensions = ['.heic', '.jpg', '.jpeg', '.png', '.webp'];
-      let matchingImage = '';
-      for (const imgExt of imageExtensions) {
-        const candidate = path.join(dir, baseName + imgExt);
-        if (fs.existsSync(candidate)) {
-          matchingImage = candidate;
-          break;
-        }
-      }
-      if (matchingImage) {
-        takenAt = getCreateDate(matchingImage);
-      }
-    }
-
-    if (!takenAt) {
-      takenAt = getCreateDate(filePath);
-    }
-
-    const destinationKey = `${takenAt}-${relativePath}`;
+    const destinationKey = `${takenAt}-${uploadRelativePath}`;
     const tempThumbnail = path.join(tempDir, `${destinationKey}.jpg`);
 
     // 1. Generate thumbnail (CPU bound)
@@ -286,10 +321,10 @@ async function main() {
       try {
         fs.mkdirSync(path.dirname(tempThumbnail), { recursive: true });
         if (isImage) {
-          await runCommand(`sips -s format jpeg -Z 600 "${filePath}" --out "${tempThumbnail}" >/dev/null 2>&1`);
+          await runCommand(`sips -s format jpeg -Z 600 "${uploadFilePath}" --out "${tempThumbnail}" >/dev/null 2>&1`);
           hasThumbnail = true;
         } else if (isVideo) {
-          await runCommand(`ffmpeg -y -nostdin -i "${filePath}" -ss 00:00:01 -vframes 1 -vf "scale=600:-1" "${tempThumbnail}" >/dev/null 2>&1`);
+          await runCommand(`ffmpeg -y -nostdin -i "${uploadFilePath}" -ss 00:00:01 -vframes 1 -vf "scale=600:-1" "${tempThumbnail}" >/dev/null 2>&1`);
           hasThumbnail = true;
         }
       } catch (e: unknown) {
@@ -303,13 +338,13 @@ async function main() {
     // 2. Upload to S3 (Network bound)
     await networkSemaphore.acquire();
     try {
-      // Upload original
-      const originalStream = fs.createReadStream(filePath);
+      // Upload original (or converted JPG)
+      const originalStream = fs.createReadStream(uploadFilePath);
       await s3.send(new PutObjectCommand({
         Bucket: IMAGES_BUCKET,
         Key: `${albumName}/${destinationKey}`,
         Body: originalStream,
-        ContentType: getContentType(filePath)
+        ContentType: getContentType(uploadFilePath)
       }));
 
       // Upload thumbnail
@@ -337,14 +372,24 @@ async function main() {
           fs.unlinkSync(tempThumbnail);
         }
       } catch {
-        // Ignore unlink error
+        // Ignore
+      }
+      // Clean up converted HEIC temp file
+      if (isHeic) {
+        try {
+          if (fs.existsSync(uploadFilePath)) {
+            fs.unlinkSync(uploadFilePath);
+          }
+        } catch {
+          // Ignore
+        }
       }
     }
   };
 
   // Run all processes concurrently
   try {
-    await Promise.all(allFiles.map(file => processFile(file)));
+    await Promise.all(filesToUpload.map(file => processFile(file)));
   } catch (e: unknown) {
     const err = e as Error;
     console.error('Sync failed due to errors:', err.message);
@@ -358,7 +403,13 @@ async function main() {
 
   if (fs.existsSync(coverImagePath)) {
     const coverImageTimestamp = getCreateDate(coverImagePath);
-    coverImageObjectKey = `${coverImageTimestamp}-${coverImage}`;
+    let coverName = coverImage;
+    const coverExt = path.extname(coverImage).toLowerCase();
+    if (['.heic', '.heif'].includes(coverExt)) {
+      const coverBase = path.basename(coverImage, path.extname(coverImage));
+      coverName = `${coverBase}.jpg`;
+    }
+    coverImageObjectKey = `${coverImageTimestamp}-${coverName}`;
   }
 
   // Write metadata to DynamoDB

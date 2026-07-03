@@ -64,9 +64,9 @@ export class App {
 
     this.imageGridView.addEventListener("modal-select", (event: Event) => {
       const customEvent = event as CustomEvent;
-      const { imageUrl, imageAlt, videoUrl } = customEvent.detail;
+      const { imageUrl, imageAlt } = customEvent.detail;
       this.currentImageIndex = this.loadedImages.findIndex((img) => img.originalUrl === imageUrl);
-      this.modalView.show(imageUrl, imageAlt, videoUrl);
+      this.modalView.show(imageUrl, imageAlt);
     });
 
     this.modalView.addEventListener("navigate", async (event: Event) => {
@@ -240,7 +240,7 @@ export class App {
       if (this.currentImageIndex < this.loadedImages.length - 1) {
         this.currentImageIndex++;
         const nextImg = this.loadedImages[this.currentImageIndex];
-        this.modalView.updateImage(nextImg.originalUrl, "Album photo", nextImg.videoUrl);
+        this.modalView.updateImage(nextImg.originalUrl, "Album photo");
       } else {
         // We are on the last image. Can we load more?
         if (this.currentNextPageToken) {
@@ -250,7 +250,7 @@ export class App {
             if (this.currentImageIndex < this.loadedImages.length - 1) {
               this.currentImageIndex++;
               const nextImg = this.loadedImages[this.currentImageIndex];
-              this.modalView.updateImage(nextImg.originalUrl, "Album photo", nextImg.videoUrl);
+              this.modalView.updateImage(nextImg.originalUrl, "Album photo");
             }
           } catch (e) {
             console.error("Failed to load more images for modal navigation:", e);
@@ -259,7 +259,7 @@ export class App {
           // Wrap around to start
           this.currentImageIndex = 0;
           const nextImg = this.loadedImages[this.currentImageIndex];
-          this.modalView.updateImage(nextImg.originalUrl, "Album photo", nextImg.videoUrl);
+          this.modalView.updateImage(nextImg.originalUrl, "Album photo");
         }
       }
     } else {
@@ -267,12 +267,12 @@ export class App {
       if (this.currentImageIndex > 0) {
         this.currentImageIndex--;
         const prevImg = this.loadedImages[this.currentImageIndex];
-        this.modalView.updateImage(prevImg.originalUrl, "Album photo", prevImg.videoUrl);
+        this.modalView.updateImage(prevImg.originalUrl, "Album photo");
       } else {
         // Wrap around to the end of currently loaded images
         this.currentImageIndex = this.loadedImages.length - 1;
         const prevImg = this.loadedImages[this.currentImageIndex];
-        this.modalView.updateImage(prevImg.originalUrl, "Album photo", prevImg.videoUrl);
+        this.modalView.updateImage(prevImg.originalUrl, "Album photo");
       }
     }
   }

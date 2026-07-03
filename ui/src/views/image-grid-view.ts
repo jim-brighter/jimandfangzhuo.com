@@ -30,13 +30,12 @@ export class ImageGridView extends EventTarget {
     this.isLoadingMore = false;
   }
 
-  private emitModalSelection(img: HTMLImageElement, videoUrl?: string) {
+  private emitModalSelection(img: HTMLImageElement) {
     this.dispatchEvent(new CustomEvent("modal-select",
       {
         detail: {
           imageUrl: img.dataset.original,
-          imageAlt: img.alt,
-          videoUrl: videoUrl
+          imageAlt: img.alt
         }
       }
     ));
@@ -106,22 +105,8 @@ export class ImageGridView extends EventTarget {
 
       wrapper.appendChild(imageImg);
 
-      // Check if originalUrl is a video or if it has a backing Live Photo videoUrl
-      if (image.videoUrl) {
-        // Live Photo badge
-        const liveBadge = document.createElement("div");
-        liveBadge.className = "live-badge";
-        liveBadge.innerHTML = `
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="live-icon">
-            <circle cx="12" cy="12" r="10" stroke-dasharray="3 3"></circle>
-            <circle cx="12" cy="12" r="6"></circle>
-            <circle cx="12" cy="12" r="2" fill="currentColor"></circle>
-          </svg>
-          <span>LIVE</span>
-        `;
-        wrapper.appendChild(liveBadge);
-        wrapper.classList.add("is-live-photo");
-      } else if (isVideo(image.originalUrl)) {
+      // Check if originalUrl is a video
+      if (isVideo(image.originalUrl)) {
         // Standalone Video
         const overlay = document.createElement("div");
         overlay.className = "video-overlay";
@@ -135,7 +120,7 @@ export class ImageGridView extends EventTarget {
       }
 
       wrapper.onclick = () => {
-        this.emitModalSelection(imageImg, image.videoUrl);
+        this.emitModalSelection(imageImg);
       };
 
       if (beforeElement) {
