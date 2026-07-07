@@ -176,6 +176,9 @@ export class App {
     this.imageGridView.hide();
 
     try {
+      if (!this.cachedAlbums) {
+        this.albumListView.showLoader();
+      }
       const albums = await this.getAlbums();
       this.albumListView.render(albums);
     } catch (error) {

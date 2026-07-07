@@ -14,12 +14,16 @@ export class ModalView extends EventTarget {
   private activeElement: HTMLImageElement | HTMLVideoElement | null = null;
   private activeLoadListener: (() => void) | null = null;
   private activeErrorListener: (() => void) | null = null;
+  private spinner: HTMLDivElement;
+  private scrollY = 0;
+
 
   constructor(containerId: string) {
     super();
     this.container = document.getElementById(containerId) as HTMLDivElement;
     this.image = document.getElementById("modal-image") as HTMLImageElement;
     this.video = document.getElementById("modal-video") as HTMLVideoElement;
+    this.spinner = document.getElementById("modal-spinner") as HTMLDivElement;
 
     this.container.onclick = (e) => {
       // If the user clicks on the video controls, don't close the modal
@@ -121,14 +125,17 @@ export class ModalView extends EventTarget {
     if (isVid) {
       // Standalone Video: Autoplay with controls
       this.image.hidden = true;
-      this.video.hidden = false;
+      this.video.hidden = true;
       this.video.controls = true;
       this.video.loop = false;
       this.video.style.opacity = "0";
       this.video.classList.remove("fade-in");
+      this.spinner.hidden = false;
 
       const onCanPlay = () => {
         this.cleanupPendingLoad();
+        this.spinner.hidden = true;
+        this.video.hidden = false;
         this.video.style.opacity = "";
         void this.video.offsetWidth; // Force reflow
         this.video.classList.add("fade-in");
@@ -142,12 +149,15 @@ export class ModalView extends EventTarget {
 
     } else {
       // Image file
-      this.image.hidden = false;
+      this.image.hidden = true;
       this.image.classList.remove("fade-in");
       this.image.style.opacity = "0";
+      this.spinner.hidden = false;
 
       const onLoad = () => {
         this.cleanupPendingLoad();
+        this.spinner.hidden = true;
+        this.image.hidden = false;
         this.image.style.opacity = "";
         void this.image.offsetWidth; // Force reflow
         this.image.classList.add("fade-in");
@@ -155,6 +165,7 @@ export class ModalView extends EventTarget {
 
       const onError = () => {
         this.cleanupPendingLoad();
+        this.spinner.hidden = true;
         this.image.style.opacity = "";
       };
 
@@ -172,7 +183,9 @@ export class ModalView extends EventTarget {
 
   public show(mediaSrc: string, mediaAlt: string) {
     this.container.hidden = false;
+    this.scrollY = window.scrollY;
     document.body.classList.add("no-scroll-fixed");
+    document.body.style.top = `-${this.scrollY}px`;
     this.loadMedia(mediaSrc, mediaAlt);
   }
 
@@ -183,6 +196,8 @@ export class ModalView extends EventTarget {
   public hide() {
     this.container.hidden = true;
     document.body.classList.remove("no-scroll-fixed");
+    document.body.style.top = "";
+    window.scrollTo(0, this.scrollY);
     this.cleanup();
   }
 
@@ -196,5 +211,6 @@ export class ModalView extends EventTarget {
     this.image.hidden = true;
     this.video.style.opacity = "";
     this.video.hidden = true;
+    this.spinner.hidden = true;
   }
 }
