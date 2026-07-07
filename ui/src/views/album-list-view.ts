@@ -21,6 +21,11 @@ export class AlbumListView extends EventTarget {
     this.container.innerHTML = "";
   }
 
+  public showLoader() {
+    this.clear();
+    this.container.innerHTML = '<div class="loader-sentinel"><div class="spinner"></div></div>';
+  }
+
   public render(albums: Album[]) {
     this.clear();
 
