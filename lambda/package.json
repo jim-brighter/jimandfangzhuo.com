@@ -21,7 +21,7 @@
     "globals": "^17.4.0",
     "jiti": "^2.6.1",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.2",
+    "typescript": "^7.0.2",
     "typescript-eslint": "^8.58.1"
   },
   "dependencies": {
