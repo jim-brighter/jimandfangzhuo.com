@@ -20,9 +20,6 @@ jobs:
           aws-region: us-east-1
       - name: Checkout
         uses: actions/checkout@v6
-        with:
-          fetch-tags: true
-          fetch-depth: 0
       - name: Setup Node
         uses: actions/setup-node@v6
         with:
@@ -33,9 +30,6 @@ jobs:
           npm i
           npm run deploy
       - name: Create Release
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        uses: jim-brighter/github-release-action@v4
+        uses: jim-brighter/github-release-action@v5
         with:
-          major-version: 2
-          minor-version: 1
+          num_releases_to_keep: 10
