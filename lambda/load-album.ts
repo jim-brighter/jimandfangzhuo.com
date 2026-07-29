@@ -1,12 +1,12 @@
-import { S3Client, ListObjectsV2Command, ListObjectsV2CommandOutput } from '@aws-sdk/client-s3';
-import { Upload } from '@aws-sdk/lib-storage';
 import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
-import fs from 'fs';
-import path from 'path';
-import os from 'os';
-import { exec, execSync } from 'child_process';
-import readline from 'readline';
-import crypto from 'crypto';
+import { ListObjectsV2Command, ListObjectsV2CommandOutput, S3Client } from '@aws-sdk/client-s3';
+import { Upload } from '@aws-sdk/lib-storage';
+import { exec, execSync } from 'node:child_process';
+import * as crypto from 'node:crypto';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as readline from 'node:readline';
 
 // Initialize AWS SDK clients
 const s3 = new S3Client({ region: 'us-east-1' });

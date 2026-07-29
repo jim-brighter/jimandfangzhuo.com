@@ -1,9 +1,8 @@
-import { CognitoUserPoolsAuthorizer } from 'aws-cdk-lib/aws-apigateway';
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
 import { Stack, StackProps } from 'aws-cdk-lib/core';
 import { Construct } from 'constructs/lib/construct';
-import { CognitoUserPool, setupAuthorizer } from './backend/Cognito';
+import { CognitoUserPool } from './backend/Cognito';
 import { UserRecord } from './core/Route53';
 
 export class CognitoStack extends Stack {
