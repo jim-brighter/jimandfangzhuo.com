@@ -1,17 +1,26 @@
-// import * as cdk from 'aws-cdk-lib'
-// import { Template } from 'aws-cdk-lib/assertions'
-// import * as Cdk from '../lib/cdk-stack'
+import * as cdk from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
+import { S3BucketStack } from '../lib/s3-bucket-stack';
 
-// example test. To run these tests, uncomment this file along with the
-// example resource in lib/cdk-stack.ts
-test('SQS Queue Created', () => {
-//   const app = new cdk.App()
-//     // WHEN
-//   const stack = new Cdk.CdkStack(app, 'MyTestStack')
-//     // THEN
-//   const template = Template.fromStack(stack)
+test('S3 Buckets configured with Standard-IA transition after 30 days', () => {
+  const app = new cdk.App();
+  const stack = new S3BucketStack(app, 'TestS3BucketStack');
+  const template = Template.fromStack(stack);
 
-//   template.hasResourceProperties('AWS::SQS::Queue', {
-//     VisibilityTimeout: 300
-//   })
+  template.hasResourceProperties('AWS::S3::Bucket', {
+    LifecycleConfiguration: {
+      Rules: [
+        {
+          Status: 'Enabled',
+          ExpiredObjectDeleteMarker: true,
+          Transitions: [
+            {
+              StorageClass: 'STANDARD_IA',
+              TransitionInDays: 30
+            }
+          ]
+        }
+      ]
+    }
+  });
 });
