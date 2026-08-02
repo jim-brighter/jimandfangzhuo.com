@@ -1,5 +1,5 @@
 import { Duration, RemovalPolicy } from 'aws-cdk-lib';
-import { Bucket, BucketAccessControl, BucketEncryption, StorageClass } from 'aws-cdk-lib/aws-s3';
+import { Bucket, BucketAccessControl, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { Construct } from 'constructs';
 
 export class ImageS3Bucket extends Bucket {
@@ -19,11 +19,7 @@ export class ImageS3Bucket extends Bucket {
       lifecycleRules: [{
         enabled: true,
         expiredObjectDeleteMarker: true,
-        noncurrentVersionExpiration: Duration.days(30),
-        transitions: [{
-          storageClass: StorageClass.INFREQUENT_ACCESS,
-          transitionAfter: Duration.days(30)
-        }]
+        noncurrentVersionExpiration: Duration.days(30)
       }],
       replicationRules: [{
         deleteMarkerReplication: true,
