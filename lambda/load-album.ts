@@ -19,7 +19,7 @@ const THUMBNAILS_BUCKET = 'jimandfangzhuo.com-thumbnails-us-east-1';
 class Semaphore {
   private active = 0;
   private queue: (() => void)[] = [];
-  constructor(private max: number) {}
+  constructor(private max: number) { }
 
   async acquire(): Promise<void> {
     if (this.active < this.max) {
@@ -384,7 +384,8 @@ async function main() {
           Bucket: IMAGES_BUCKET,
           Key: `${albumName}/${destinationKey}`,
           Body: fs.createReadStream(uploadFilePath),
-          ContentType: getContentType(uploadFilePath)
+          ContentType: getContentType(uploadFilePath),
+          StorageClass: 'INTELLIGENT_TIERING'
         }
       });
       await originalUpload.done();
@@ -397,7 +398,8 @@ async function main() {
             Bucket: THUMBNAILS_BUCKET,
             Key: `${albumName}/${destinationKey}`,
             Body: fs.createReadStream(tempThumbnail),
-            ContentType: 'image/jpeg'
+            ContentType: 'image/jpeg',
+            StorageClass: 'INTELLIGENT_TIERING'
           }
         });
         await thumbnailUpload.done();
