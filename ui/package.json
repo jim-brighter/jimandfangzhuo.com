@@ -10,9 +10,9 @@
   },
   "devDependencies": {
     "typescript": "~7.0.2",
-    "vite": "^8.1.5"
+    "vite": "^8.2.0"
   },
   "dependencies": {
-    "aws-amplify": "^6.19.0"
+    "aws-amplify": "^6.20.0"
   }
 }
