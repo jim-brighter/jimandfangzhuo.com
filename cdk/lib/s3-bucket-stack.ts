@@ -1,5 +1,5 @@
 import { Stack, StackProps } from 'aws-cdk-lib/core';
-import { Construct } from 'constructs/lib/construct';
+import { Construct } from 'constructs';
 import { Region } from './constants';
 import { ImageS3Bucket } from './backend/ImageS3Bucket';
 

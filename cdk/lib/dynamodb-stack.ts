@@ -1,5 +1,5 @@
 import { Stack, StackProps } from 'aws-cdk-lib/core';
-import { Construct } from 'constructs/lib/construct';
+import { Construct } from 'constructs';
 import { DynamoTable, setupBackupPlan } from './backend/DynamoDB';
 
 export class DynamoDBStack extends Stack {
