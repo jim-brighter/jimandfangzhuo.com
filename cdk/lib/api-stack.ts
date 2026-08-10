@@ -1,7 +1,7 @@
 import { Certificate } from 'aws-cdk-lib/aws-certificatemanager';
 import { HostedZone } from 'aws-cdk-lib/aws-route53';
 import { Stack, StackProps } from 'aws-cdk-lib/core';
-import { Construct } from 'constructs/lib/construct';
+import { Construct } from 'constructs';
 import { ApiGateway } from './backend/ApiGateway';
 import { DefaultErrorLambda, NodeLambda } from './backend/Lambda';
 import { CognitoStack } from './cognito-stack';

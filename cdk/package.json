@@ -11,30 +11,30 @@
     "cdk:watch": "tsc -w",
     "cdk:test": "jest",
     "cdk": "cdk",
-    "cdk:deploy": "cdk deploy --all --require-approval never --outputs-file outputs.json",
+    "cdk:deploy": "cdk deploy --require-approval never --outputs-file outputs.json",
     "cdk:lambda:install": "cd ../lambda && npm i && cd ../cdk",
     "cdk:ui:build": "cd ../ui && npm i && npm run build && cd ../cdk",
     "deploy": "npm run cdk:lambda:install && npm run cdk:ui:build && npm run cdk:deploy",
-    "synth": "npm run cdk:lambda:install && npm run cdk:ui:build && cdk synth --all"
+    "synth": "npm run cdk:lambda:install && npm run cdk:ui:build && cdk synth"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
     "@types/node": "26.1.2",
-    "aws-cdk": "2.1133.0",
+    "aws-cdk": "2.1135.0",
     "esbuild": "^0.28.1",
     "eslint": "^10.8.0",
-    "globals": "^17.8.0",
+    "globals": "^17.9.0",
     "jest": "^30.4.2",
     "jiti": "^2.7.0",
     "ts-jest": "^29.4.12",
     "ts-node": "^10.9.2",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.65.0"
+    "typescript-eslint": "^8.66.0"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.262.1",
-    "constructs": "^10.7.1",
+    "aws-cdk-lib": "^2.263.0",
+    "constructs": "^10.8.1",
     "source-map-support": "^0.5.21"
   }
 }
