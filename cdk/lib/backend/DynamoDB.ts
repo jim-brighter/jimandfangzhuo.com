@@ -1,6 +1,6 @@
 import { RemovalPolicy } from 'aws-cdk-lib';
 import { BackupPlan, BackupResource } from 'aws-cdk-lib/aws-backup';
-import { AttributeType, BillingMode, ProjectionType, Table, TableEncryption } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, BillingMode, ProjectionType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Construct } from 'constructs';
 
 export class DynamoTable extends Table {
@@ -10,7 +10,6 @@ export class DynamoTable extends Table {
         name: partitionKeyName,
         type: AttributeType.STRING
       },
-      encryption: TableEncryption.AWS_MANAGED,
       tableName: tableName,
       removalPolicy: RemovalPolicy.DESTROY,
       billingMode: BillingMode.PAY_PER_REQUEST,
