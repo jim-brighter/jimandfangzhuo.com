@@ -21,7 +21,7 @@
     "@eslint/js": "^10.0.1",
     "@types/jest": "^30.0.0",
     "@types/node": "26.6.5",
-    "aws-cdk": "2.1146.0",
+    "aws-cdk": "2.1146.1",
     "esbuild": "^0.28.2",
     "eslint": "^10.13.0",
     "globals": "^17.13.0",
@@ -30,10 +30,10 @@
     "ts-jest": "^29.4.15",
     "ts-node": "^10.9.2",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.72.0"
+    "typescript-eslint": "^8.72.1"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.274.0",
+    "aws-cdk-lib": "^2.275.0",
     "constructs": "^10.8.1",
     "source-map-support": "^0.5.21"
   }
