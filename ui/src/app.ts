@@ -93,7 +93,7 @@ export class App {
 
   private async handleLogin(username: string, password: string) {
     try {
-      await doLogin(username, password);
+      await doLogin(username.toLowerCase(), password);
       this.loginView.setLoading(false);
       this.triggerRouteUpdate();
     } catch (error) {
